@@ -1,0 +1,9 @@
+[package]
+name = "dnssector"
+version = "0.1.0"
+authors = ["Frank Denis <github@pureftpd.org>"]
+
+[dependencies]
+clippy = {version = "~0", optional = true}
+debug_stub_derive = "*"
+error-chain = "*"
