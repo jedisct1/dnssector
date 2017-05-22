@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ParsedPacket` struct in crate `dnssector`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ParsedPacket">
+
+    <title>dnssector::parsed_packet::ParsedPacket - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct ParsedPacket</p><div class="block items"><ul><li><a href="#fields">Fields</a></li><li><a href="#methods">Methods</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='../index.html'>dnssector</a>::<wbr><a href='index.html'>parsed_packet</a></p><script>window.sidebarCurrent = {name: 'ParsedPacket', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>dnssector</a>::<wbr><a href='index.html'>parsed_packet</a>::<wbr><a class="struct" href=''>ParsedPacket</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#11-22' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct ParsedPacket {
+    pub dns_sector: <a class="struct" href="../../dnssector/dns_sector/struct.DNSSector.html" title="struct dnssector::dns_sector::DNSSector">DNSSector</a>,
+    pub offset_question: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,
+    pub offset_answers: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,
+    pub offset_nameservers: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,
+    pub offset_additional: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,
+    pub offset_edns: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,
+    pub edns_count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>,
+    pub ext_rcode: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    pub edns_version: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    pub ext_flags: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>&gt;,
+}</pre><div class='docblock'><p>A <code>ParsedPacket</code> structure contains information about a successfully parsed
+DNS packet, that allows quick access to (extended) flags and to individual sections.</p>
+</div><h2 id='fields' class='fields'>Fields</h2><span id='structfield.dns_sector' class="structfield">
+                           <span id='dns_sector.v' class='invisible'>
+                           <code>dns_sector: <a class="struct" href="../../dnssector/dns_sector/struct.DNSSector.html" title="struct dnssector::dns_sector::DNSSector">DNSSector</a></code>
+                           </span></span><span id='structfield.offset_question' class="structfield">
+                           <span id='offset_question.v' class='invisible'>
+                           <code>offset_question: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;</code>
+                           </span></span><span id='structfield.offset_answers' class="structfield">
+                           <span id='offset_answers.v' class='invisible'>
+                           <code>offset_answers: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;</code>
+                           </span></span><span id='structfield.offset_nameservers' class="structfield">
+                           <span id='offset_nameservers.v' class='invisible'>
+                           <code>offset_nameservers: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;</code>
+                           </span></span><span id='structfield.offset_additional' class="structfield">
+                           <span id='offset_additional.v' class='invisible'>
+                           <code>offset_additional: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;</code>
+                           </span></span><span id='structfield.offset_edns' class="structfield">
+                           <span id='offset_edns.v' class='invisible'>
+                           <code>offset_edns: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;</code>
+                           </span></span><span id='structfield.edns_count' class="structfield">
+                           <span id='edns_count.v' class='invisible'>
+                           <code>edns_count: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a></code>
+                           </span></span><span id='structfield.ext_rcode' class="structfield">
+                           <span id='ext_rcode.v' class='invisible'>
+                           <code>ext_rcode: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code>
+                           </span></span><span id='structfield.edns_version' class="structfield">
+                           <span id='edns_version.v' class='invisible'>
+                           <code>edns_version: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code>
+                           </span></span><span id='structfield.ext_flags' class="structfield">
+                           <span id='ext_flags.v' class='invisible'>
+                           <code>ext_flags: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>&gt;</code>
+                           </span></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#24-59' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.into_dns_sector' class="method"><span id='into_dns_sector.v' class='invisible'><code>fn <a href='#method.into_dns_sector' class='fnname'>into_dns_sector</a>(self) -&gt; <a class="struct" href="../../dnssector/dns_sector/struct.DNSSector.html" title="struct dnssector::dns_sector::DNSSector">DNSSector</a></code></span></h4>
+<div class='docblock'><p>Converts a <code>ParsedPacket</code> back into a <code>DNSSector</code>.</p>
+</div><h4 id='method.into_packet' class="method"><span id='into_packet.v' class='invisible'><code>fn <a href='#method.into_packet' class='fnname'>into_packet</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code></span></h4>
+<div class='docblock'><p>Converts a <code>ParsedPacket</code> back into a raw packet.</p>
+</div><h4 id='method.into_iter_question' class="method"><span id='into_iter_question.v' class='invisible'><code>fn <a href='#method.into_iter_question' class='fnname'>into_iter_question</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../dnssector/question_iterator/struct.QuestionIterator.html" title="struct dnssector::question_iterator::QuestionIterator">QuestionIterator</a>&gt;</code></span></h4>
+<div class='docblock'><p>Iterates over the question section.</p>
+</div><h4 id='method.into_iter_answer' class="method"><span id='into_iter_answer.v' class='invisible'><code>fn <a href='#method.into_iter_answer' class='fnname'>into_iter_answer</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="type" href="../../dnssector/response_iterator/type.AnswerIterator.html" title="type dnssector::response_iterator::AnswerIterator">AnswerIterator</a>&gt;</code></span></h4>
+<div class='docblock'><p>Iterates over the answer section.</p>
+</div><h4 id='method.into_iter_nameservers' class="method"><span id='into_iter_nameservers.v' class='invisible'><code>fn <a href='#method.into_iter_nameservers' class='fnname'>into_iter_nameservers</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="type" href="../../dnssector/response_iterator/type.NameServersIterator.html" title="type dnssector::response_iterator::NameServersIterator">NameServersIterator</a>&gt;</code></span></h4>
+<div class='docblock'><p>Iterates over the list of name servers.</p>
+</div><h4 id='method.into_iter_additional' class="method"><span id='into_iter_additional.v' class='invisible'><code>fn <a href='#method.into_iter_additional' class='fnname'>into_iter_additional</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="type" href="../../dnssector/response_iterator/type.AdditionalIterator.html" title="type dnssector::response_iterator::AdditionalIterator">AdditionalIterator</a>&gt;</code></span></h4>
+<div class='docblock'><p>Iterates over the additional section.</p>
+</div><h4 id='method.into_iter_edns' class="method"><span id='into_iter_edns.v' class='invisible'><code>fn <a href='#method.into_iter_edns' class='fnname'>into_iter_edns</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../dnssector/edns_iterator/struct.EdnsIterator.html" title="struct dnssector::edns_iterator::EdnsIterator">EdnsIterator</a>&gt;</code></span></h4>
+<div class='docblock'><p>Iterates over the records from the optional edns pseudo-section.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#10' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "dnssector";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

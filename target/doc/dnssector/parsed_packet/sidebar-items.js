@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ParsedPacket","A `ParsedPacket` structure contains information about a successfully parsed DNS packet, that allows quick access to (extended) flags and to individual sections."]]});

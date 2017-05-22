@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["derive_debug_stub","Implementation of the `#[derive(DebugStub)]` derive macro."]]});

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `constants` mod in crate `dnssector`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, constants">
+
+    <title>dnssector::constants - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc mod">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Module constants</p><div class="block items"><ul><li><a href="#enums">Enums</a></li><li><a href="#constants">Constants</a></li></ul></div><p class='location'><a href='../index.html'>dnssector</a></p><script>window.sidebarCurrent = {name: 'constants', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>dnssector</a>::<wbr><a class="mod" href=''>constants</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/dnssector/constants.rs.html#1-201' title='goto source code'>[src]</a></span></h1>
+<h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Class.html"
+                                  title='enum dnssector::constants::Class'>Class</a></td>
+                           <td class='docblock-short'>
+                                <p>DNS query class</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.EdnsOption.html"
+                                  title='enum dnssector::constants::EdnsOption'>EdnsOption</a></td>
+                           <td class='docblock-short'>
+                                <p>EDNS option</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Section.html"
+                                  title='enum dnssector::constants::Section'>Section</a></td>
+                           <td class='docblock-short'>
+                                <p>DNS packet section</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Type.html"
+                                  title='enum dnssector::constants::Type'>Type</a></td>
+                           <td class='docblock-short'>
+                                <p>DNS query type</p>
+                           </td>
+                       </tr></table><h2 id='constants' class='section-header'><a href="#constants">Constants</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_EDNS_RR_CODE_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_EDNS_RR_CODE_OFFSET'>DNS_EDNS_RR_CODE_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the extended RR code, from the beginning of an extended RR.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_EDNS_RR_HEADER_SIZE.html"
+                                  title='constant dnssector::constants::DNS_EDNS_RR_HEADER_SIZE'>DNS_EDNS_RR_HEADER_SIZE</a></td>
+                           <td class='docblock-short'>
+                                <p>Size of the header of an extended RR.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_EDNS_RR_RDLEN_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_EDNS_RR_RDLEN_OFFSET'>DNS_EDNS_RR_RDLEN_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the length of an extended RR, from the beginning of the extended RR.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_HEADER_SIZE.html"
+                                  title='constant dnssector::constants::DNS_HEADER_SIZE'>DNS_HEADER_SIZE</a></td>
+                           <td class='docblock-short'>
+                                <p>Size of the main DNS header, that includes flags and the size of each section.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_MAX_HOSTNAME_INDIRECTIONS.html"
+                                  title='constant dnssector::constants::DNS_MAX_HOSTNAME_INDIRECTIONS'>DNS_MAX_HOSTNAME_INDIRECTIONS</a></td>
+                           <td class='docblock-short'>
+                                <p>Maximum number of indirections in a compressed name.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_MAX_HOSTNAME_LEN.html"
+                                  title='constant dnssector::constants::DNS_MAX_HOSTNAME_LEN'>DNS_MAX_HOSTNAME_LEN</a></td>
+                           <td class='docblock-short'>
+                                <p>Maximum length of a host name.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_OFFSET_QUESTION.html"
+                                  title='constant dnssector::constants::DNS_OFFSET_QUESTION'>DNS_OFFSET_QUESTION</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the first (and usually only) record of the question section, from the start of the packet.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_OPT_RR_EDNS_VERSION_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_OPT_RR_EDNS_VERSION_OFFSET'>DNS_OPT_RR_EDNS_VERSION_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the edns version number, for OPT RRs.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_OPT_RR_EXT_RCODE_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_OPT_RR_EXT_RCODE_OFFSET'>DNS_OPT_RR_EXT_RCODE_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the extended rcode ,for OPT RRs.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_OPT_RR_HEADER_SIZE.html"
+                                  title='constant dnssector::constants::DNS_OPT_RR_HEADER_SIZE'>DNS_OPT_RR_HEADER_SIZE</a></td>
+                           <td class='docblock-short'>
+                                <p>Size of the header of an edns section.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_OPT_RR_MAX_PAYLOAD_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_OPT_RR_MAX_PAYLOAD_OFFSET'>DNS_OPT_RR_MAX_PAYLOAD_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the maximum payload for edns0-enabled UDP packets, for OPT RRs.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_OPT_RR_RDLEN_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_OPT_RR_RDLEN_OFFSET'>DNS_OPT_RR_RDLEN_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the total size of the edns records, within OPT RRS.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_RR_CLASS_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_RR_CLASS_OFFSET'>DNS_RR_CLASS_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the class identifier, from the location right after the RR name.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_RR_HEADER_SIZE.html"
+                                  title='constant dnssector::constants::DNS_RR_HEADER_SIZE'>DNS_RR_HEADER_SIZE</a></td>
+                           <td class='docblock-short'>
+                                <p>Size of the header for a RR in a section that is not the question section.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_RR_QUESTION_HEADER_SIZE.html"
+                                  title='constant dnssector::constants::DNS_RR_QUESTION_HEADER_SIZE'>DNS_RR_QUESTION_HEADER_SIZE</a></td>
+                           <td class='docblock-short'>
+                                <p>Size of the header for a RR in the question section.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_RR_RDLEN_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_RR_RDLEN_OFFSET'>DNS_RR_RDLEN_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the rdata length, from the location right after the RR name.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_RR_TTL_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_RR_TTL_OFFSET'>DNS_RR_TTL_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the TTL, from the location right after the RR name.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_RR_TYPE_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_RR_TYPE_OFFSET'>DNS_RR_TYPE_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the type identifier, from the location right after the RR name.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "dnssector";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

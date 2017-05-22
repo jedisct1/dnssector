@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ast` mod in crate `cpp_demangle`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ast">
+
+    <title>cpp_demangle::ast - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc mod">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Module ast</p><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li></ul></div><p class='location'><a href='../index.html'>cpp_demangle</a></p><script>window.sidebarCurrent = {name: 'ast', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>cpp_demangle</a>::<wbr><a class="mod" href=''>ast</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/cpp_demangle/ast.rs.html#1-8708' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Abstract syntax tree types for mangled symbols.</p>
+</div><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.ArgScopeStack.html"
+                                  title='struct cpp_demangle::ast::ArgScopeStack'>ArgScopeStack</a></td>
+                           <td class='docblock-short'>
+                                <p>An <code>ArgScopeStack</code> represents the current function and template demangling
+scope we are within. As we enter new demangling scopes, we construct new
+<code>ArgScopeStack</code>s whose <code>prev</code> references point back to the old ones. These
+<code>ArgScopeStack</code>s are kept on the native stack, and as functions return, they
+go out of scope and we use the previous <code>ArgScopeStack</code>s again.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.BareFunctionType.html"
+                                  title='struct cpp_demangle::ast::BareFunctionType'>BareFunctionType</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;bare-function-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.ClosureTypeName.html"
+                                  title='struct cpp_demangle::ast::ClosureTypeName'>ClosureTypeName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;closure-type-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.CvQualifiers.html"
+                                  title='struct cpp_demangle::ast::CvQualifiers'>CvQualifiers</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;CV-qualifiers&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.DataMemberPrefix.html"
+                                  title='struct cpp_demangle::ast::DataMemberPrefix'>DataMemberPrefix</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;data-member-prefix&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Discriminator.html"
+                                  title='struct cpp_demangle::ast::Discriminator'>Discriminator</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;discriminator&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.FunctionParam.html"
+                                  title='struct cpp_demangle::ast::FunctionParam'>FunctionParam</a></td>
+                           <td class='docblock-short'>
+                                <p>The <function-param> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.FunctionType.html"
+                                  title='struct cpp_demangle::ast::FunctionType'>FunctionType</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;function-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Identifier.html"
+                                  title='struct cpp_demangle::ast::Identifier'>Identifier</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;identifier&gt;</code> pseudo-terminal.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.Initializer.html"
+                                  title='struct cpp_demangle::ast::Initializer'>Initializer</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;initializer&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.LambdaSig.html"
+                                  title='struct cpp_demangle::ast::LambdaSig'>LambdaSig</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;lambda-sig&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.NestedName.html"
+                                  title='struct cpp_demangle::ast::NestedName'>NestedName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;nested-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.NvOffset.html"
+                                  title='struct cpp_demangle::ast::NvOffset'>NvOffset</a></td>
+                           <td class='docblock-short'>
+                                <p>A non-virtual offset, as described by the <nv-offset> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.ParseContext.html"
+                                  title='struct cpp_demangle::ast::ParseContext'>ParseContext</a></td>
+                           <td class='docblock-short'>
+                                <p>Common context needed when parsing.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.PointerToMemberType.html"
+                                  title='struct cpp_demangle::ast::PointerToMemberType'>PointerToMemberType</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;pointer-to-member-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.QualifiedBuiltin.html"
+                                  title='struct cpp_demangle::ast::QualifiedBuiltin'>QualifiedBuiltin</a></td>
+                           <td class='docblock-short'>
+                                <p>A built-in type with CV-qualifiers.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.SeqId.html"
+                                  title='struct cpp_demangle::ast::SeqId'>SeqId</a></td>
+                           <td class='docblock-short'>
+                                <p>A <seq-id> production encoding a base-36 positive number.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.SimpleId.html"
+                                  title='struct cpp_demangle::ast::SimpleId'>SimpleId</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;simple-id&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.SourceName.html"
+                                  title='struct cpp_demangle::ast::SourceName'>SourceName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;source-name&gt;</code> non-terminal.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TemplateArgs.html"
+                                  title='struct cpp_demangle::ast::TemplateArgs'>TemplateArgs</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;template-args&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TemplateParam.html"
+                                  title='struct cpp_demangle::ast::TemplateParam'>TemplateParam</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;template-param&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.TemplateTemplateParam.html"
+                                  title='struct cpp_demangle::ast::TemplateTemplateParam'>TemplateTemplateParam</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;template-template-param&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.UnnamedTypeName.html"
+                                  title='struct cpp_demangle::ast::UnnamedTypeName'>UnnamedTypeName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;unnamed-type-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.UnresolvedQualifierLevel.html"
+                                  title='struct cpp_demangle::ast::UnresolvedQualifierLevel'>UnresolvedQualifierLevel</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;unresolved-qualifier-level&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.UnscopedTemplateName.html"
+                                  title='struct cpp_demangle::ast::UnscopedTemplateName'>UnscopedTemplateName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;unscoped-template-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="struct" href="struct.VOffset.html"
+                                  title='struct cpp_demangle::ast::VOffset'>VOffset</a></td>
+                           <td class='docblock-short'>
+                                <p>A virtual offset, as described by the <v-offset> production.</p>
+                           </td>
+                       </tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
+<table>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.ArrayType.html"
+                                  title='enum cpp_demangle::ast::ArrayType'>ArrayType</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;array-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.BaseUnresolvedName.html"
+                                  title='enum cpp_demangle::ast::BaseUnresolvedName'>BaseUnresolvedName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;base-unresolved-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.BuiltinType.html"
+                                  title='enum cpp_demangle::ast::BuiltinType'>BuiltinType</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;builtin-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.CallOffset.html"
+                                  title='enum cpp_demangle::ast::CallOffset'>CallOffset</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;call-offset&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.ClassEnumType.html"
+                                  title='enum cpp_demangle::ast::ClassEnumType'>ClassEnumType</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;class-enum-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.CtorDtorName.html"
+                                  title='enum cpp_demangle::ast::CtorDtorName'>CtorDtorName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;ctor-dtor-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Decltype.html"
+                                  title='enum cpp_demangle::ast::Decltype'>Decltype</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;decltype&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.DestructorName.html"
+                                  title='enum cpp_demangle::ast::DestructorName'>DestructorName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;destructor-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Encoding.html"
+                                  title='enum cpp_demangle::ast::Encoding'>Encoding</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;encoding&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.ExprPrimary.html"
+                                  title='enum cpp_demangle::ast::ExprPrimary'>ExprPrimary</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;expr-primary&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Expression.html"
+                                  title='enum cpp_demangle::ast::Expression'>Expression</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;expression&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.LocalName.html"
+                                  title='enum cpp_demangle::ast::LocalName'>LocalName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;local-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.MangledName.html"
+                                  title='enum cpp_demangle::ast::MangledName'>MangledName</a></td>
+                           <td class='docblock-short'>
+                                <p>The root AST node, and starting production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Name.html"
+                                  title='enum cpp_demangle::ast::Name'>Name</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.OperatorName.html"
+                                  title='enum cpp_demangle::ast::OperatorName'>OperatorName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;operator-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Prefix.html"
+                                  title='enum cpp_demangle::ast::Prefix'>Prefix</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;prefix&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.PrefixHandle.html"
+                                  title='enum cpp_demangle::ast::PrefixHandle'>PrefixHandle</a></td>
+                           <td class='docblock-short'>
+                                <p>A reference to a parsed <code>&lt;prefix&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.RefQualifier.html"
+                                  title='enum cpp_demangle::ast::RefQualifier'>RefQualifier</a></td>
+                           <td class='docblock-short'>
+                                <p>A <ref-qualifier> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.SimpleOperatorName.html"
+                                  title='enum cpp_demangle::ast::SimpleOperatorName'>SimpleOperatorName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;simple-operator-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.SpecialName.html"
+                                  title='enum cpp_demangle::ast::SpecialName'>SpecialName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;special-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.StandardBuiltinType.html"
+                                  title='enum cpp_demangle::ast::StandardBuiltinType'>StandardBuiltinType</a></td>
+                           <td class='docblock-short'>
+                                <p>A one of the standard variants of the <builtin-type> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Substitution.html"
+                                  title='enum cpp_demangle::ast::Substitution'>Substitution</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;substitution&gt;</code> form: a back-reference to some component we&#39;ve already
+parsed.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.TemplateArg.html"
+                                  title='enum cpp_demangle::ast::TemplateArg'>TemplateArg</a></td>
+                           <td class='docblock-short'>
+                                <p>A <template-arg> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.TemplateTemplateParamHandle.html"
+                                  title='enum cpp_demangle::ast::TemplateTemplateParamHandle'>TemplateTemplateParamHandle</a></td>
+                           <td class='docblock-short'>
+                                <p>A reference to a parsed <code>TemplateTemplateParam</code>.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Type.html"
+                                  title='enum cpp_demangle::ast::Type'>Type</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.TypeHandle.html"
+                                  title='enum cpp_demangle::ast::TypeHandle'>TypeHandle</a></td>
+                           <td class='docblock-short'>
+                                <p>A reference to a parsed <code>Type</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.UnqualifiedName.html"
+                                  title='enum cpp_demangle::ast::UnqualifiedName'>UnqualifiedName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;unqualified-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.UnresolvedName.html"
+                                  title='enum cpp_demangle::ast::UnresolvedName'>UnresolvedName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;unresolved-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.UnresolvedType.html"
+                                  title='enum cpp_demangle::ast::UnresolvedType'>UnresolvedType</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;unresolved-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.UnresolvedTypeHandle.html"
+                                  title='enum cpp_demangle::ast::UnresolvedTypeHandle'>UnresolvedTypeHandle</a></td>
+                           <td class='docblock-short'>
+                                <p>A reference to a parsed <code>&lt;unresolved-type&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.UnscopedName.html"
+                                  title='enum cpp_demangle::ast::UnscopedName'>UnscopedName</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;unscoped-name&gt;</code> production.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.UnscopedTemplateNameHandle.html"
+                                  title='enum cpp_demangle::ast::UnscopedTemplateNameHandle'>UnscopedTemplateNameHandle</a></td>
+                           <td class='docblock-short'>
+                                <p>A handle to an <code>UnscopedTemplateName</code>.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.WellKnownComponent.html"
+                                  title='enum cpp_demangle::ast::WellKnownComponent'>WellKnownComponent</a></td>
+                           <td class='docblock-short'>
+                                <p>The <code>&lt;substitution&gt;</code> variants that are encoded directly in the grammar,
+rather than as back references to other components in the substitution
+table.</p>
+                           </td>
+                       </tr></table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "cpp_demangle";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

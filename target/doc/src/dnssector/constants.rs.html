@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="Source to the Rust file `src/constants.rs`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang">
+
+    <title>constants.rs.html -- source</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc source">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+</pre><pre class="rust ">
+<span class="attribute">#<span class="op">!</span>[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">From</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
+
+<span class="doccomment">/// Size of the main DNS header, that includes flags and the size of each section.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">12</span>;
+
+<span class="doccomment">/// Offset to the first (and usually only) record of the question section, from the start of the packet.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OFFSET_QUESTION</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">DNS_HEADER_SIZE</span>;
+
+<span class="doccomment">/// Maximum length of a host name.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_MAX_HOSTNAME_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">255</span>;
+
+<span class="doccomment">/// Maximum number of indirections in a compressed name.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_MAX_HOSTNAME_INDIRECTIONS</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">16</span>;
+
+<span class="doccomment">/// Size of the header for a RR in the question section.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_RR_QUESTION_HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+
+<span class="doccomment">/// Size of the header for a RR in a section that is not the question section.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_RR_HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
+
+<span class="doccomment">/// Offset to the type identifier, from the location right after the RR name.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_RR_TYPE_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+
+<span class="doccomment">/// Offset to the class identifier, from the location right after the RR name.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_RR_CLASS_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
+
+<span class="doccomment">/// Offset to the TTL, from the location right after the RR name.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_RR_TTL_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+
+<span class="doccomment">/// Offset to the rdata length, from the location right after the RR name.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_RR_RDLEN_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+
+<span class="doccomment">/// Offset to the maximum payload for edns0-enabled UDP packets, for OPT RRs.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_MAX_PAYLOAD_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
+
+<span class="doccomment">/// Offset to the extended rcode ,for OPT RRs.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_EXT_RCODE_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+
+<span class="doccomment">/// Offset to the edns version number, for OPT RRs.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_EDNS_VERSION_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
+
+<span class="doccomment">/// Offset to the total size of the edns records, within OPT RRS.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_RDLEN_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
+
+<span class="doccomment">/// Size of the header of an edns section.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">10</span>;
+
+<span class="doccomment">/// Offset to the extended RR code, from the beginning of an extended RR.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_EDNS_RR_CODE_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+
+<span class="doccomment">/// Offset to the length of an extended RR, from the beginning of the extended RR.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_EDNS_RR_RDLEN_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
+
+<span class="doccomment">/// Size of the header of an extended RR.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_EDNS_RR_HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+
+<span class="doccomment">/// DNS query class</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Class</span> {
+    <span class="ident">IN</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">CH</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">HS</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">NONE</span> <span class="op">=</span> <span class="number">254</span>,
+    <span class="ident">ANY</span> <span class="op">=</span> <span class="number">255</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Class</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Class</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
+        <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>) }
+    }
+}
+
+<span class="doccomment">/// DNS query type</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Type</span> {
+    <span class="ident">A</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">NS</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">MD</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">MF</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">CNAME</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="ident">SOA</span> <span class="op">=</span> <span class="number">6</span>,
+    <span class="ident">MB</span> <span class="op">=</span> <span class="number">7</span>,
+    <span class="ident">MG</span> <span class="op">=</span> <span class="number">8</span>,
+    <span class="ident">MR</span> <span class="op">=</span> <span class="number">9</span>,
+    <span class="ident">NULL</span> <span class="op">=</span> <span class="number">10</span>,
+    <span class="ident">WKS</span> <span class="op">=</span> <span class="number">11</span>,
+    <span class="ident">PTR</span> <span class="op">=</span> <span class="number">12</span>,
+    <span class="ident">HINFO</span> <span class="op">=</span> <span class="number">13</span>,
+    <span class="ident">MINFO</span> <span class="op">=</span> <span class="number">14</span>,
+    <span class="ident">MX</span> <span class="op">=</span> <span class="number">15</span>,
+    <span class="ident">TXT</span> <span class="op">=</span> <span class="number">16</span>,
+    <span class="ident">RP</span> <span class="op">=</span> <span class="number">17</span>,
+    <span class="ident">AFSDB</span> <span class="op">=</span> <span class="number">18</span>,
+    <span class="ident">X25</span> <span class="op">=</span> <span class="number">19</span>,
+    <span class="ident">ISDN</span> <span class="op">=</span> <span class="number">20</span>,
+    <span class="ident">RT</span> <span class="op">=</span> <span class="number">21</span>,
+    <span class="ident">NSAP</span> <span class="op">=</span> <span class="number">22</span>,
+    <span class="ident">NSAP_PTR</span> <span class="op">=</span> <span class="number">23</span>,
+    <span class="ident">SIG</span> <span class="op">=</span> <span class="number">24</span>,
+    <span class="ident">KEY</span> <span class="op">=</span> <span class="number">25</span>,
+    <span class="ident">PX</span> <span class="op">=</span> <span class="number">26</span>,
+    <span class="ident">GPOS</span> <span class="op">=</span> <span class="number">27</span>,
+    <span class="ident">AAAA</span> <span class="op">=</span> <span class="number">28</span>,
+    <span class="ident">LOC</span> <span class="op">=</span> <span class="number">29</span>,
+    <span class="ident">NXT</span> <span class="op">=</span> <span class="number">30</span>,
+    <span class="ident">EID</span> <span class="op">=</span> <span class="number">31</span>,
+    <span class="ident">NIMLOC</span> <span class="op">=</span> <span class="number">32</span>,
+    <span class="ident">SRV</span> <span class="op">=</span> <span class="number">33</span>,
+    <span class="ident">ATMA</span> <span class="op">=</span> <span class="number">34</span>,
+    <span class="ident">NAPTR</span> <span class="op">=</span> <span class="number">35</span>,
+    <span class="ident">KX</span> <span class="op">=</span> <span class="number">36</span>,
+    <span class="ident">CERT</span> <span class="op">=</span> <span class="number">37</span>,
+    <span class="ident">A6</span> <span class="op">=</span> <span class="number">38</span>,
+    <span class="ident">DNAME</span> <span class="op">=</span> <span class="number">39</span>,
+    <span class="ident">SINK</span> <span class="op">=</span> <span class="number">40</span>,
+    <span class="ident">OPT</span> <span class="op">=</span> <span class="number">41</span>,
+    <span class="ident">APL</span> <span class="op">=</span> <span class="number">42</span>,
+    <span class="ident">DS</span> <span class="op">=</span> <span class="number">43</span>,
+    <span class="ident">SSHFP</span> <span class="op">=</span> <span class="number">44</span>, <span class="comment">/* RFC 4255 */</span>
+    <span class="ident">IPSECKEY</span> <span class="op">=</span> <span class="number">45</span>, <span class="comment">/* RFC 4025 */</span>
+    <span class="ident">RRSIG</span> <span class="op">=</span> <span class="number">46</span>, <span class="comment">/* RFC 4034 */</span>
+    <span class="ident">NSEC</span> <span class="op">=</span> <span class="number">47</span>, <span class="comment">/* RFC 4034 */</span>
+    <span class="ident">DNSKEY</span> <span class="op">=</span> <span class="number">48</span>, <span class="comment">/* RFC 4034 */</span>
+    <span class="ident">DHCID</span> <span class="op">=</span> <span class="number">49</span>, <span class="comment">/* RFC 4701 */</span>
+    <span class="ident">NSEC3</span> <span class="op">=</span> <span class="number">50</span>, <span class="comment">/* RFC 5155 */</span>
+    <span class="ident">NSEC3PARAM</span> <span class="op">=</span> <span class="number">51</span>, <span class="comment">/* RFC 5155 */</span>
+    <span class="ident">TLSA</span> <span class="op">=</span> <span class="number">52</span>, <span class="comment">/* RFC 6698 */</span>
+    <span class="ident">SMIMEA</span> <span class="op">=</span> <span class="number">53</span>, <span class="comment">/* draft-ietf-dane-smime */</span>
+    <span class="ident">HIP</span> <span class="op">=</span> <span class="number">55</span>, <span class="comment">/* RFC 5205 */</span>
+    <span class="ident">NINFO</span> <span class="op">=</span> <span class="number">56</span>,
+    <span class="ident">RKEY</span> <span class="op">=</span> <span class="number">57</span>,
+    <span class="ident">TALINK</span> <span class="op">=</span> <span class="number">58</span>,
+    <span class="ident">CDS</span> <span class="op">=</span> <span class="number">59</span>, <span class="comment">/* RFC 7344 */</span>
+    <span class="ident">CDNSKEY</span> <span class="op">=</span> <span class="number">60</span>, <span class="comment">/* RFC 7344 */</span>
+    <span class="ident">OPENPGPKEY</span> <span class="op">=</span> <span class="number">61</span>, <span class="comment">/* RFC 7929 */</span>
+    <span class="ident">CSYNC</span> <span class="op">=</span> <span class="number">62</span>, <span class="comment">/* RFC 7477 */</span>
+    <span class="ident">SPF</span> <span class="op">=</span> <span class="number">99</span>, <span class="comment">/* RFC 4408 */</span>
+    <span class="ident">UINFO</span> <span class="op">=</span> <span class="number">100</span>,
+    <span class="ident">UID</span> <span class="op">=</span> <span class="number">101</span>,
+    <span class="ident">GID</span> <span class="op">=</span> <span class="number">102</span>,
+    <span class="ident">UNSPEC</span> <span class="op">=</span> <span class="number">103</span>,
+    <span class="ident">NID</span> <span class="op">=</span> <span class="number">104</span>, <span class="comment">/* RFC 6742 */</span>
+    <span class="ident">L32</span> <span class="op">=</span> <span class="number">105</span>, <span class="comment">/* RFC 6742 */</span>
+    <span class="ident">L64</span> <span class="op">=</span> <span class="number">106</span>, <span class="comment">/* RFC 6742 */</span>
+    <span class="ident">LP</span> <span class="op">=</span> <span class="number">107</span>, <span class="comment">/* RFC 6742 */</span>
+    <span class="ident">EUI48</span> <span class="op">=</span> <span class="number">108</span>, <span class="comment">/* RFC 7043 */</span>
+    <span class="ident">EUI64</span> <span class="op">=</span> <span class="number">109</span>, <span class="comment">/* RFC 7043 */</span>
+    <span class="ident">TKEY</span> <span class="op">=</span> <span class="number">249</span>, <span class="comment">/* RFC 2930 */</span>
+    <span class="ident">TSIG</span> <span class="op">=</span> <span class="number">250</span>,
+    <span class="ident">IXFR</span> <span class="op">=</span> <span class="number">251</span>,
+    <span class="ident">AXFR</span> <span class="op">=</span> <span class="number">252</span>,
+    <span class="ident">MAILB</span> <span class="op">=</span> <span class="number">253</span>,
+    <span class="ident">MAILA</span> <span class="op">=</span> <span class="number">254</span>,
+    <span class="ident">ANY</span> <span class="op">=</span> <span class="number">255</span>,
+    <span class="ident">URI</span> <span class="op">=</span> <span class="number">256</span>, <span class="comment">/* RFC 7553 */</span>
+    <span class="ident">CAA</span> <span class="op">=</span> <span class="number">257</span>, <span class="comment">/* RFC 6844 */</span>
+    <span class="ident">AVC</span> <span class="op">=</span> <span class="number">258</span>, <span class="comment">/* Cisco&#39;s DNS-AS RR, see www.dns-as.org */</span>
+    <span class="ident">TA</span> <span class="op">=</span> <span class="number">32768</span>,
+    <span class="ident">DLV</span> <span class="op">=</span> <span class="number">32769</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Type</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
+        <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>) }
+    }
+}
+
+<span class="doccomment">/// EDNS option</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EdnsOption</span> {
+    <span class="ident">LLQ</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">UL</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">NSID</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">DAU</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="ident">DHU</span> <span class="op">=</span> <span class="number">6</span>,
+    <span class="ident">N3U</span> <span class="op">=</span> <span class="number">7</span>,
+    <span class="ident">CLIENT_SUBNET</span> <span class="op">=</span> <span class="number">8</span>,
+    <span class="ident">KEEPALIVE</span> <span class="op">=</span> <span class="number">11</span>,
+    <span class="ident">PADDING</span> <span class="op">=</span> <span class="number">12</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EdnsOption</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">EdnsOption</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
+        <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>) }
+    }
+}
+
+<span class="doccomment">/// DNS packet section</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Section</span> {
+    <span class="ident">Question</span>,
+    <span class="ident">Answer</span>,
+    <span class="ident">NameServers</span>,
+    <span class="ident">Additional</span>,
+    <span class="ident">Edns</span>,
+}
+</pre>
+</section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "dnssector";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

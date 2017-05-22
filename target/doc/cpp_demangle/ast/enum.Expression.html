@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Expression` enum in crate `cpp_demangle`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Expression">
+
+    <title>cpp_demangle::ast::Expression - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc enum">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Enum Expression</p><div class="block items"><ul><li><a href="#variants">Variants</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='../index.html'>cpp_demangle</a>::<wbr><a href='index.html'>ast</a></p><script>window.sidebarCurrent = {name: 'Expression', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>cpp_demangle</a>::<wbr><a href='index.html'>ast</a>::<wbr><a class="enum" href=''>Expression</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/cpp_demangle/ast.rs.html#3621-3749' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Expression {
+    Unary(<a class="enum" href="../../cpp_demangle/ast/enum.OperatorName.html" title="enum cpp_demangle::ast::OperatorName">OperatorName</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    Binary(<a class="enum" href="../../cpp_demangle/ast/enum.OperatorName.html" title="enum cpp_demangle::ast::OperatorName">OperatorName</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    Ternary(<a class="enum" href="../../cpp_demangle/ast/enum.OperatorName.html" title="enum cpp_demangle::ast::OperatorName">OperatorName</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    PrefixInc(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    PrefixDec(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    Call(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    ConversionOne(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    ConversionMany(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    ConversionBraced(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    BracedInitList(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    New(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;),
+    GlobalNew(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;),
+    NewArray(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;),
+    GlobalNewArray(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;),
+    Delete(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    GlobalDelete(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    DeleteArray(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    GlobalDeleteArray(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    DynamicCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    StaticCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    ConstCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    ReinterpretCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    TypeidType(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>),
+    TypeidExpr(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    SizeofType(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>),
+    SizeofExpr(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    AlignofType(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>),
+    AlignofExpr(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    Noexcept(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    TemplateParam(<a class="struct" href="../../cpp_demangle/ast/struct.TemplateParam.html" title="struct cpp_demangle::ast::TemplateParam">TemplateParam</a>),
+    FunctionParam(<a class="struct" href="../../cpp_demangle/ast/struct.FunctionParam.html" title="struct cpp_demangle::ast::FunctionParam">FunctionParam</a>),
+    Member(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.UnresolvedName.html" title="enum cpp_demangle::ast::UnresolvedName">UnresolvedName</a>),
+    DerefMember(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.UnresolvedName.html" title="enum cpp_demangle::ast::UnresolvedName">UnresolvedName</a>),
+    PointerToMember(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    SizeofTemplatePack(<a class="struct" href="../../cpp_demangle/ast/struct.TemplateParam.html" title="struct cpp_demangle::ast::TemplateParam">TemplateParam</a>),
+    SizeofFunctionPack(<a class="struct" href="../../cpp_demangle/ast/struct.FunctionParam.html" title="struct cpp_demangle::ast::FunctionParam">FunctionParam</a>),
+    SizeofCapturedTemplatePack(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.TemplateArg.html" title="enum cpp_demangle::ast::TemplateArg">TemplateArg</a>&gt;),
+    PackExpansion(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    Throw(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;),
+    Rethrow,
+    UnresolvedName(<a class="enum" href="../../cpp_demangle/ast/enum.UnresolvedName.html" title="enum cpp_demangle::ast::UnresolvedName">UnresolvedName</a>),
+    Primary(<a class="enum" href="../../cpp_demangle/ast/enum.ExprPrimary.html" title="enum cpp_demangle::ast::ExprPrimary">ExprPrimary</a>),
+}</pre><div class='docblock'><p>The <code>&lt;expression&gt;</code> production.</p>
+
+<pre><code class="language-text"> &lt;expression&gt; ::= &lt;unary operator-name&gt; &lt;expression&gt;
+              ::= &lt;binary operator-name&gt; &lt;expression&gt; &lt;expression&gt;
+              ::= &lt;ternary operator-name&gt; &lt;expression&gt; &lt;expression&gt; &lt;expression&gt;
+              ::= pp_ &lt;expression&gt;                             # prefix ++
+              ::= mm_ &lt;expression&gt;                             # prefix --
+              ::= cl &lt;expression&gt;+ E                           # expression (expr-list), call
+              ::= cv &lt;type&gt; &lt;expression&gt;                       # type (expression), conversion with one argument
+              ::= cv &lt;type&gt; _ &lt;expression&gt;* E                  # type (expr-list), conversion with other than one argument
+              ::= tl &lt;type&gt; &lt;expression&gt;* E                    # type {expr-list}, conversion with braced-init-list argument
+              ::= il &lt;expression&gt; E                            # {expr-list}, braced-init-list in any other context
+              ::= [gs] nw &lt;expression&gt;* _ &lt;type&gt; E             # new (expr-list) type
+              ::= [gs] nw &lt;expression&gt;* _ &lt;type&gt; &lt;initializer&gt; # new (expr-list) type (init)
+              ::= [gs] na &lt;expression&gt;* _ &lt;type&gt; E             # new[] (expr-list) type
+              ::= [gs] na &lt;expression&gt;* _ &lt;type&gt; &lt;initializer&gt; # new[] (expr-list) type (init)
+              ::= [gs] dl &lt;expression&gt;                         # delete expression
+              ::= [gs] da &lt;expression&gt;                         # delete[] expression
+              ::= dc &lt;type&gt; &lt;expression&gt;                       # dynamic_cast&lt;type&gt; (expression)
+              ::= sc &lt;type&gt; &lt;expression&gt;                       # static_cast&lt;type&gt; (expression)
+              ::= cc &lt;type&gt; &lt;expression&gt;                       # const_cast&lt;type&gt; (expression)
+              ::= rc &lt;type&gt; &lt;expression&gt;                       # reinterpret_cast&lt;type&gt; (expression)
+              ::= ti &lt;type&gt;                                    # typeid (type)
+              ::= te &lt;expression&gt;                              # typeid (expression)
+              ::= st &lt;type&gt;                                    # sizeof (type)
+              ::= sz &lt;expression&gt;                              # sizeof (expression)
+              ::= at &lt;type&gt;                                    # alignof (type)
+              ::= az &lt;expression&gt;                              # alignof (expression)
+              ::= nx &lt;expression&gt;                              # noexcept (expression)
+              ::= &lt;template-param&gt;
+              ::= &lt;function-param&gt;
+              ::= dt &lt;expression&gt; &lt;unresolved-name&gt;            # expr.name
+              ::= pt &lt;expression&gt; &lt;unresolved-name&gt;            # expr-&gt;name
+              ::= ds &lt;expression&gt; &lt;expression&gt;                 # expr.*expr
+              ::= sZ &lt;template-param&gt;                          # sizeof...(T), size of a template parameter pack
+              ::= sZ &lt;function-param&gt;                          # sizeof...(parameter), size of a function parameter pack
+              ::= sP &lt;template-arg&gt;* E                         # sizeof...(T), size of a captured template parameter pack from an alias template
+              ::= sp &lt;expression&gt;                              # expression..., pack expansion
+              ::= tw &lt;expression&gt;                              # throw expression
+              ::= tr                                           # throw with no operand (rethrow)
+              ::= &lt;unresolved-name&gt;                            # f(p), N::f(p), ::f(p),
+                                                               # freestanding dependent name (e.g., T::x),
+                                                               # objectless nonstatic member reference
+              ::= &lt;expr-primary&gt;
+</code></pre>
+</div><h2 id='variants' class='variants'>Variants</h2>
+<span id='variant.Unary' class='variant'><span id='Unary.v' class='invisible'><code>Unary(<a class="enum" href="../../cpp_demangle/ast/enum.OperatorName.html" title="enum cpp_demangle::ast::OperatorName">OperatorName</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A unary operator expression.</p>
+</div><span id='variant.Binary' class='variant'><span id='Binary.v' class='invisible'><code>Binary(<a class="enum" href="../../cpp_demangle/ast/enum.OperatorName.html" title="enum cpp_demangle::ast::OperatorName">OperatorName</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A binary operator expression.</p>
+</div><span id='variant.Ternary' class='variant'><span id='Ternary.v' class='invisible'><code>Ternary(<a class="enum" href="../../cpp_demangle/ast/enum.OperatorName.html" title="enum cpp_demangle::ast::OperatorName">OperatorName</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A ternary operator expression.</p>
+</div><span id='variant.PrefixInc' class='variant'><span id='PrefixInc.v' class='invisible'><code>PrefixInc(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A prefix <code>++</code>.</p>
+</div><span id='variant.PrefixDec' class='variant'><span id='PrefixDec.v' class='invisible'><code>PrefixDec(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A prefix <code>--</code>.</p>
+</div><span id='variant.Call' class='variant'><span id='Call.v' class='invisible'><code>Call(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A call with functor and arguments.</p>
+</div><span id='variant.ConversionOne' class='variant'><span id='ConversionOne.v' class='invisible'><code>ConversionOne(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A type conversion with one argument.</p>
+</div><span id='variant.ConversionMany' class='variant'><span id='ConversionMany.v' class='invisible'><code>ConversionMany(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A type conversion with many arguments.</p>
+</div><span id='variant.ConversionBraced' class='variant'><span id='ConversionBraced.v' class='invisible'><code>ConversionBraced(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A type conversion with many arguments.</p>
+</div><span id='variant.BracedInitList' class='variant'><span id='BracedInitList.v' class='invisible'><code>BracedInitList(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>A braced init list expression.</p>
+</div><span id='variant.New' class='variant'><span id='New.v' class='invisible'><code>New(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;)</code></span></span><div class='docblock'><p>The <code>new</code> operator.</p>
+</div><span id='variant.GlobalNew' class='variant'><span id='GlobalNew.v' class='invisible'><code>GlobalNew(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;)</code></span></span><div class='docblock'><p>The global <code>::new</code> operator.</p>
+</div><span id='variant.NewArray' class='variant'><span id='NewArray.v' class='invisible'><code>NewArray(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;)</code></span></span><div class='docblock'><p>The <code>new[]</code> operator.</p>
+</div><span id='variant.GlobalNewArray' class='variant'><span id='GlobalNewArray.v' class='invisible'><code>GlobalNewArray(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../cpp_demangle/ast/struct.Initializer.html" title="struct cpp_demangle::ast::Initializer">Initializer</a>&gt;)</code></span></span><div class='docblock'><p>The global <code>::new[]</code> operator.</p>
+</div><span id='variant.Delete' class='variant'><span id='Delete.v' class='invisible'><code>Delete(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>The <code>delete</code> operator.</p>
+</div><span id='variant.GlobalDelete' class='variant'><span id='GlobalDelete.v' class='invisible'><code>GlobalDelete(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>The global <code>::delete</code> operator.</p>
+</div><span id='variant.DeleteArray' class='variant'><span id='DeleteArray.v' class='invisible'><code>DeleteArray(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>The <code>delete[]</code> operator.</p>
+</div><span id='variant.GlobalDeleteArray' class='variant'><span id='GlobalDeleteArray.v' class='invisible'><code>GlobalDeleteArray(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p>The global <code>::delete[]</code> operator.</p>
+</div><span id='variant.DynamicCast' class='variant'><span id='DynamicCast.v' class='invisible'><code>DynamicCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>dynamic_cast&lt;type&gt; (expression)</code></p>
+</div><span id='variant.StaticCast' class='variant'><span id='StaticCast.v' class='invisible'><code>StaticCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>static_cast&lt;type&gt; (expression)</code></p>
+</div><span id='variant.ConstCast' class='variant'><span id='ConstCast.v' class='invisible'><code>ConstCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>const_cast&lt;type&gt; (expression)</code></p>
+</div><span id='variant.ReinterpretCast' class='variant'><span id='ReinterpretCast.v' class='invisible'><code>ReinterpretCast(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>reinterpret_cast&lt;type&gt; (expression)</code></p>
+</div><span id='variant.TypeidType' class='variant'><span id='TypeidType.v' class='invisible'><code>TypeidType(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>)</code></span></span><div class='docblock'><p><code>typeid (type)</code></p>
+</div><span id='variant.TypeidExpr' class='variant'><span id='TypeidExpr.v' class='invisible'><code>TypeidExpr(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>typeid (expression)</code></p>
+</div><span id='variant.SizeofType' class='variant'><span id='SizeofType.v' class='invisible'><code>SizeofType(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>)</code></span></span><div class='docblock'><p><code>sizeof (type)</code></p>
+</div><span id='variant.SizeofExpr' class='variant'><span id='SizeofExpr.v' class='invisible'><code>SizeofExpr(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>sizeof (expression)</code></p>
+</div><span id='variant.AlignofType' class='variant'><span id='AlignofType.v' class='invisible'><code>AlignofType(<a class="enum" href="../../cpp_demangle/ast/enum.TypeHandle.html" title="enum cpp_demangle::ast::TypeHandle">TypeHandle</a>)</code></span></span><div class='docblock'><p><code>alignof (type)</code></p>
+</div><span id='variant.AlignofExpr' class='variant'><span id='AlignofExpr.v' class='invisible'><code>AlignofExpr(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>alignof (expression)</code></p>
+</div><span id='variant.Noexcept' class='variant'><span id='Noexcept.v' class='invisible'><code>Noexcept(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>noexcept (expression)</code></p>
+</div><span id='variant.TemplateParam' class='variant'><span id='TemplateParam.v' class='invisible'><code>TemplateParam(<a class="struct" href="../../cpp_demangle/ast/struct.TemplateParam.html" title="struct cpp_demangle::ast::TemplateParam">TemplateParam</a>)</code></span></span><div class='docblock'><p>A named template parameter.</p>
+</div><span id='variant.FunctionParam' class='variant'><span id='FunctionParam.v' class='invisible'><code>FunctionParam(<a class="struct" href="../../cpp_demangle/ast/struct.FunctionParam.html" title="struct cpp_demangle::ast::FunctionParam">FunctionParam</a>)</code></span></span><div class='docblock'><p>A function parameter.</p>
+</div><span id='variant.Member' class='variant'><span id='Member.v' class='invisible'><code>Member(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.UnresolvedName.html" title="enum cpp_demangle::ast::UnresolvedName">UnresolvedName</a>)</code></span></span><div class='docblock'><p><code>expr.name</code></p>
+</div><span id='variant.DerefMember' class='variant'><span id='DerefMember.v' class='invisible'><code>DerefMember(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="enum" href="../../cpp_demangle/ast/enum.UnresolvedName.html" title="enum cpp_demangle::ast::UnresolvedName">UnresolvedName</a>)</code></span></span><div class='docblock'><p><code>expr-&gt;name</code></p>
+</div><span id='variant.PointerToMember' class='variant'><span id='PointerToMember.v' class='invisible'><code>PointerToMember(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;,&nbsp;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>expr.*expr</code></p>
+</div><span id='variant.SizeofTemplatePack' class='variant'><span id='SizeofTemplatePack.v' class='invisible'><code>SizeofTemplatePack(<a class="struct" href="../../cpp_demangle/ast/struct.TemplateParam.html" title="struct cpp_demangle::ast::TemplateParam">TemplateParam</a>)</code></span></span><div class='docblock'><p><code>sizeof...(T)</code>, size of a template parameter pack.</p>
+</div><span id='variant.SizeofFunctionPack' class='variant'><span id='SizeofFunctionPack.v' class='invisible'><code>SizeofFunctionPack(<a class="struct" href="../../cpp_demangle/ast/struct.FunctionParam.html" title="struct cpp_demangle::ast::FunctionParam">FunctionParam</a>)</code></span></span><div class='docblock'><p><code>sizeof...(parameter)</code>, size of a function parameter pack.</p>
+</div><span id='variant.SizeofCapturedTemplatePack' class='variant'><span id='SizeofCapturedTemplatePack.v' class='invisible'><code>SizeofCapturedTemplatePack(<a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.TemplateArg.html" title="enum cpp_demangle::ast::TemplateArg">TemplateArg</a>&gt;)</code></span></span><div class='docblock'><p><code>sizeof...(T)</code>, size of a captured template parameter pack from an alias
+template.</p>
+</div><span id='variant.PackExpansion' class='variant'><span id='PackExpansion.v' class='invisible'><code>PackExpansion(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>expression...</code>, pack expansion.</p>
+</div><span id='variant.Throw' class='variant'><span id='Throw.v' class='invisible'><code>Throw(<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html" title="struct alloc::boxed::Box">Box</a>&lt;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>&gt;)</code></span></span><div class='docblock'><p><code>throw expression</code></p>
+</div><span id='variant.Rethrow' class='variant'><span id='Rethrow.v' class='invisible'><code>Rethrow</code></span></span><div class='docblock'><p><code>throw</code> with no operand</p>
+</div><span id='variant.UnresolvedName' class='variant'><span id='UnresolvedName.v' class='invisible'><code>UnresolvedName(<a class="enum" href="../../cpp_demangle/ast/enum.UnresolvedName.html" title="enum cpp_demangle::ast::UnresolvedName">UnresolvedName</a>)</code></span></span><div class='docblock'><p><code>f(p)</code>, <code>N::f(p)</code>, <code>::f(p)</code>, freestanding dependent name (e.g., <code>T::x</code>),
+objectless nonstatic member reference.</p>
+</div><span id='variant.Primary' class='variant'><span id='Primary.v' class='invisible'><code>Primary(<a class="enum" href="../../cpp_demangle/ast/enum.ExprPrimary.html" title="enum cpp_demangle::ast::ExprPrimary">ExprPrimary</a>)</code></span></span><div class='docblock'><p>An <code>&lt;expr-primary&gt;</code> production.</p>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/cpp_demangle/ast.rs.html#3620' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/cpp_demangle/ast.rs.html#3620' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/cpp_demangle/ast.rs.html#3620' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="enum" href="../../cpp_demangle/ast/enum.Expression.html" title="enum cpp_demangle::ast::Expression">Expression</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/cpp_demangle/ast.rs.html#3620' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "cpp_demangle";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

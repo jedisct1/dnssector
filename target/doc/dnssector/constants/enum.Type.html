@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Type` enum in crate `dnssector`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Type">
+
+    <title>dnssector::constants::Type - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc enum">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Enum Type</p><div class="block items"><ul><li><a href="#variants">Variants</a></li><li><a href="#implementations">Trait Implementations</a></li></ul></div><p class='location'><a href='../index.html'>dnssector</a>::<wbr><a href='index.html'>constants</a></p><script>window.sidebarCurrent = {name: 'Type', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../index.html'>dnssector</a>::<wbr><a href='index.html'>constants</a>::<wbr><a class="enum" href=''>Type</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/dnssector/constants.rs.html#79-164' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum Type {
+    A,
+    NS,
+    MD,
+    MF,
+    CNAME,
+    SOA,
+    MB,
+    MG,
+    MR,
+    NULL,
+    WKS,
+    PTR,
+    HINFO,
+    MINFO,
+    MX,
+    TXT,
+    RP,
+    AFSDB,
+    X25,
+    ISDN,
+    RT,
+    NSAP,
+    NSAP_PTR,
+    SIG,
+    KEY,
+    PX,
+    GPOS,
+    AAAA,
+    LOC,
+    NXT,
+    EID,
+    NIMLOC,
+    SRV,
+    ATMA,
+    NAPTR,
+    KX,
+    CERT,
+    A6,
+    DNAME,
+    SINK,
+    OPT,
+    APL,
+    DS,
+    SSHFP,
+    IPSECKEY,
+    RRSIG,
+    NSEC,
+    DNSKEY,
+    DHCID,
+    NSEC3,
+    NSEC3PARAM,
+    TLSA,
+    SMIMEA,
+    HIP,
+    NINFO,
+    RKEY,
+    TALINK,
+    CDS,
+    CDNSKEY,
+    OPENPGPKEY,
+    CSYNC,
+    SPF,
+    UINFO,
+    UID,
+    GID,
+    UNSPEC,
+    NID,
+    L32,
+    L64,
+    LP,
+    EUI48,
+    EUI64,
+    TKEY,
+    TSIG,
+    IXFR,
+    AXFR,
+    MAILB,
+    MAILA,
+    ANY,
+    URI,
+    CAA,
+    AVC,
+    TA,
+    DLV,
+}</pre><div class='docblock'><p>DNS query type</p>
+</div><h2 id='variants' class='variants'>Variants</h2>
+<span id='variant.A' class='variant'><span id='A.v' class='invisible'><code>A</code></span></span><span id='variant.NS' class='variant'><span id='NS.v' class='invisible'><code>NS</code></span></span><span id='variant.MD' class='variant'><span id='MD.v' class='invisible'><code>MD</code></span></span><span id='variant.MF' class='variant'><span id='MF.v' class='invisible'><code>MF</code></span></span><span id='variant.CNAME' class='variant'><span id='CNAME.v' class='invisible'><code>CNAME</code></span></span><span id='variant.SOA' class='variant'><span id='SOA.v' class='invisible'><code>SOA</code></span></span><span id='variant.MB' class='variant'><span id='MB.v' class='invisible'><code>MB</code></span></span><span id='variant.MG' class='variant'><span id='MG.v' class='invisible'><code>MG</code></span></span><span id='variant.MR' class='variant'><span id='MR.v' class='invisible'><code>MR</code></span></span><span id='variant.NULL' class='variant'><span id='NULL.v' class='invisible'><code>NULL</code></span></span><span id='variant.WKS' class='variant'><span id='WKS.v' class='invisible'><code>WKS</code></span></span><span id='variant.PTR' class='variant'><span id='PTR.v' class='invisible'><code>PTR</code></span></span><span id='variant.HINFO' class='variant'><span id='HINFO.v' class='invisible'><code>HINFO</code></span></span><span id='variant.MINFO' class='variant'><span id='MINFO.v' class='invisible'><code>MINFO</code></span></span><span id='variant.MX' class='variant'><span id='MX.v' class='invisible'><code>MX</code></span></span><span id='variant.TXT' class='variant'><span id='TXT.v' class='invisible'><code>TXT</code></span></span><span id='variant.RP' class='variant'><span id='RP.v' class='invisible'><code>RP</code></span></span><span id='variant.AFSDB' class='variant'><span id='AFSDB.v' class='invisible'><code>AFSDB</code></span></span><span id='variant.X25' class='variant'><span id='X25.v' class='invisible'><code>X25</code></span></span><span id='variant.ISDN' class='variant'><span id='ISDN.v' class='invisible'><code>ISDN</code></span></span><span id='variant.RT' class='variant'><span id='RT.v' class='invisible'><code>RT</code></span></span><span id='variant.NSAP' class='variant'><span id='NSAP.v' class='invisible'><code>NSAP</code></span></span><span id='variant.NSAP_PTR' class='variant'><span id='NSAP_PTR.v' class='invisible'><code>NSAP_PTR</code></span></span><span id='variant.SIG' class='variant'><span id='SIG.v' class='invisible'><code>SIG</code></span></span><span id='variant.KEY' class='variant'><span id='KEY.v' class='invisible'><code>KEY</code></span></span><span id='variant.PX' class='variant'><span id='PX.v' class='invisible'><code>PX</code></span></span><span id='variant.GPOS' class='variant'><span id='GPOS.v' class='invisible'><code>GPOS</code></span></span><span id='variant.AAAA' class='variant'><span id='AAAA.v' class='invisible'><code>AAAA</code></span></span><span id='variant.LOC' class='variant'><span id='LOC.v' class='invisible'><code>LOC</code></span></span><span id='variant.NXT' class='variant'><span id='NXT.v' class='invisible'><code>NXT</code></span></span><span id='variant.EID' class='variant'><span id='EID.v' class='invisible'><code>EID</code></span></span><span id='variant.NIMLOC' class='variant'><span id='NIMLOC.v' class='invisible'><code>NIMLOC</code></span></span><span id='variant.SRV' class='variant'><span id='SRV.v' class='invisible'><code>SRV</code></span></span><span id='variant.ATMA' class='variant'><span id='ATMA.v' class='invisible'><code>ATMA</code></span></span><span id='variant.NAPTR' class='variant'><span id='NAPTR.v' class='invisible'><code>NAPTR</code></span></span><span id='variant.KX' class='variant'><span id='KX.v' class='invisible'><code>KX</code></span></span><span id='variant.CERT' class='variant'><span id='CERT.v' class='invisible'><code>CERT</code></span></span><span id='variant.A6' class='variant'><span id='A6.v' class='invisible'><code>A6</code></span></span><span id='variant.DNAME' class='variant'><span id='DNAME.v' class='invisible'><code>DNAME</code></span></span><span id='variant.SINK' class='variant'><span id='SINK.v' class='invisible'><code>SINK</code></span></span><span id='variant.OPT' class='variant'><span id='OPT.v' class='invisible'><code>OPT</code></span></span><span id='variant.APL' class='variant'><span id='APL.v' class='invisible'><code>APL</code></span></span><span id='variant.DS' class='variant'><span id='DS.v' class='invisible'><code>DS</code></span></span><span id='variant.SSHFP' class='variant'><span id='SSHFP.v' class='invisible'><code>SSHFP</code></span></span><span id='variant.IPSECKEY' class='variant'><span id='IPSECKEY.v' class='invisible'><code>IPSECKEY</code></span></span><span id='variant.RRSIG' class='variant'><span id='RRSIG.v' class='invisible'><code>RRSIG</code></span></span><span id='variant.NSEC' class='variant'><span id='NSEC.v' class='invisible'><code>NSEC</code></span></span><span id='variant.DNSKEY' class='variant'><span id='DNSKEY.v' class='invisible'><code>DNSKEY</code></span></span><span id='variant.DHCID' class='variant'><span id='DHCID.v' class='invisible'><code>DHCID</code></span></span><span id='variant.NSEC3' class='variant'><span id='NSEC3.v' class='invisible'><code>NSEC3</code></span></span><span id='variant.NSEC3PARAM' class='variant'><span id='NSEC3PARAM.v' class='invisible'><code>NSEC3PARAM</code></span></span><span id='variant.TLSA' class='variant'><span id='TLSA.v' class='invisible'><code>TLSA</code></span></span><span id='variant.SMIMEA' class='variant'><span id='SMIMEA.v' class='invisible'><code>SMIMEA</code></span></span><span id='variant.HIP' class='variant'><span id='HIP.v' class='invisible'><code>HIP</code></span></span><span id='variant.NINFO' class='variant'><span id='NINFO.v' class='invisible'><code>NINFO</code></span></span><span id='variant.RKEY' class='variant'><span id='RKEY.v' class='invisible'><code>RKEY</code></span></span><span id='variant.TALINK' class='variant'><span id='TALINK.v' class='invisible'><code>TALINK</code></span></span><span id='variant.CDS' class='variant'><span id='CDS.v' class='invisible'><code>CDS</code></span></span><span id='variant.CDNSKEY' class='variant'><span id='CDNSKEY.v' class='invisible'><code>CDNSKEY</code></span></span><span id='variant.OPENPGPKEY' class='variant'><span id='OPENPGPKEY.v' class='invisible'><code>OPENPGPKEY</code></span></span><span id='variant.CSYNC' class='variant'><span id='CSYNC.v' class='invisible'><code>CSYNC</code></span></span><span id='variant.SPF' class='variant'><span id='SPF.v' class='invisible'><code>SPF</code></span></span><span id='variant.UINFO' class='variant'><span id='UINFO.v' class='invisible'><code>UINFO</code></span></span><span id='variant.UID' class='variant'><span id='UID.v' class='invisible'><code>UID</code></span></span><span id='variant.GID' class='variant'><span id='GID.v' class='invisible'><code>GID</code></span></span><span id='variant.UNSPEC' class='variant'><span id='UNSPEC.v' class='invisible'><code>UNSPEC</code></span></span><span id='variant.NID' class='variant'><span id='NID.v' class='invisible'><code>NID</code></span></span><span id='variant.L32' class='variant'><span id='L32.v' class='invisible'><code>L32</code></span></span><span id='variant.L64' class='variant'><span id='L64.v' class='invisible'><code>L64</code></span></span><span id='variant.LP' class='variant'><span id='LP.v' class='invisible'><code>LP</code></span></span><span id='variant.EUI48' class='variant'><span id='EUI48.v' class='invisible'><code>EUI48</code></span></span><span id='variant.EUI64' class='variant'><span id='EUI64.v' class='invisible'><code>EUI64</code></span></span><span id='variant.TKEY' class='variant'><span id='TKEY.v' class='invisible'><code>TKEY</code></span></span><span id='variant.TSIG' class='variant'><span id='TSIG.v' class='invisible'><code>TSIG</code></span></span><span id='variant.IXFR' class='variant'><span id='IXFR.v' class='invisible'><code>IXFR</code></span></span><span id='variant.AXFR' class='variant'><span id='AXFR.v' class='invisible'><code>AXFR</code></span></span><span id='variant.MAILB' class='variant'><span id='MAILB.v' class='invisible'><code>MAILB</code></span></span><span id='variant.MAILA' class='variant'><span id='MAILA.v' class='invisible'><code>MAILA</code></span></span><span id='variant.ANY' class='variant'><span id='ANY.v' class='invisible'><code>ANY</code></span></span><span id='variant.URI' class='variant'><span id='URI.v' class='invisible'><code>URI</code></span></span><span id='variant.CAA' class='variant'><span id='CAA.v' class='invisible'><code>CAA</code></span></span><span id='variant.AVC' class='variant'><span id='AVC.v' class='invisible'><code>AVC</code></span></span><span id='variant.TA' class='variant'><span id='TA.v' class='invisible'><code>TA</code></span></span><span id='variant.DLV' class='variant'><span id='DLV.v' class='invisible'><code>DLV</code></span></span><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="enum" href="../../dnssector/constants/enum.Type.html" title="enum dnssector::constants::Type">Type</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/constants.rs.html#78' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="enum" href="../../dnssector/constants/enum.Type.html" title="enum dnssector::constants::Type">Type</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/constants.rs.html#78' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="enum" href="../../dnssector/constants/enum.Type.html" title="enum dnssector::constants::Type">Type</a></code></span></h4>
+<div class='docblock'><p>Returns a copy of the value. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone">Read more</a></p>
+</div><h4 id='method.clone_from' class="method"><span id='clone_from.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from' class='fnname'>clone_from</a>(&amp;mut self, source: &amp;Self)</code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>Performs copy-assignment from <code>source</code>. <a href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#method.clone_from">Read more</a></p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="enum" href="../../dnssector/constants/enum.Type.html" title="enum dnssector::constants::Type">Type</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/constants.rs.html#78' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
+<div class='docblock'><p>Formats the value using the given formatter.</p>
+</div></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.Eq.html" title="trait core::cmp::Eq">Eq</a> for <a class="enum" href="../../dnssector/constants/enum.Type.html" title="enum dnssector::constants::Type">Type</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/constants.rs.html#78' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html" title="trait core::cmp::PartialEq">PartialEq</a> for <a class="enum" href="../../dnssector/constants/enum.Type.html" title="enum dnssector::constants::Type">Type</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/constants.rs.html#78' title='goto source code'>[src]</a></span></h3>
+<div class='impl-items'><h4 id='method.eq' class="method"><span id='eq.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class="enum" href="../../dnssector/constants/enum.Type.html" title="enum dnssector::constants::Type">Type</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code></span></h4>
+<div class='docblock'><p>This method tests for <code>self</code> and <code>other</code> values to be equal, and is used by <code>==</code>. <a href="https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#tymethod.eq">Read more</a></p>
+</div><h4 id='method.ne' class="method"><span id='ne.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, other: &amp;Rhs) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a></code><div class='since' title='Stable since Rust version 1.0.0'>1.0.0</div></span></h4>
+<div class='docblock'><p>This method tests for <code>!=</code>.</p>
+</div></div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "dnssector";
+    </script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>
