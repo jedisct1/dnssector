@@ -77,7 +77,7 @@ pub const DNS_FLAG_RD: u32 = 1 << 8;
 pub const DNS_FLAG_RA: u32 = 1 << 7;
 pub const DNS_FLAG_AD: u32 = 1 << 5;
 pub const DNS_FLAG_CD: u32 = 1 << 4;
-pub const DNS_FLAG_DO: u32 = 1 << 23;
+pub const DNS_FLAG_DO: u32 = 1 << 31;
 
 /// DNS query class
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
