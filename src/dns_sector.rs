@@ -316,7 +316,6 @@ impl DNSSector {
     fn parse_rr(&mut self, section: Section) -> Result<()> {
         self.skip_name()?;
         let rr_type = self.rr_type()?;
-        println!("rr_type={:?}", rr_type);
         if rr_type == Type::OPT.into() {
             if section != Section::Additional {
                 bail!(ErrorKind::InvalidPacket("OPT RRs must be in the additional section"));
@@ -408,6 +407,12 @@ impl DNSSector {
         self.u8_load(DNS_OPT_RR_EDNS_VERSION_OFFSET)
     }
 
+    /// Returns the edns extended flags, from an optional `OPT` record.
+    #[inline]
+    fn opt_rr_edns_ext_flags(&self) -> Result<u16> {
+        self.be16_load(DNS_OPT_RR_EDNS_EXT_FLAGS_OFFSET)
+    }
+
     /// Returns the length of the data contained within an `OPT` record.
     #[inline]
     fn opt_rr_rdlen(&self) -> Result<usize> {
@@ -421,6 +426,7 @@ impl DNSSector {
         }
         self.ext_rcode = Some(self.opt_rr_ext_rcode()?);
         self.edns_version = Some(self.opt_rr_edns_version()?);
+        self.ext_flags = Some(self.opt_rr_edns_ext_flags()?);
         let edns_len = self.opt_rr_rdlen()?;
         self.increment_offset(DNS_OPT_RR_HEADER_SIZE)?;
         self.edns_start = Some(self.offset);

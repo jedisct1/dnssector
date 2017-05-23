@@ -36,11 +36,14 @@ pub const DNS_RR_RDLEN_OFFSET: usize = 8;
 /// Offset to the maximum payload for edns0-enabled UDP packets, for OPT RRs.
 pub const DNS_OPT_RR_MAX_PAYLOAD_OFFSET: usize = 2;
 
-/// Offset to the extended rcode ,for OPT RRs.
+/// Offset to the extended rcode, for OPT RRs.
 pub const DNS_OPT_RR_EXT_RCODE_OFFSET: usize = 4;
 
 /// Offset to the edns version number, for OPT RRs.
 pub const DNS_OPT_RR_EDNS_VERSION_OFFSET: usize = 5;
+
+/// Offset to the edns extended flags, for OPT RRs.
+pub const DNS_OPT_RR_EDNS_EXT_FLAGS_OFFSET: usize = 6;
 
 /// Offset to the total size of the edns records, within OPT RRS.
 pub const DNS_OPT_RR_RDLEN_OFFSET: usize = 8;
@@ -65,6 +68,16 @@ pub const DNS_FLAGS_OFFSET: usize = 2;
 
 /// Offset to the return code, from the beginning of the DNS packet
 pub const DNS_RCODE_OFFSET: usize = 3;
+
+// DNS flags - 32 bit because we include extended flags
+pub const DNS_FLAG_QR: u32 = 1 << 15;
+pub const DNS_FLAG_AA: u32 = 1 << 10;
+pub const DNS_FLAG_TC: u32 = 1 << 9;
+pub const DNS_FLAG_RD: u32 = 1 << 8;
+pub const DNS_FLAG_RA: u32 = 1 << 7;
+pub const DNS_FLAG_AD: u32 = 1 << 5;
+pub const DNS_FLAG_CD: u32 = 1 << 4;
+pub const DNS_FLAG_DO: u32 = 1 << 23;
 
 /// DNS query class
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
