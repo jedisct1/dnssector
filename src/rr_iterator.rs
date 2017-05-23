@@ -150,17 +150,17 @@ impl<'t> RRIterator<'t> {
     }
 
     #[inline]
-    fn u8_load(packet: &[u8], offset: usize) -> u8 {
+    pub fn u8_load(packet: &[u8], offset: usize) -> u8 {
         packet[offset]
     }
 
     #[inline]
-    fn be16_load(packet: &[u8], offset: usize) -> u16 {
+    pub fn be16_load(packet: &[u8], offset: usize) -> u16 {
         (packet[offset] as u16) << 8 | packet[offset + 1] as u16
     }
 
     #[inline]
-    fn be32_load(packet: &[u8], offset: usize) -> u32 {
+    pub fn be32_load(packet: &[u8], offset: usize) -> u32 {
         (packet[offset] as u32) << 24 | (packet[offset + 1] as u32) << 16 |
         (packet[offset + 2] as u32) << 8 | packet[offset + 3] as u32
     }

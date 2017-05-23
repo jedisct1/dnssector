@@ -7,7 +7,7 @@ use std::mem;
 pub const DNS_HEADER_SIZE: usize = 12;
 
 /// Offset to the first (and usually only) record of the question section, from the start of the packet.
-pub const DNS_OFFSET_QUESTION: usize = DNS_HEADER_SIZE;
+pub const DNS_QUESTION_OFFSET: usize = DNS_HEADER_SIZE;
 
 /// Maximum length of a host name.
 pub const DNS_MAX_HOSTNAME_LEN: usize = 255;
@@ -56,6 +56,15 @@ pub const DNS_EDNS_RR_RDLEN_OFFSET: usize = 2;
 
 /// Size of the header of an extended RR.
 pub const DNS_EDNS_RR_HEADER_SIZE: usize = 4;
+
+/// Offset to the transaction ID, from the beginning of a DNS packet
+pub const DNS_TID_OFFSET: usize = 0;
+
+/// Offset to the flags (including rcode and opcode), from the beginning of the DNS packet
+pub const DNS_FLAGS_OFFSET: usize = 2;
+
+/// Offset to the return code, from the beginning of the DNS packet
+pub const DNS_RCODE_OFFSET: usize = 3;
 
 /// DNS query class
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -187,6 +196,44 @@ pub enum EdnsOption {
 impl From<EdnsOption> for u16 {
     fn from(v: EdnsOption) -> u16 {
         unsafe { mem::transmute(v as u16) }
+    }
+}
+
+/// DNS return codes
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Rcode {
+    NOERROR = 0,
+    FORMERR = 1,
+    SERVFAIL = 2,
+    NXDOMAIN = 3,
+    NOTIMPL = 4,
+    REFUSED = 5,
+    YXDOMAIN = 6,
+    YXRRSET = 7,
+    NXRRSET = 8,
+    NOTAUTH = 9,
+    NOTZONE = 10
+}
+
+impl From<Rcode> for u8 {
+    fn from(v: Rcode) -> u8 {
+        unsafe { mem::transmute(v as u8) }
+    }
+}
+
+/// DNS opcodes
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum Opcode {
+    QUERY = 0,
+    IQUERY = 1,
+    STATUS = 2,
+    NOTIFY = 4,
+    UPDATE = 5
+}
+
+impl From<Opcode> for u8 {
+    fn from(v: Opcode) -> u8 {
+        unsafe { mem::transmute(v as u8) }
     }
 }
 

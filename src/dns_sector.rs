@@ -257,7 +257,7 @@ impl DNSSector {
         if qdcount > 1 {
             bail!(ErrorKind::InvalidPacket("A DNS packet cannot contain more than one question"));
         }
-        self.set_offset(DNS_OFFSET_QUESTION)?;
+        self.set_offset(DNS_QUESTION_OFFSET)?;
         let offset_question = if qdcount > 0 { Some(self.offset) } else { None };
         if qdcount != 0 {
             assert_eq!(qdcount, 1);

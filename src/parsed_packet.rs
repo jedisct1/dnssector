@@ -56,4 +56,36 @@ impl ParsedPacket {
     pub fn into_iter_edns(&mut self) -> Option<EdnsIterator> {
         EdnsIterator::new(RRIterator::new(self, Section::Edns)).next()
     }
+
+    /// Returns the transaction ID.
+    #[inline]
+    pub fn tid(&self) -> u16 {
+        RRIterator::be16_load(&self.dns_sector.packet, DNS_TID_OFFSET)
+    }
+
+    /// Returns the flags, including extended flags.
+    /// The extended flags optionally obtained using edns are exposed as the highest 16 bits,
+    /// instead of having distinct sets of flags.
+    /// The opcode and rcode are intentionally masked in order to prevent misuse:
+    /// these bits are never supposed to be accessed individually.
+    pub fn flags(&self) -> u32 {
+        let mut rflags = RRIterator::be16_load(&self.dns_sector.packet, DNS_FLAGS_OFFSET);
+        rflags &= ! 0x7800; // mask opcode
+        rflags &= ! 0x000f; // mask rcode
+        (self.ext_flags.unwrap_or(0) as u32) << 16 | (rflags as u32)
+    }
+
+    /// Returns the return code.
+    #[inline]
+    pub fn rcode(&self) -> u8 {
+        let rflags = RRIterator::u8_load(&self.dns_sector.packet, DNS_FLAGS_OFFSET + 1);
+        rflags & 0x0f
+    }
+
+    /// Returns the opcode.
+    #[inline]
+    pub fn opcode(&self) -> u8 {
+        let rflags = RRIterator::u8_load(&self.dns_sector.packet, DNS_FLAGS_OFFSET);
+        (rflags & 0x78) >> 3
+    }
 }
