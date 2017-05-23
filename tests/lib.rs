@@ -2,24 +2,24 @@
 
 extern crate dnssector;
 
-use dnssector::*;
-
 mod tests {
+    use dnssector::*;
+
     #[test]
     fn test_empty_packet() {
         let data : Vec<u8> = vec![];
-        let dns_sector = super::DNSSector::new(data).unwrap();
+        let dns_sector = DNSSector::new(data).unwrap();
         assert!(dns_sector.parse().is_err());
     }
 
     #[test]
     fn test_packet_too_small() {
         let data_small : Vec<u8> = vec![1; 11];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(super::errors::Error(super::errors::ErrorKind::PacketTooSmall, _)) => { assert!(true) },
+            Some(errors::Error(errors::ErrorKind::PacketTooSmall, _)) => { assert!(true) },
             _ => { assert!(false) },
         }
     }
@@ -29,11 +29,11 @@ mod tests {
         let data_small : Vec<u8> = vec![0, 0, 0, 0,
                                         0, 2, 0, 0,
                                         0, 0, 0, 0, ];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(super::errors::Error(super::errors::ErrorKind::InvalidPacket(_), _)) => { assert!(true) },
+            Some(errors::Error(errors::ErrorKind::InvalidPacket(_), _)) => { assert!(true) },
             a => { assert!(false, "type: {:?}", a) },
         }
     }
@@ -44,11 +44,11 @@ mod tests {
                                         0, 1, 0, 0,
                                         0, 0, 0, 0,
                                         ];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(super::errors::Error(super::errors::ErrorKind::InternalError(_), _)) => { assert!(true) },
+            Some(errors::Error(errors::ErrorKind::InternalError(_), _)) => { assert!(true) },
             a => { assert!(false, "type: {:?}", a) },
         }
     }
@@ -61,7 +61,7 @@ mod tests {
                                         0,
                                         0, 0, 0, 1,
                                         ];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_ok());
     }
@@ -71,14 +71,14 @@ mod tests {
         let data_small : Vec<u8> = vec![0, 0, 0, 0,
                                         0, 1, 0, 0,
                                         0, 0, 0, 0,
-                                        1, 'a' as u8,
+                                        1, b'a',
                                         0, 0, 0, 1,
                                         ];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(super::errors::Error(super::errors::ErrorKind::PacketTooSmall, _)) => { assert!(true) },
+            Some(errors::Error(errors::ErrorKind::PacketTooSmall, _)) => { assert!(true) },
             a => { assert!(false, "type: {:?}", a) },
         }
     }
@@ -99,11 +99,11 @@ mod tests {
                                         97, 0,
                                         0, 0, 0, 1,
                                         ];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(super::errors::Error(super::errors::ErrorKind::InvalidName(_), _)) => { assert!(true) },
+            Some(errors::Error(errors::ErrorKind::InvalidName(_), _)) => { assert!(true) },
             a => { assert!(false, "type: {:?}", a) },
         }
     }
@@ -132,11 +132,11 @@ mod tests {
                                         0,
                                         0, 0, 0, 1,
                                         ];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(super::errors::Error(super::errors::ErrorKind::InvalidName(_), _)) => { assert!(true) },
+            Some(errors::Error(errors::ErrorKind::InvalidName(_), _)) => { assert!(true) },
             a => { assert!(false, "type: {:?}", a) },
         }
     }
@@ -181,11 +181,11 @@ mod tests {
                                         0, 0, 0, 0,
                                         0, 0,
                                         ];
-        let dns_sector = super::DNSSector::new(data_small).unwrap();
+        let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(super::errors::Error(super::errors::ErrorKind::InvalidName("Name too long"), _)) => { assert!(true) },
+            Some(errors::Error(errors::ErrorKind::InvalidName("Name too long"), _)) => { assert!(true) },
             a => { assert!(false, "type: {:?}", a) },
         }
     }
@@ -201,9 +201,13 @@ mod tests {
              95, 105, 180, 59, 216, 202, 174, 113, 201, 121, 23, 4, 26, 241, 134, 233, 52, 104,
              120, 80, 237, 252, 215, 146, 44, 120, 229, 63, 16, 95, 19, 209, 103, 165, 196, 195,
              151, 222, 52, 0, 0, 41, 2, 0, 0, 0, 128, 0, 0, 0];
-        let dns_sector = super::DNSSector::new(data).unwrap();
+        let dns_sector = DNSSector::new(data).unwrap();
         let ret = dns_sector.parse().expect("Valid packet couldn't be parsed");
         let flags = ret.flags();
+        assert_eq!(flags & DNS_FLAG_DO, DNS_FLAG_DO);
+        assert_eq!(flags & DNS_FLAG_QR, DNS_FLAG_QR);
+        assert_eq!(flags & DNS_FLAG_AD, DNS_FLAG_AD);
+        assert_eq!(flags & DNS_FLAG_RD, DNS_FLAG_RD);
         assert_eq!(flags, 0x800081a0);
     }
 }
