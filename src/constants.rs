@@ -225,7 +225,7 @@ pub enum Rcode {
     YXRRSET = 7,
     NXRRSET = 8,
     NOTAUTH = 9,
-    NOTZONE = 10
+    NOTZONE = 10,
 }
 
 impl From<Rcode> for u8 {
@@ -241,7 +241,7 @@ pub enum Opcode {
     IQUERY = 1,
     STATUS = 2,
     NOTIFY = 4,
-    UPDATE = 5
+    UPDATE = 5,
 }
 
 impl From<Opcode> for u8 {

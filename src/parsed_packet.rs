@@ -70,8 +70,8 @@ impl ParsedPacket {
     /// these bits are never supposed to be accessed individually.
     pub fn flags(&self) -> u32 {
         let mut rflags = RRIterator::be16_load(&self.dns_sector.packet, DNS_FLAGS_OFFSET);
-        rflags &= ! 0x7800; // mask opcode
-        rflags &= ! 0x000f; // mask rcode
+        rflags &= !0x7800; // mask opcode
+        rflags &= !0x000f; // mask rcode
         (self.ext_flags.unwrap_or(0) as u32) << 16 | (rflags as u32)
     }
 
