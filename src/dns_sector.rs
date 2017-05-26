@@ -1,3 +1,4 @@
+use byteorder::{BigEndian, ByteOrder};
 use constants::*;
 use errors::*;
 use parsed_packet::*;
@@ -23,57 +24,53 @@ impl DNSSector {
     /// Returns the number of records in the question section.
     #[inline]
     pub fn qdcount(packet: &[u8]) -> u16 {
-        ((packet[4] as u16) << 8) | packet[5] as u16
+        BigEndian::read_u16(&packet[4..])
     }
 
     /// Changes the number of questions.
     #[allow(dead_code)]
     #[inline]
     pub fn set_qdcount(packet: &mut [u8], value: u16) {
-        packet[4] = (value >> 8) as u8;
-        packet[5] = value as u8;
+        BigEndian::write_u16(&mut packet[4..], value);
     }
 
     /// Returns the numbersof records in the answer section.
     #[inline]
     pub fn ancount(packet: &[u8]) -> u16 {
-        ((packet[6] as u16) << 8) | packet[7] as u16
+        BigEndian::read_u16(&packet[6..])
     }
 
     /// Changes the number of records in the answer section.
     #[allow(dead_code)]
     #[inline]
     pub fn set_ancount(packet: &mut [u8], value: u16) {
-        packet[6] = (value >> 8) as u8;
-        packet[7] = value as u8;
+        BigEndian::write_u16(&mut packet[6..], value)
     }
 
     /// Returns the number of records in the nameservers section.
     #[inline]
     pub fn nscount(packet: &[u8]) -> u16 {
-        ((packet[8] as u16) << 8) | packet[9] as u16
+        BigEndian::read_u16(&packet[8..])
     }
 
     /// Changes the number of records in the nameservers section.
     #[allow(dead_code)]
     #[inline]
     pub fn set_nscount(packet: &mut [u8], value: u16) {
-        packet[8] = (value >> 8) as u8;
-        packet[9] = value as u8;
+        BigEndian::write_u16(&mut packet[8..], value)
     }
 
     /// Returns the number of records in the additional section.
     #[inline]
     pub fn arcount(packet: &[u8]) -> u16 {
-        ((packet[10] as u16) << 8) | packet[11] as u16
+        BigEndian::read_u16(&packet[10..])
     }
 
     /// Changes the number of records in the additional section.
     #[allow(dead_code)]
     #[inline]
     pub fn set_arcount(packet: &mut [u8], value: u16) {
-        packet[10] = (value >> 8) as u8;
-        packet[11] = value as u8;
+        BigEndian::write_u16(&mut packet[10..], value)
     }
 
     /// Returns the number of yet unparsed bytes.
@@ -118,15 +115,14 @@ impl DNSSector {
     fn be16_load(&self, rr_offset: usize) -> Result<u16> {
         self.ensure_remaining_len(rr_offset + 2)?;
         let offset = self.offset + rr_offset;
-        Ok((self.packet[offset] as u16) << 8 | self.packet[offset + 1] as u16)
+        Ok((BigEndian::read_u16(&self.packet[offset..])))
     }
 
     #[inline]
     fn be32_load(&self, rr_offset: usize) -> Result<u32> {
         self.ensure_remaining_len(rr_offset + 4)?;
         let offset = self.offset + rr_offset;
-        Ok((self.packet[offset] as u32) << 24 | (self.packet[offset + 1] as u32) << 16 |
-           (self.packet[offset + 2] as u32) << 8 | self.packet[offset + 3] as u32)
+        Ok((BigEndian::read_u32(&self.packet[offset..])))
     }
 
     /// Check that an encoded DNS name is valid. This includes following indirections for

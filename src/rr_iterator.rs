@@ -1,3 +1,4 @@
+use byteorder::{BigEndian, ByteOrder};
 use constants::*;
 use parsed_packet::*;
 use std::marker;
@@ -69,7 +70,7 @@ pub trait TypedIterable {
     fn rr_type(&self) -> u16
         where Self: DNSIterable
     {
-        RRIterator::be16_load(self.rdata_slice(), DNS_RR_TYPE_OFFSET)
+        BigEndian::read_u16(&self.rdata_slice()[DNS_RR_TYPE_OFFSET..])
     }
 
     /// Returns the query class for the current RR.
@@ -77,7 +78,7 @@ pub trait TypedIterable {
     fn rr_class(&self) -> u16
         where Self: DNSIterable
     {
-        RRIterator::be16_load(self.rdata_slice(), DNS_RR_CLASS_OFFSET)
+        BigEndian::read_u16(&self.rdata_slice()[DNS_RR_CLASS_OFFSET..])
     }
 
     /// Returns the TTL for the current RR.
@@ -85,7 +86,7 @@ pub trait TypedIterable {
     fn rr_ttl(&self) -> u32
         where Self: DNSIterable
     {
-        RRIterator::be32_load(self.rdata_slice(), DNS_RR_TTL_OFFSET)
+        BigEndian::read_u32(&self.rdata_slice()[DNS_RR_TTL_OFFSET..])
     }
 
     /// Returns the record length for the current RR.
@@ -93,7 +94,7 @@ pub trait TypedIterable {
     fn rr_rdlen(&self) -> usize
         where Self: DNSIterable
     {
-        RRIterator::be16_load(self.rdata_slice(), DNS_RR_RDLEN_OFFSET) as usize
+        BigEndian::read_u16(&self.rdata_slice()[DNS_RR_RDLEN_OFFSET..]) as usize
     }
 }
 
@@ -150,24 +151,8 @@ impl<'t> RRIterator<'t> {
     }
 
     #[inline]
-    pub fn u8_load(packet: &[u8], offset: usize) -> u8 {
-        packet[offset]
-    }
-
-    #[inline]
-    pub fn be16_load(packet: &[u8], offset: usize) -> u16 {
-        (packet[offset] as u16) << 8 | packet[offset + 1] as u16
-    }
-
-    #[inline]
-    pub fn be32_load(packet: &[u8], offset: usize) -> u32 {
-        (packet[offset] as u32) << 24 | (packet[offset + 1] as u32) << 16 |
-        (packet[offset + 2] as u32) << 8 | packet[offset + 3] as u32
-    }
-
-    #[inline]
     fn rr_rdlen(packet: &[u8], offset: usize) -> usize {
-        Self::be16_load(packet, offset + DNS_RR_RDLEN_OFFSET) as usize
+        BigEndian::read_u16(&packet[offset + DNS_RR_RDLEN_OFFSET..]) as usize
     }
 
     #[inline]
@@ -182,7 +167,7 @@ impl<'t> RRIterator<'t> {
 
     #[inline]
     fn edns_rr_rdlen(packet: &[u8], offset: usize) -> usize {
-        Self::be16_load(packet, offset + DNS_EDNS_RR_RDLEN_OFFSET) as usize
+        BigEndian::read_u16(&packet[offset + DNS_EDNS_RR_RDLEN_OFFSET..]) as usize
     }
 
     pub fn edns_skip_rr(packet: &[u8], mut offset: usize) -> usize {
