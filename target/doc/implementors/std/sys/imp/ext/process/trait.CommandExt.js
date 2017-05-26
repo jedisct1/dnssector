@@ -1,5 +1,4 @@
 (function() {var implementors = {};
-implementors["cpp_demangle"] = [];
 implementors["error_chain"] = [];
 implementors["libc"] = [];
 implementors["syn"] = [];

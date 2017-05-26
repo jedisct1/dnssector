@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#11-22' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#12-23' title='goto source code'>[src]</a></span></h1>
 <pre class='rust struct'>pub struct ParsedPacket {
     pub dns_sector: <a class="struct" href="../../dnssector/dns_sector/struct.DNSSector.html" title="struct dnssector::dns_sector::DNSSector">DNSSector</a>,
     pub offset_question: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>&gt;,
@@ -92,7 +92,7 @@ DNS packet, that allows quick access to (extended) flags and to individual secti
                            </span></span><span id='structfield.ext_flags' class="structfield">
                            <span id='ext_flags.v' class='invisible'>
                            <code>ext_flags: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>&gt;</code>
-                           </span></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#24-59' title='goto source code'>[src]</a></span></h3>
+                           </span></span><h2 id='methods'>Methods</h2><h3 class='impl'><span class='in-band'><code>impl <a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#25-92' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.into_dns_sector' class="method"><span id='into_dns_sector.v' class='invisible'><code>fn <a href='#method.into_dns_sector' class='fnname'>into_dns_sector</a>(self) -&gt; <a class="struct" href="../../dnssector/dns_sector/struct.DNSSector.html" title="struct dnssector::dns_sector::DNSSector">DNSSector</a></code></span></h4>
 <div class='docblock'><p>Converts a <code>ParsedPacket</code> back into a <code>DNSSector</code>.</p>
 </div><h4 id='method.into_packet' class="method"><span id='into_packet.v' class='invisible'><code>fn <a href='#method.into_packet' class='fnname'>into_packet</a>(self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html" title="struct collections::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;</code></span></h4>
@@ -107,7 +107,19 @@ DNS packet, that allows quick access to (extended) flags and to individual secti
 <div class='docblock'><p>Iterates over the additional section.</p>
 </div><h4 id='method.into_iter_edns' class="method"><span id='into_iter_edns.v' class='invisible'><code>fn <a href='#method.into_iter_edns' class='fnname'>into_iter_edns</a>(&amp;mut self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="../../dnssector/edns_iterator/struct.EdnsIterator.html" title="struct dnssector::edns_iterator::EdnsIterator">EdnsIterator</a>&gt;</code></span></h4>
 <div class='docblock'><p>Iterates over the records from the optional edns pseudo-section.</p>
-</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#10' title='goto source code'>[src]</a></span></h3>
+</div><h4 id='method.tid' class="method"><span id='tid.v' class='invisible'><code>fn <a href='#method.tid' class='fnname'>tid</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a></code></span></h4>
+<div class='docblock'><p>Returns the transaction ID.</p>
+</div><h4 id='method.flags' class="method"><span id='flags.v' class='invisible'><code>fn <a href='#method.flags' class='fnname'>flags</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code></span></h4>
+<div class='docblock'><p>Returns the flags, including extended flags.
+The extended flags optionally obtained using edns are exposed as the highest 16 bits,
+instead of having distinct sets of flags.
+The opcode and rcode are intentionally masked in order to prevent misuse:
+these bits are never supposed to be accessed individually.</p>
+</div><h4 id='method.rcode' class="method"><span id='rcode.v' class='invisible'><code>fn <a href='#method.rcode' class='fnname'>rcode</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></span></h4>
+<div class='docblock'><p>Returns the return code.</p>
+</div><h4 id='method.opcode' class="method"><span id='opcode.v' class='invisible'><code>fn <a href='#method.opcode' class='fnname'>opcode</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code></span></h4>
+<div class='docblock'><p>Returns the opcode.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html" title="trait core::fmt::Debug">Debug</a> for <a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../../src/dnssector/parsed_packet.rs.html#11' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.fmt' class="method"><span id='fmt.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#tymethod.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class="struct" href="https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html" title="struct core::fmt::Formatter">Formatter</a>) -&gt; <a class="type" href="https://doc.rust-lang.org/nightly/core/fmt/type.Result.html" title="type core::fmt::Result">Result</a></code></span></h4>
 <div class='docblock'><p>Formats the value using the given formatter.</p>
 </div></div></section>

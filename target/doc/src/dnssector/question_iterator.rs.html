@@ -109,6 +109,8 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">constants</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">dns_sector</span>::<span class="kw-2">*</span>;
@@ -118,6 +120,8 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QuestionIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> {
     <span class="ident">rr_iterator</span>: <span class="ident">RRIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span>,
 }
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="ident">TypedIterable</span> <span class="kw">for</span> <span class="ident">QuestionIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> <span class="ident">DNSIterable</span> <span class="kw">for</span> <span class="ident">QuestionIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/Users/j/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.1/src/lib.rs`.">
+    <meta name="description" content="Source to the Rust file `/Users/j/.cargo/registry/src/github.com-1ecc6299db9ec823/backtrace-0.3.2/src/lib.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>lib.rs.html -- source</title>
@@ -210,6 +210,8 @@
 <span id="165">165</span>
 <span id="166">166</span>
 <span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
 </pre><pre class="rust ">
 <span class="doccomment">//! A library for acquiring a backtrace at runtime</span>
 <span class="doccomment">//!</span>
@@ -290,6 +292,10 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
 
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_derive&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde_derive&quot;</span>, <span class="ident">macro_use</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_derive</span>;
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustc-serialize&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rustc_serialize</span>;
 
@@ -313,9 +319,7 @@
 <span class="kw">mod</span> <span class="ident">symbolize</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">capture</span>::{<span class="ident">Backtrace</span>, <span class="ident">BacktraceFrame</span>, <span class="ident">BacktraceSymbol</span>};
-<span class="kw">mod</span> <span class="ident">capture</span> {
-    <span class="macro">include</span><span class="macro">!</span>(<span class="macro">concat</span><span class="macro">!</span>(<span class="macro">env</span><span class="macro">!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/capture.rs&quot;</span>));
-}
+<span class="kw">mod</span> <span class="ident">capture</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Bomb</span> {

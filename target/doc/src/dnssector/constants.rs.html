@@ -244,6 +244,66 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
 </pre><pre class="rust ">
 <span class="attribute">#<span class="op">!</span>[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 
@@ -254,7 +314,7 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">12</span>;
 
 <span class="doccomment">/// Offset to the first (and usually only) record of the question section, from the start of the packet.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OFFSET_QUESTION</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">DNS_HEADER_SIZE</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_QUESTION_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">DNS_HEADER_SIZE</span>;
 
 <span class="doccomment">/// Maximum length of a host name.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_MAX_HOSTNAME_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">255</span>;
@@ -283,11 +343,14 @@
 <span class="doccomment">/// Offset to the maximum payload for edns0-enabled UDP packets, for OPT RRs.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_MAX_PAYLOAD_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
 
-<span class="doccomment">/// Offset to the extended rcode ,for OPT RRs.</span>
+<span class="doccomment">/// Offset to the extended rcode, for OPT RRs.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_EXT_RCODE_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
 
 <span class="doccomment">/// Offset to the edns version number, for OPT RRs.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_EDNS_VERSION_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
+
+<span class="doccomment">/// Offset to the edns extended flags, for OPT RRs.</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_EDNS_EXT_FLAGS_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6</span>;
 
 <span class="doccomment">/// Offset to the total size of the edns records, within OPT RRS.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_OPT_RR_RDLEN_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
@@ -303,6 +366,25 @@
 
 <span class="doccomment">/// Size of the header of an extended RR.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_EDNS_RR_HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
+
+<span class="doccomment">/// Offset to the transaction ID, from the beginning of a DNS packet</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_TID_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+
+<span class="doccomment">/// Offset to the flags (including rcode and opcode), from the beginning of the DNS packet</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAGS_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
+
+<span class="doccomment">/// Offset to the return code, from the beginning of the DNS packet</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_RCODE_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
+
+<span class="comment">// DNS flags - 32 bit because we include extended flags</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_QR</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">15</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_AA</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">10</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_TC</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">9</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_RD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">8</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_RA</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">7</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_AD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">5</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_CD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">4</span>;
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_DO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">31</span>;
 
 <span class="doccomment">/// DNS query class</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
@@ -434,6 +516,44 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">EdnsOption</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u16</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">EdnsOption</span>) <span class="op">-&gt;</span> <span class="ident">u16</span> {
         <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u16</span>) }
+    }
+}
+
+<span class="doccomment">/// DNS return codes</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Rcode</span> {
+    <span class="ident">NOERROR</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="ident">FORMERR</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">SERVFAIL</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">NXDOMAIN</span> <span class="op">=</span> <span class="number">3</span>,
+    <span class="ident">NOTIMPL</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">REFUSED</span> <span class="op">=</span> <span class="number">5</span>,
+    <span class="ident">YXDOMAIN</span> <span class="op">=</span> <span class="number">6</span>,
+    <span class="ident">YXRRSET</span> <span class="op">=</span> <span class="number">7</span>,
+    <span class="ident">NXRRSET</span> <span class="op">=</span> <span class="number">8</span>,
+    <span class="ident">NOTAUTH</span> <span class="op">=</span> <span class="number">9</span>,
+    <span class="ident">NOTZONE</span> <span class="op">=</span> <span class="number">10</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Rcode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Rcode</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u8</span>) }
+    }
+}
+
+<span class="doccomment">/// DNS opcodes</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Opcode</span> {
+    <span class="ident">QUERY</span> <span class="op">=</span> <span class="number">0</span>,
+    <span class="ident">IQUERY</span> <span class="op">=</span> <span class="number">1</span>,
+    <span class="ident">STATUS</span> <span class="op">=</span> <span class="number">2</span>,
+    <span class="ident">NOTIFY</span> <span class="op">=</span> <span class="number">4</span>,
+    <span class="ident">UPDATE</span> <span class="op">=</span> <span class="number">5</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Opcode</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Opcode</span>) <span class="op">-&gt;</span> <span class="ident">u8</span> {
+        <span class="kw">unsafe</span> { <span class="ident">mem</span>::<span class="ident">transmute</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u8</span>) }
     }
 }
 

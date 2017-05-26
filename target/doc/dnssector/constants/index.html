@@ -48,7 +48,7 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/dnssector/constants.rs.html#1-201' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/dnssector/constants.rs.html#1-261' title='goto source code'>[src]</a></span></h1>
 <h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table>
                        <tr class=' module-item'>
@@ -63,6 +63,20 @@
                                   title='enum dnssector::constants::EdnsOption'>EdnsOption</a></td>
                            <td class='docblock-short'>
                                 <p>EDNS option</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Opcode.html"
+                                  title='enum dnssector::constants::Opcode'>Opcode</a></td>
+                           <td class='docblock-short'>
+                                <p>DNS opcodes</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="enum" href="enum.Rcode.html"
+                                  title='enum dnssector::constants::Rcode'>Rcode</a></td>
+                           <td class='docblock-short'>
+                                <p>DNS return codes</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -102,6 +116,69 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAGS_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_FLAGS_OFFSET'>DNS_FLAGS_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the flags (including rcode and opcode), from the beginning of the DNS packet</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_AA.html"
+                                  title='constant dnssector::constants::DNS_FLAG_AA'>DNS_FLAG_AA</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_AD.html"
+                                  title='constant dnssector::constants::DNS_FLAG_AD'>DNS_FLAG_AD</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_CD.html"
+                                  title='constant dnssector::constants::DNS_FLAG_CD'>DNS_FLAG_CD</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_DO.html"
+                                  title='constant dnssector::constants::DNS_FLAG_DO'>DNS_FLAG_DO</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_QR.html"
+                                  title='constant dnssector::constants::DNS_FLAG_QR'>DNS_FLAG_QR</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_RA.html"
+                                  title='constant dnssector::constants::DNS_FLAG_RA'>DNS_FLAG_RA</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_RD.html"
+                                  title='constant dnssector::constants::DNS_FLAG_RD'>DNS_FLAG_RD</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_FLAG_TC.html"
+                                  title='constant dnssector::constants::DNS_FLAG_TC'>DNS_FLAG_TC</a></td>
+                           <td class='docblock-short'>
+                                
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
                            <td><a class="constant" href="constant.DNS_HEADER_SIZE.html"
                                   title='constant dnssector::constants::DNS_HEADER_SIZE'>DNS_HEADER_SIZE</a></td>
                            <td class='docblock-short'>
@@ -123,10 +200,10 @@
                            </td>
                        </tr>
                        <tr class=' module-item'>
-                           <td><a class="constant" href="constant.DNS_OFFSET_QUESTION.html"
-                                  title='constant dnssector::constants::DNS_OFFSET_QUESTION'>DNS_OFFSET_QUESTION</a></td>
+                           <td><a class="constant" href="constant.DNS_OPT_RR_EDNS_EXT_FLAGS_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_OPT_RR_EDNS_EXT_FLAGS_OFFSET'>DNS_OPT_RR_EDNS_EXT_FLAGS_OFFSET</a></td>
                            <td class='docblock-short'>
-                                <p>Offset to the first (and usually only) record of the question section, from the start of the packet.</p>
+                                <p>Offset to the edns extended flags, for OPT RRs.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -140,7 +217,7 @@
                            <td><a class="constant" href="constant.DNS_OPT_RR_EXT_RCODE_OFFSET.html"
                                   title='constant dnssector::constants::DNS_OPT_RR_EXT_RCODE_OFFSET'>DNS_OPT_RR_EXT_RCODE_OFFSET</a></td>
                            <td class='docblock-short'>
-                                <p>Offset to the extended rcode ,for OPT RRs.</p>
+                                <p>Offset to the extended rcode, for OPT RRs.</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -162,6 +239,20 @@
                                   title='constant dnssector::constants::DNS_OPT_RR_RDLEN_OFFSET'>DNS_OPT_RR_RDLEN_OFFSET</a></td>
                            <td class='docblock-short'>
                                 <p>Offset to the total size of the edns records, within OPT RRS.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_QUESTION_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_QUESTION_OFFSET'>DNS_QUESTION_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the first (and usually only) record of the question section, from the start of the packet.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_RCODE_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_RCODE_OFFSET'>DNS_RCODE_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the return code, from the beginning of the DNS packet</p>
                            </td>
                        </tr>
                        <tr class=' module-item'>
@@ -204,6 +295,13 @@
                                   title='constant dnssector::constants::DNS_RR_TYPE_OFFSET'>DNS_RR_TYPE_OFFSET</a></td>
                            <td class='docblock-short'>
                                 <p>Offset to the type identifier, from the location right after the RR name.</p>
+                           </td>
+                       </tr>
+                       <tr class=' module-item'>
+                           <td><a class="constant" href="constant.DNS_TID_OFFSET.html"
+                                  title='constant dnssector::constants::DNS_TID_OFFSET'>DNS_TID_OFFSET</a></td>
+                           <td class='docblock-short'>
+                                <p>Offset to the transaction ID, from the beginning of a DNS packet</p>
                            </td>
                        </tr></table></section>
     <section id='search' class="content hidden"></section>
