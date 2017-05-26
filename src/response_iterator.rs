@@ -12,6 +12,7 @@ pub type NameServersIterator<'t> = ResponseIterator<'t>;
 pub type AdditionalIterator<'t> = ResponseIterator<'t>;
 
 impl<'t> TypedIterable for ResponseIterator<'t> {}
+impl<'t> RdataIterable for ResponseIterator<'t> {}
 
 impl<'t> DNSIterable for ResponseIterator<'t> {
     #[inline]

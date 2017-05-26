@@ -63,12 +63,16 @@ pub trait DNSIterable {
         let raw = self.raw_mut();
         &mut raw.packet[raw.name_end..]
     }
+}
 
-    /// Returns the name, as a byte vector. The name is not supposed to be valid UTF-8.
-    fn name(&self) -> Vec<u8> {
+pub trait TypedIterable {
+    /// Returns the RR name, as a byte vector. The name is not supposed to be valid UTF-8.
+    fn name(&self) -> Vec<u8>
+        where Self: DNSIterable
+    {
         let raw = self.raw();
         let mut offset = raw.offset;
-        let mut res: Vec<u8> = Vec::new();
+        let mut res: Vec<u8> = Vec::with_capacity(64);
         if raw.name_end <= offset {
             return res;
         }
@@ -95,9 +99,7 @@ pub trait DNSIterable {
         res.make_ascii_lowercase();
         res
     }
-}
 
-pub trait TypedIterable {
     /// Returns the query type for the current RR.
     #[inline]
     fn rr_type(&self) -> u16
@@ -113,11 +115,13 @@ pub trait TypedIterable {
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_CLASS_OFFSET..])
     }
+}
 
+pub trait RdataIterable {
     /// Returns the TTL for the current RR.
     #[inline]
     fn rr_ttl(&self) -> u32
-        where Self: DNSIterable
+        where Self: DNSIterable + TypedIterable
     {
         BigEndian::read_u32(&self.rdata_slice()[DNS_RR_TTL_OFFSET..])
     }
@@ -125,7 +129,7 @@ pub trait TypedIterable {
     /// Returns the record length for the current RR.
     #[inline]
     fn rr_rdlen(&self) -> usize
-        where Self: DNSIterable
+        where Self: DNSIterable + TypedIterable
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_RDLEN_OFFSET..]) as usize
     }

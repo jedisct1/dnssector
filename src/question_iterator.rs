@@ -7,6 +7,8 @@ pub struct QuestionIterator<'t> {
     rr_iterator: RRIterator<'t>,
 }
 
+impl<'t> TypedIterable for QuestionIterator<'t> {}
+
 impl<'t> DNSIterable for QuestionIterator<'t> {
     #[inline]
     fn offset(&self) -> Option<usize> {
