@@ -1,3 +1,4 @@
+use std::ascii::AsciiExt;
 use byteorder::{BigEndian, ByteOrder};
 use constants::*;
 use parsed_packet::*;
@@ -29,17 +30,17 @@ pub trait DNSIterable {
     /// Returns the offset of the current RR, or `None` if we haven't started iterating yet.
     fn offset(&self) -> Option<usize>;
 
-    /// Access the raw packet data.
+    /// Accesses the raw packet data.
     fn raw(&self) -> RRRaw;
 
-    /// Access the mutable raw packet data.
+    /// Accesses the mutable raw packet data.
     fn raw_mut(&mut self) -> RRRawMut;
 
-    /// Access the raw packet data, starting from the name.
+    /// Accesses the raw packet data, starting from the name.
     #[inline]
     fn name_slice(&self) -> &[u8] {
         let raw = self.raw();
-        &raw.packet[raw.offset..]
+        &raw.packet[raw.offset..raw.name_end]
     }
 
     /// Access the raw packet data, starting from right after the name.
@@ -49,18 +50,50 @@ pub trait DNSIterable {
         &raw.packet[raw.name_end..]
     }
 
-    /// Access the mutable raw packet data, starting from the name.
+    /// Accesses the mutable raw packet data, starting from the name.
     #[inline]
     fn name_slice_mut(&mut self) -> &mut [u8] {
         let raw = self.raw_mut();
-        &mut raw.packet[raw.offset..]
+        &mut raw.packet[raw.offset..raw.name_end]
     }
 
-    /// Access the mutable raw packet data, starting from right after the name.
+    /// Accesses the mutable raw packet data, starting from right after the name.
     #[inline]
     fn rdata_slice_mut(&mut self) -> &mut [u8] {
         let raw = self.raw_mut();
         &mut raw.packet[raw.name_end..]
+    }
+
+    /// Returns the name, as a byte vector. The name is not supposed to be valid UTF-8.
+    fn name(&self) -> Vec<u8> {
+        let raw = self.raw();
+        let mut offset = raw.offset;
+        let mut res: Vec<u8> = Vec::new();
+        if raw.name_end <= offset {
+            return res;
+        }
+        let packet = raw.packet;
+        loop {
+            let label_len = match packet[offset] {
+                0 => break,                    
+                len if len & 0xc0 == 0xc0 => {
+                    let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
+                    assert!(new_offset < offset);
+                    offset = new_offset;
+                    continue;
+                }
+                len => len,
+            } as usize;
+            offset += 1;
+            let label = &packet[offset..offset + label_len];
+            offset += label_len;
+            if !res.is_empty() {
+                res.push(b'.');
+            }
+            res.extend(label);
+        }
+        res.make_ascii_lowercase();
+        res
     }
 }
 
