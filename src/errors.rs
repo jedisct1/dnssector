@@ -1,11 +1,12 @@
 error_chain! {
     errors {
         PacketTooSmall
+        PacketTooLarge
         UnsupportedClass
         InternalError(t: &'static str) {
             description("Internal error")
             display("Internal error: '{}'", t)            
-        }        
+        }
         InvalidName(t: &'static str) {
             description("Invalid name in a DNS record")
             display("Invalid name in a DNS record: '{}'", t)            

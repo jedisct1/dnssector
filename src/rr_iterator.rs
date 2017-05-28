@@ -66,7 +66,7 @@ pub trait DNSIterable {
 }
 
 pub trait TypedIterable {
-    /// Returns the RR name, as a byte vector. The name is not supposed to be valid UTF-8.
+    /// Returns the RR name (labels are dot-telimited), as a byte vector. The name is not supposed to be valid UTF-8.
     fn name(&self) -> Vec<u8>
         where Self: DNSIterable
     {
@@ -79,7 +79,7 @@ pub trait TypedIterable {
         let packet = raw.packet;
         loop {
             let label_len = match packet[offset] {
-                0 => break,                    
+                0 => break,
                 len if len & 0xc0 == 0xc0 => {
                     let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
                     assert!(new_offset < offset);
@@ -98,6 +98,32 @@ pub trait TypedIterable {
         }
         res.make_ascii_lowercase();
         res
+    }
+
+    /// Appends the uncompressed RR name (raw format, with labels prefixed by their length) to the given vector.
+    fn copy_raw_name(&self, res: &mut Vec<u8>)
+        where Self: DNSIterable
+    {
+        let raw = self.raw();
+        let mut offset = raw.offset;
+        if raw.name_end <= offset {
+            return;
+        }
+        let packet = raw.packet;
+        loop {
+            let label_len = match packet[offset] {
+                0 => break,
+                len if len & 0xc0 == 0xc0 => {
+                    let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
+                    assert!(new_offset < offset);
+                    offset = new_offset;
+                    continue;
+                }
+                len => len,
+            } as usize;
+            res.extend(&packet[offset..offset + 1 + label_len]);
+            offset += 1 + label_len;
+        }
     }
 
     /// Returns the query type for the current RR.

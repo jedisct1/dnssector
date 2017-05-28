@@ -48,9 +48,14 @@ impl ParsedPacket {
         NameServersIterator::new(RRIterator::new(self, Section::NameServers)).next()
     }
 
-    /// Iterates over the additional section.
+    /// Iterates over the additional section - OPT RRs are skipped.
     pub fn into_iter_additional(&mut self) -> Option<AdditionalIterator> {
         AdditionalIterator::new(RRIterator::new(self, Section::Additional)).next()
+    }
+
+    /// Iterates over the additional section - OPT RRs are included.
+    pub fn into_iter_additional_including_opt(&mut self) -> Option<AdditionalIterator> {
+        AdditionalIterator::new(RRIterator::new(self, Section::Additional)).next_including_opt()
     }
 
     /// Iterates over the records from the optional edns pseudo-section.

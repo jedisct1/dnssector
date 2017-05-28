@@ -39,6 +39,17 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
     }
 
     fn next(mut self) -> Option<Self> {
+        self.next_including_opt()
+            .and_then(move |this| this.maybe_skip_opt_section())
+    }
+}
+
+impl<'t> ResponseIterator<'t> {
+    pub fn new(rr_iterator: RRIterator<'t>) -> Self {
+        ResponseIterator { rr_iterator }
+    }
+
+    pub fn next_including_opt(mut self) -> Option<Self> {
         {
             let rr_iterator = &mut self.rr_iterator;
             let parsed_packet = &mut rr_iterator.parsed_packet;
@@ -75,13 +86,7 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
                                                      rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
-        self.maybe_skip_opt_section()
-    }
-}
-
-impl<'t> ResponseIterator<'t> {
-    pub fn new(rr_iterator: RRIterator<'t>) -> Self {
-        ResponseIterator { rr_iterator }
+        Some(self)
     }
 
     fn maybe_skip_opt_section(mut self) -> Option<Self> {
