@@ -105,7 +105,8 @@ impl Compress {
                 debug_assert!(rr_rdlen.is_none());
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_QUESTION_HEADER_SIZE]);
             }
-            Some(x) if x == Type::NS.into() => {
+            Some(x) if x == Type::NS.into() || x == Type::CNAME.into() ||
+                       x == Type::DNAME.into() || x == Type::PTR.into() => {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
                 let new_rdlen = Compress::copy_uncompressed_name(&mut uncompressed,
