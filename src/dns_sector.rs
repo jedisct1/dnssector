@@ -1,4 +1,5 @@
 use byteorder::{BigEndian, ByteOrder};
+use compress::*;
 use constants::*;
 use errors::*;
 use parsed_packet::*;
@@ -125,65 +126,11 @@ impl DNSSector {
         Ok((BigEndian::read_u32(&self.packet[offset..])))
     }
 
-    /// Check that an encoded DNS name is valid. This includes following indirections for
+    /// Checks that an encoded DNS name is valid. This includes following indirections for
     /// compressed names, checks for label lengths, checks for truncated names and checks for
     /// cycles.
-    fn check_name(&self, mut offset: usize) -> Result<usize> {
-        let packet = &self.packet;
-        let packet_len = packet.len();
-        let mut name_len = 0;
-        let (mut barrier_offset, mut lowest_offset, mut final_offset) = (packet_len, offset, None);
-        let mut refs_allowed = DNS_MAX_HOSTNAME_INDIRECTIONS;
-        if offset >= packet_len {
-            bail!(ErrorKind::InternalError("Offset outside packet boundaries"));
-        }
-        if 1 > packet_len - offset {
-            bail!(ErrorKind::InvalidName("Empty name"));
-        }
-        loop {
-            if offset >= barrier_offset {
-                if offset >= packet_len {
-                    bail!(ErrorKind::InvalidName("Truncated name"));
-                }
-                bail!(ErrorKind::InvalidName("Cycle"));
-            }
-            let label_len = match packet[offset] {
-                len if len & 0xc0 == 0xc0 => {
-                    if refs_allowed <= 0 {
-                        bail!(ErrorKind::InvalidName("Too many indirections"));
-                    }
-                    refs_allowed -= 1;
-                    if 2 > packet_len - offset {
-                        bail!(ErrorKind::InvalidName("Invalid internal offset"));
-                    }
-                    let ref_offset = ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as
-                                     usize;
-                    if ref_offset >= lowest_offset {
-                        bail!(ErrorKind::InvalidName("Forward/self reference"));
-                    }
-                    final_offset = final_offset.or(Some(offset + 2));
-                    offset = ref_offset;
-                    barrier_offset = lowest_offset;
-                    lowest_offset = ref_offset;
-                    continue;
-                }
-                len if len > 0x3f => bail!(ErrorKind::InvalidName("Label length too long")),
-                len => len as usize,
-            };
-            if label_len >= packet_len - offset {
-                bail!(ErrorKind::InvalidName("Out-of-bounds name"));
-            }
-            name_len += label_len + 1;
-            if name_len > DNS_MAX_HOSTNAME_LEN {
-                bail!(ErrorKind::InvalidName("Name too long"));
-            }
-            offset += label_len + 1;
-            if label_len == 0 {
-                break;
-            }
-        }
-        let final_offset = final_offset.unwrap_or(offset);
-        Ok(final_offset)
+    fn check_name(&self, offset: usize) -> Result<usize> {
+        Compress::check_compressed_name(&self.packet, offset)
     }
 
     /// Verifies that a name has been properly encoded, and sets the internal

@@ -38,7 +38,7 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
         }
     }
 
-    fn next(mut self) -> Option<Self> {
+    fn next(self) -> Option<Self> {
         self.next_including_opt()
             .and_then(move |this| this.maybe_skip_opt_section())
     }
