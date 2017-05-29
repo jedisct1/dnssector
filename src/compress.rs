@@ -69,10 +69,10 @@ impl Compress {
 
     /// Uncompresses a name starting at `offset`, and puts the result into `name`.
     /// This function assumes that the input is trusted and doesn't perform any checks.
-    pub fn copy_uncompressed_name(name: &mut Vec<u8>, packet: &[u8], mut offset: usize) {
+    pub fn copy_uncompressed_name(name: &mut Vec<u8>, packet: &[u8], mut offset: usize) -> usize {
+        let mut name_len = 0;
         loop {
             let label_len = match packet[offset] {
-                0 => break,
                 len if len & 0xc0 == 0xc0 => {
                     let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
                     assert!(new_offset < offset);
@@ -81,9 +81,15 @@ impl Compress {
                 }
                 len => len,
             } as usize;
-            name.extend(&packet[offset..offset + 1 + label_len]);
-            offset += 1 + label_len;
+            let prefixed_label_len = 1 + label_len;
+            name.extend(&packet[offset..offset + prefixed_label_len]);
+            name_len += prefixed_label_len;
+            offset += prefixed_label_len;
+            if label_len == 0 {
+                break;
+            }
         }
+        name_len
     }
 
     /// Uncompresses untrusted record's data and puts the result into `name`.
@@ -97,15 +103,20 @@ impl Compress {
         match rr_type {
             None => {
                 debug_assert!(rr_rdlen.is_none());
-                uncompressed.extend_from_slice(&rdata[..DNS_RR_QUESTION_HEADER_SIZE])
+                uncompressed.extend_from_slice(&rdata[..DNS_RR_QUESTION_HEADER_SIZE]);
             }
             Some(x) if x == Type::NS.into() => {
+                let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
-                Compress::copy_uncompressed_name(&mut uncompressed,
-                                                 packet,
-                                                 offset_rdata + DNS_RR_HEADER_SIZE);
+                let new_rdlen = Compress::copy_uncompressed_name(&mut uncompressed,
+                                                                 packet,
+                                                                 offset_rdata + DNS_RR_HEADER_SIZE);
+                BigEndian::write_u16(&mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
+                                     new_rdlen as u16);
             }
-            _ => uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + rr_rdlen.unwrap()]),
+            _ => {
+                uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + rr_rdlen.unwrap()]);
+            }
         }
     }
 
