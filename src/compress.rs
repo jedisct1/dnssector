@@ -115,6 +115,17 @@ impl Compress {
                 BigEndian::write_u16(&mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
                                      new_rdlen as u16);
             }
+            Some(x) if x == Type::MX.into() => {
+                let offset = uncompressed.len();
+                uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
+                let new_rdlen = 2 +
+                                Compress::copy_uncompressed_name(&mut uncompressed,
+                                                                 packet,
+                                                                 offset_rdata + DNS_RR_HEADER_SIZE +
+                                                                 2);
+                BigEndian::write_u16(&mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
+                                     new_rdlen as u16);
+            }
             _ => {
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + rr_rdlen.unwrap()]);
             }
