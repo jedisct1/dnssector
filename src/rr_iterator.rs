@@ -109,6 +109,7 @@ pub trait TypedIterable {
     }
 
     /// Appends the uncompressed RR name (raw format, with labels prefixed by their length) to the given vector.
+    /// Returns the length of the uncompressed name.
     fn copy_raw_name(&self, name: &mut Vec<u8>) -> usize
         where Self: DNSIterable
     {
@@ -117,7 +118,7 @@ pub trait TypedIterable {
             return 0;
         }
         let packet = raw.packet;
-        Compress::copy_uncompressed_name(name, raw.packet, raw.offset)
+        Compress::copy_uncompressed_name(name, raw.packet, raw.offset).name_len
     }
 
     /// Returns the query type for the current RR.
