@@ -131,14 +131,14 @@ impl DNSSector {
     /// Checks that an encoded DNS name is valid. This includes following indirections for
     /// compressed names, checks for label lengths, checks for truncated names and checks for
     /// cycles.
-    fn check_name(&self, offset: usize) -> Result<usize> {
+    fn check_compressed_name(&self, offset: usize) -> Result<usize> {
         Compress::check_compressed_name(&self.packet, offset)
     }
 
     /// Verifies that a name has been properly encoded, and sets the internal
     /// offset to the location right after than name.
     fn skip_name(&mut self) -> Result<()> {
-        let offset = self.check_name(self.offset)?;
+        let offset = self.check_compressed_name(self.offset)?;
         self.set_offset(offset).map(|_| {})
     }
 
@@ -265,13 +265,16 @@ impl DNSSector {
     fn parse_rr(&mut self, section: Section) -> Result<()> {
         self.skip_name()?;
         let rr_type = self.rr_type()?;
-        if rr_type == Type::OPT.into() {
-            if section != Section::Additional {
-                bail!(ErrorKind::InvalidPacket(
-                    "OPT RRs must be in the additional section",
-                ));
+        match rr_type {
+            x if x == Type::OPT.into() => {
+                if section != Section::Additional {
+                    bail!(ErrorKind::InvalidPacket(
+                        "OPT RRs must be in the additional section",
+                    ));
+                }
+                return self.parse_opt();
             }
-            return self.parse_opt();
+            _ => {}
         }
         let inc = DNS_RR_HEADER_SIZE + self.rr_rdlen()?;
         self.increment_offset(inc)?;
