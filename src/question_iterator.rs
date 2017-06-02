@@ -51,9 +51,10 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
             }
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
-            rr_iterator.name_end =
-                RRIterator::skip_name(&rr_iterator.parsed_packet.dns_sector.packet,
-                                      rr_iterator.offset.unwrap());
+            rr_iterator.name_end = RRIterator::skip_name(
+                &rr_iterator.parsed_packet.dns_sector.packet,
+                rr_iterator.offset.unwrap(),
+            );
             let offset_next = rr_iterator.name_end + DNS_RR_QUESTION_HEADER_SIZE;
             rr_iterator.offset_next = offset_next;
         }

@@ -39,8 +39,9 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
     }
 
     fn next(self) -> Option<Self> {
-        self.next_including_opt()
-            .and_then(move |this| this.maybe_skip_opt_section())
+        self.next_including_opt().and_then(move |this| {
+                this.maybe_skip_opt_section()
+            })
     }
 }
 
@@ -56,16 +57,22 @@ impl<'t> ResponseIterator<'t> {
             if rr_iterator.offset.is_none() {
                 let (count, offset) = match rr_iterator.section {
                     Section::Answer => {
-                        (DNSSector::ancount(&parsed_packet.dns_sector.packet),
-                         parsed_packet.offset_answers)
+                        (
+                            DNSSector::ancount(&parsed_packet.dns_sector.packet),
+                            parsed_packet.offset_answers,
+                        )
                     }
                     Section::NameServers => {
-                        (DNSSector::nscount(&parsed_packet.dns_sector.packet),
-                         parsed_packet.offset_nameservers)
+                        (
+                            DNSSector::nscount(&parsed_packet.dns_sector.packet),
+                            parsed_packet.offset_nameservers,
+                        )
                     }
                     Section::Additional => {
-                        (DNSSector::arcount(&parsed_packet.dns_sector.packet),
-                         parsed_packet.offset_additional)
+                        (
+                            DNSSector::arcount(&parsed_packet.dns_sector.packet),
+                            parsed_packet.offset_additional,
+                        )
                     }                    
                     _ => unreachable!("Unexpected section"),
                 };
@@ -80,10 +87,12 @@ impl<'t> ResponseIterator<'t> {
             }
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
-            rr_iterator.name_end = RRIterator::skip_name(&parsed_packet.dns_sector.packet,
-                                                         rr_iterator.offset.unwrap());
-            let offset_next = RRIterator::skip_rdata(&parsed_packet.dns_sector.packet,
-                                                     rr_iterator.name_end);
+            rr_iterator.name_end = RRIterator::skip_name(
+                &parsed_packet.dns_sector.packet,
+                rr_iterator.offset.unwrap(),
+            );
+            let offset_next =
+                RRIterator::skip_rdata(&parsed_packet.dns_sector.packet, rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         Some(self)
@@ -98,10 +107,12 @@ impl<'t> ResponseIterator<'t> {
                 return None;
             }
             rr_iterator.offset = Some(rr_iterator.offset_next);
-            rr_iterator.name_end = RRIterator::skip_name(&parsed_packet.dns_sector.packet,
-                                                         rr_iterator.offset.unwrap());
-            let offset_next = RRIterator::skip_rdata(&parsed_packet.dns_sector.packet,
-                                                     rr_iterator.name_end);
+            rr_iterator.name_end = RRIterator::skip_name(
+                &parsed_packet.dns_sector.packet,
+                rr_iterator.offset.unwrap(),
+            );
+            let offset_next =
+                RRIterator::skip_rdata(&parsed_packet.dns_sector.packet, rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         debug_assert!(self.rr_type() != Type::OPT.into());

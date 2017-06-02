@@ -92,7 +92,9 @@ impl DNSSector {
     /// Sets the internal offset to the data to be parsed to an arbitrary location
     pub fn set_offset(&mut self, offset: usize) -> Result<usize> {
         if offset >= self.packet.len() {
-            bail!(ErrorKind::InternalError("Setting offset past the end of the packet"))
+            bail!(ErrorKind::InternalError(
+                "Setting offset past the end of the packet",
+            ))
         }
         Ok(mem::replace(&mut self.offset, offset))
     }
@@ -198,7 +200,9 @@ impl DNSSector {
         }
         let qdcount = Self::qdcount(&self.packet);
         if qdcount > 1 {
-            bail!(ErrorKind::InvalidPacket("A DNS packet cannot contain more than one question"));
+            bail!(ErrorKind::InvalidPacket(
+                "A DNS packet cannot contain more than one question",
+            ));
         }
         self.set_offset(DNS_QUESTION_OFFSET)?;
         let offset_question = if qdcount > 0 { Some(self.offset) } else { None };
@@ -222,7 +226,9 @@ impl DNSSector {
             self.parse_rr(Section::Additional)?;
         }
         if self.remaining_len() > 0 {
-            bail!(ErrorKind::InvalidPacket("Extra data found after the last record"));
+            bail!(ErrorKind::InvalidPacket(
+                "Extra data found after the last record",
+            ));
         }
         let edns_start = self.edns_start;
         let ext_rcode = self.ext_rcode;
@@ -261,7 +267,9 @@ impl DNSSector {
         let rr_type = self.rr_type()?;
         if rr_type == Type::OPT.into() {
             if section != Section::Additional {
-                bail!(ErrorKind::InvalidPacket("OPT RRs must be in the additional section"));
+                bail!(ErrorKind::InvalidPacket(
+                    "OPT RRs must be in the additional section",
+                ));
             }
             return self.parse_opt();
         }
@@ -300,15 +308,19 @@ impl DNSSector {
     fn edns_be16_load(&self, rr_offset: usize) -> Result<u16> {
         self.edns_ensure_remaining_len(rr_offset + 2)?;
         let offset = self.offset + rr_offset;
-        Ok((self.packet[offset] as u16) << 8 | self.packet[offset + 1] as u16)
+        Ok(
+            (self.packet[offset] as u16) << 8 | self.packet[offset + 1] as u16,
+        )
     }
 
     #[inline]
     fn edns_be32_load(&self, rr_offset: usize) -> Result<u32> {
         self.edns_ensure_remaining_len(rr_offset + 4)?;
         let offset = self.offset + rr_offset;
-        Ok((self.packet[offset] as u32) << 24 | (self.packet[offset + 1] as u32) << 16 |
-           (self.packet[offset + 2] as u32) << 8 | self.packet[offset + 3] as u32)
+        Ok(
+            (self.packet[offset] as u32) << 24 | (self.packet[offset + 1] as u32) << 16 |
+                (self.packet[offset + 2] as u32) << 8 | self.packet[offset + 3] as u32,
+        )
     }
 
     /// Returns the extended code of a record within the edns pseudo-section.
@@ -320,8 +332,9 @@ impl DNSSector {
     /// Returns the record length of a record within the edns pseudo-section.
     #[inline]
     pub fn edns_rr_rdlen(&self) -> Result<usize> {
-        self.edns_be16_load(DNS_EDNS_RR_RDLEN_OFFSET)
-            .map(|x| x as usize)
+        self.edns_be16_load(DNS_EDNS_RR_RDLEN_OFFSET).map(
+            |x| x as usize,
+        )
     }
 
     /// Skips over a record of the edns pseudo-section.
@@ -334,8 +347,9 @@ impl DNSSector {
     /// Returns the maximum payload size for UDP packets, from an optional `OPT` record.
     #[inline]
     fn opt_rr_max_payload(&self) -> Result<usize> {
-        self.be16_load(DNS_OPT_RR_MAX_PAYLOAD_OFFSET)
-            .map(|x| x as usize)
+        self.be16_load(DNS_OPT_RR_MAX_PAYLOAD_OFFSET).map(
+            |x| x as usize,
+        )
     }
 
     /// Returns the extended return code, from an optional `OPT` record.

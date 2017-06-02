@@ -26,7 +26,9 @@ pub struct RRRawMut<'t> {
 /// The `DNSIterable` trait represents a set of records that can be iterated over.
 pub trait DNSIterable {
     /// Returns the next record, or `None` if there aren't any left.
-    fn next(self) -> Option<Self> where Self: marker::Sized;
+    fn next(self) -> Option<Self>
+    where
+        Self: marker::Sized;
 
     /// Returns the offset of the current RR, or `None` if we haven't started iterating yet.
     fn offset(&self) -> Option<usize>;
@@ -76,7 +78,8 @@ pub trait DNSIterable {
 pub trait TypedIterable {
     /// Returns the RR name (labels are dot-telimited), as a byte vector. The name is not supposed to be valid UTF-8.
     fn name(&self) -> Vec<u8>
-        where Self: DNSIterable
+    where
+        Self: DNSIterable,
     {
         let raw = self.raw();
         let mut offset = raw.offset;
@@ -111,7 +114,8 @@ pub trait TypedIterable {
     /// Appends the uncompressed RR name (raw format, with labels prefixed by their length) to the given vector.
     /// Returns the length of the uncompressed name.
     fn copy_raw_name(&self, name: &mut Vec<u8>) -> usize
-        where Self: DNSIterable
+    where
+        Self: DNSIterable,
     {
         let raw = self.raw();
         if raw.name_end <= raw.offset {
@@ -124,7 +128,8 @@ pub trait TypedIterable {
     /// Returns the query type for the current RR.
     #[inline]
     fn rr_type(&self) -> u16
-        where Self: DNSIterable
+    where
+        Self: DNSIterable,
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_TYPE_OFFSET..])
     }
@@ -132,7 +137,8 @@ pub trait TypedIterable {
     /// Returns the query class for the current RR.
     #[inline]
     fn rr_class(&self) -> u16
-        where Self: DNSIterable
+    where
+        Self: DNSIterable,
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_CLASS_OFFSET..])
     }
@@ -142,7 +148,8 @@ pub trait RdataIterable {
     /// Returns the TTL for the current RR.
     #[inline]
     fn rr_ttl(&self) -> u32
-        where Self: DNSIterable + TypedIterable
+    where
+        Self: DNSIterable + TypedIterable,
     {
         BigEndian::read_u32(&self.rdata_slice()[DNS_RR_TTL_OFFSET..])
     }
@@ -150,7 +157,8 @@ pub trait RdataIterable {
     /// Returns the record length for the current RR.
     #[inline]
     fn rr_rdlen(&self) -> usize
-        where Self: DNSIterable + TypedIterable
+    where
+        Self: DNSIterable + TypedIterable,
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_RDLEN_OFFSET..]) as usize
     }

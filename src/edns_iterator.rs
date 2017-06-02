@@ -50,8 +50,8 @@ impl<'t> DNSIterable for EdnsIterator<'t> {
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
             rr_iterator.name_end = rr_iterator.offset.unwrap();
-            let offset_next = RRIterator::edns_skip_rr(&parsed_packet.dns_sector.packet,
-                                                       rr_iterator.name_end);
+            let offset_next =
+                RRIterator::edns_skip_rr(&parsed_packet.dns_sector.packet, rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         Some(self)

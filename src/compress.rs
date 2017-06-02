@@ -46,8 +46,8 @@ impl Compress {
                     if 2 > packet_len - offset {
                         bail!(ErrorKind::InvalidName("Invalid internal offset"));
                     }
-                    let ref_offset = ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as
-                                     usize;
+                    let ref_offset =
+                        ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as usize;
                     if ref_offset >= lowest_offset {
                         bail!(ErrorKind::InvalidName("Forward/self reference"));
                     }
@@ -127,37 +127,46 @@ impl Compress {
             Some(x) if x == Type::NS.into() || x == Type::CNAME.into() || x == Type::PTR.into() => {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
-                let new_rdlen = Compress::copy_uncompressed_name(&mut uncompressed,
-                                                                 packet,
-                                                                 offset_rdata + DNS_RR_HEADER_SIZE)
-                    .name_len;
-                BigEndian::write_u16(&mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
-                                     new_rdlen as u16);
+                let new_rdlen = Compress::copy_uncompressed_name(
+                    &mut uncompressed,
+                    packet,
+                    offset_rdata + DNS_RR_HEADER_SIZE,
+                ).name_len;
+                BigEndian::write_u16(
+                    &mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
+                    new_rdlen as u16,
+                );
             }
             Some(x) if x == Type::MX.into() => {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
                 let new_rdlen = 2 +
-                                Compress::copy_uncompressed_name(&mut uncompressed,
-                                                                 packet,
-                                                                 offset_rdata + DNS_RR_HEADER_SIZE +
-                                                                 2)
-                                    .name_len;
-                BigEndian::write_u16(&mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
-                                     new_rdlen as u16);
+                    Compress::copy_uncompressed_name(
+                        &mut uncompressed,
+                        packet,
+                        offset_rdata + DNS_RR_HEADER_SIZE + 2,
+                    ).name_len;
+                BigEndian::write_u16(
+                    &mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
+                    new_rdlen as u16,
+                );
             }
             Some(x) if x == Type::SOA.into() => {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
-                let u1 = Compress::copy_uncompressed_name(&mut uncompressed,
-                                                          packet,
-                                                          offset_rdata + DNS_RR_HEADER_SIZE);
+                let u1 = Compress::copy_uncompressed_name(
+                    &mut uncompressed,
+                    packet,
+                    offset_rdata + DNS_RR_HEADER_SIZE,
+                );
                 let u2 =
                     Compress::copy_uncompressed_name(&mut uncompressed, packet, u1.final_offset);
                 uncompressed.extend_from_slice(&packet[u2.final_offset..u2.final_offset + 20]);
                 let new_rdlen = u1.name_len + u2.name_len + 20;
-                BigEndian::write_u16(&mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
-                                     new_rdlen as u16);
+                BigEndian::write_u16(
+                    &mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
+                    new_rdlen as u16,
+                );
             }
             _ => {
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + rr_rdlen.unwrap()]);
@@ -185,10 +194,12 @@ impl Compress {
             let mut it = parsed_packet.into_iter_answer();
             while let Some(item) = it {
                 item.copy_raw_name(&mut uncompressed);
-                Self::uncompress_rdata(&mut uncompressed,
-                                       item.raw(),
-                                       Some(item.rr_type()),
-                                       Some(item.rr_rdlen()));
+                Self::uncompress_rdata(
+                    &mut uncompressed,
+                    item.raw(),
+                    Some(item.rr_type()),
+                    Some(item.rr_rdlen()),
+                );
                 it = item.next();
             }
         }
@@ -196,10 +207,12 @@ impl Compress {
             let mut it = parsed_packet.into_iter_nameservers();
             while let Some(item) = it {
                 item.copy_raw_name(&mut uncompressed);
-                Self::uncompress_rdata(&mut uncompressed,
-                                       item.raw(),
-                                       Some(item.rr_type()),
-                                       Some(item.rr_rdlen()));
+                Self::uncompress_rdata(
+                    &mut uncompressed,
+                    item.raw(),
+                    Some(item.rr_type()),
+                    Some(item.rr_rdlen()),
+                );
                 it = item.next();
             }
         }
@@ -207,10 +220,12 @@ impl Compress {
             let mut it = parsed_packet.into_iter_additional_including_opt();
             while let Some(item) = it {
                 item.copy_raw_name(&mut uncompressed);
-                Self::uncompress_rdata(&mut uncompressed,
-                                       item.raw(),
-                                       Some(item.rr_type()),
-                                       Some(item.rr_rdlen()));
+                Self::uncompress_rdata(
+                    &mut uncompressed,
+                    item.raw(),
+                    Some(item.rr_type()),
+                    Some(item.rr_rdlen()),
+                );
                 it = item.next_including_opt();
             }
         }
