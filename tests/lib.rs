@@ -242,4 +242,20 @@ mod tests {
         assert_eq!(flags & DNS_FLAG_RD, DNS_FLAG_RD);
         assert_eq!(flags, 0x80008500);
     }
+
+    #[test]
+    fn test_packet_edns_client_subnet_1() {
+        let data = vec![0x43, 0x96, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+                        0x03, 0x63, 0x39, 0x78, 0x03, 0x6f, 0x72, 0x67, 0x00, 0x00, 0x10, 0x00,
+                        0x01, 0x00, 0x00, 0x29, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0b,
+                        0x00, 0x08, 0x00, 0x07, 0x00, 0x01, 0x18, 0x00, 0xa3, 0x05, 0x01];
+        let dns_sector = DNSSector::new(data).unwrap();
+        let ret = dns_sector.parse().expect("Valid packet couldn't be parsed");
+        let flags = ret.flags();
+        assert_eq!(flags & DNS_FLAG_DO, 0);
+        assert_eq!(flags & DNS_FLAG_QR, 0);
+        assert_eq!(flags & DNS_FLAG_AD, 0);
+        assert_eq!(flags & DNS_FLAG_RD, DNS_FLAG_RD);
+        assert_eq!(flags, 0x100);
+    }
 }
