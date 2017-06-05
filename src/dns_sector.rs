@@ -265,6 +265,7 @@ impl DNSSector {
     fn parse_rr(&mut self, section: Section) -> Result<()> {
         self.skip_name()?;
         let rr_type = self.rr_type()?;
+        let rr_rdlen = self.rr_rdlen()?;
         match rr_type {
             x if x == Type::OPT.into() => {
                 if section != Section::Additional {
@@ -274,10 +275,36 @@ impl DNSSector {
                 }
                 return self.parse_opt();
             }
-            _ => {}
+            x if x == Type::NS.into() || x == Type::CNAME.into() || x == Type::PTR.into() => {
+                if rr_rdlen <= 0 {
+                    bail!(ErrorKind::PacketTooSmall);
+                }
+                self.increment_offset(DNS_RR_HEADER_SIZE)?;
+                let final_offset = Compress::check_compressed_name(&self.packet, self.offset)?;
+                if final_offset - self.offset != rr_rdlen {
+                    bail!(ErrorKind::InvalidPacket(
+                        "Unexpected data after name in rdata",
+                    ))
+                }
+                self.increment_offset(rr_rdlen)?;
+            }
+            x if x == Type::MX.into() => {
+                if rr_rdlen <= 2 {
+                    bail!(ErrorKind::PacketTooSmall);
+                }
+                self.increment_offset(DNS_RR_HEADER_SIZE)?;
+                let final_offset = Compress::check_compressed_name(&self.packet, self.offset + 2)?;
+                if final_offset - self.offset != rr_rdlen {
+                    bail!(ErrorKind::InvalidPacket(
+                        "Unexpected data after name in rdata",
+                    ))
+                }
+                self.increment_offset(rr_rdlen)?;
+            }
+            _ => {
+                self.increment_offset(DNS_RR_HEADER_SIZE + rr_rdlen)?;
+            }
         }
-        let inc = DNS_RR_HEADER_SIZE + self.rr_rdlen()?;
-        self.increment_offset(inc)?;
         Ok(())
     }
 
@@ -397,6 +424,7 @@ impl DNSSector {
             self.edns_skip_rr()?;
             self.edns_count += 1;
         }
+        debug_assert_eq!(self.edns_remaining_len(), 0);
         Ok(())
     }
 }
