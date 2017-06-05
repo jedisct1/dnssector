@@ -61,15 +61,17 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
+<span id="19">19</span>
 </pre><pre class="rust ">
 <span class="macro">error_chain</span><span class="macro">!</span> {
     <span class="ident">errors</span> {
         <span class="ident">PacketTooSmall</span>
+        <span class="ident">PacketTooLarge</span>
         <span class="ident">UnsupportedClass</span>
         <span class="ident">InternalError</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
             <span class="ident">description</span>(<span class="string">&quot;Internal error&quot;</span>)
             <span class="ident">display</span>(<span class="string">&quot;Internal error: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)            
-        }        
+        }
         <span class="ident">InvalidName</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
             <span class="ident">description</span>(<span class="string">&quot;Invalid name in a DNS record&quot;</span>)
             <span class="ident">display</span>(<span class="string">&quot;Invalid name in a DNS record: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)            

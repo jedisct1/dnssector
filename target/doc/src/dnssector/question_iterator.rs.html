@@ -111,6 +111,7 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
+<span id="69">69</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">constants</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">dns_sector</span>::<span class="kw-2">*</span>;
@@ -165,9 +166,10 @@
             }
             <span class="ident">rr_iterator</span>.<span class="ident">rrs_left</span> <span class="op">-=</span> <span class="number">1</span>;
             <span class="ident">rr_iterator</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rr_iterator</span>.<span class="ident">offset_next</span>);
-            <span class="ident">rr_iterator</span>.<span class="ident">name_end</span> <span class="op">=</span>
-                <span class="ident">RRIterator</span>::<span class="ident">skip_name</span>(<span class="kw-2">&amp;</span><span class="ident">rr_iterator</span>.<span class="ident">parsed_packet</span>.<span class="ident">dns_sector</span>.<span class="ident">packet</span>,
-                                      <span class="ident">rr_iterator</span>.<span class="ident">offset</span>.<span class="ident">unwrap</span>());
+            <span class="ident">rr_iterator</span>.<span class="ident">name_end</span> <span class="op">=</span> <span class="ident">RRIterator</span>::<span class="ident">skip_name</span>(
+                <span class="kw-2">&amp;</span><span class="ident">rr_iterator</span>.<span class="ident">parsed_packet</span>.<span class="ident">dns_sector</span>.<span class="ident">packet</span>,
+                <span class="ident">rr_iterator</span>.<span class="ident">offset</span>.<span class="ident">unwrap</span>(),
+            );
             <span class="kw">let</span> <span class="ident">offset_next</span> <span class="op">=</span> <span class="ident">rr_iterator</span>.<span class="ident">name_end</span> <span class="op">+</span> <span class="ident">DNS_RR_QUESTION_HEADER_SIZE</span>;
             <span class="ident">rr_iterator</span>.<span class="ident">offset_next</span> <span class="op">=</span> <span class="ident">offset_next</span>;
         }

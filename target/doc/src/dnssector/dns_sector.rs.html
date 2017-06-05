@@ -481,8 +481,63 @@
 <span id="436">436</span>
 <span id="437">437</span>
 <span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ByteOrder</span>};
+<span class="kw">use</span> <span class="ident">compress</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">parsed_packet</span>::<span class="kw-2">*</span>;
@@ -575,7 +630,9 @@
     <span class="doccomment">/// Sets the internal offset to the data to be parsed to an arbitrary location</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="self">self</span>.<span class="ident">packet</span>.<span class="ident">len</span>() {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InternalError</span>(<span class="string">&quot;Setting offset past the end of the packet&quot;</span>))
+            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InternalError</span>(
+                <span class="string">&quot;Setting offset past the end of the packet&quot;</span>,
+            ))
         }
         <span class="prelude-val">Ok</span>(<span class="ident">mem</span>::<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">offset</span>, <span class="ident">offset</span>))
     }
@@ -609,71 +666,17 @@
         <span class="prelude-val">Ok</span>((<span class="ident">BigEndian</span>::<span class="ident">read_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span>..])))
     }
 
-    <span class="doccomment">/// Check that an encoded DNS name is valid. This includes following indirections for</span>
+    <span class="doccomment">/// Checks that an encoded DNS name is valid. This includes following indirections for</span>
     <span class="doccomment">/// compressed names, checks for label lengths, checks for truncated names and checks for</span>
     <span class="doccomment">/// cycles.</span>
-    <span class="kw">fn</span> <span class="ident">check_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">offset</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>;
-        <span class="kw">let</span> <span class="ident">packet_len</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name_len</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">barrier_offset</span>, <span class="kw-2">mut</span> <span class="ident">lowest_offset</span>, <span class="kw-2">mut</span> <span class="ident">final_offset</span>) <span class="op">=</span> (<span class="ident">packet_len</span>, <span class="ident">offset</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">refs_allowed</span> <span class="op">=</span> <span class="ident">DNS_MAX_HOSTNAME_INDIRECTIONS</span>;
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="ident">packet_len</span> {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InternalError</span>(<span class="string">&quot;Offset outside packet boundaries&quot;</span>));
-        }
-        <span class="kw">if</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="ident">packet_len</span> <span class="op">-</span> <span class="ident">offset</span> {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Empty name&quot;</span>));
-        }
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="ident">barrier_offset</span> {
-                <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="ident">packet_len</span> {
-                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Truncated name&quot;</span>));
-                }
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Cycle&quot;</span>));
-            }
-            <span class="kw">let</span> <span class="ident">label_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">packet</span>[<span class="ident">offset</span>] {
-                <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&amp;</span> <span class="number">0xc0</span> <span class="op">==</span> <span class="number">0xc0</span> <span class="op">=&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">refs_allowed</span> <span class="op">&lt;=</span> <span class="number">0</span> {
-                        <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Too many indirections&quot;</span>));
-                    }
-                    <span class="ident">refs_allowed</span> <span class="op">-=</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="number">2</span> <span class="op">&gt;</span> <span class="ident">packet_len</span> <span class="op">-</span> <span class="ident">offset</span> {
-                        <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Invalid internal offset&quot;</span>));
-                    }
-                    <span class="kw">let</span> <span class="ident">ref_offset</span> <span class="op">=</span> ((((<span class="ident">len</span> <span class="op">&amp;</span> <span class="number">0x3f</span>) <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span>) <span class="op">|</span> (<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>]) <span class="kw">as</span> <span class="ident">u16</span>) <span class="kw">as</span>
-                                     <span class="ident">usize</span>;
-                    <span class="kw">if</span> <span class="ident">ref_offset</span> <span class="op">&gt;=</span> <span class="ident">lowest_offset</span> {
-                        <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Forward/self reference&quot;</span>));
-                    }
-                    <span class="ident">final_offset</span> <span class="op">=</span> <span class="ident">final_offset</span>.<span class="ident">or</span>(<span class="prelude-val">Some</span>(<span class="ident">offset</span> <span class="op">+</span> <span class="number">2</span>));
-                    <span class="ident">offset</span> <span class="op">=</span> <span class="ident">ref_offset</span>;
-                    <span class="ident">barrier_offset</span> <span class="op">=</span> <span class="ident">lowest_offset</span>;
-                    <span class="ident">lowest_offset</span> <span class="op">=</span> <span class="ident">ref_offset</span>;
-                    <span class="kw">continue</span>;
-                }
-                <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0x3f</span> <span class="op">=&gt;</span> <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Label length too long&quot;</span>)),
-                <span class="ident">len</span> <span class="op">=&gt;</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            };
-            <span class="kw">if</span> <span class="ident">label_len</span> <span class="op">&gt;=</span> <span class="ident">packet_len</span> <span class="op">-</span> <span class="ident">offset</span> {
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Out-of-bounds name&quot;</span>));
-            }
-            <span class="ident">name_len</span> <span class="op">+=</span> <span class="ident">label_len</span> <span class="op">+</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">name_len</span> <span class="op">&gt;</span> <span class="ident">DNS_MAX_HOSTNAME_LEN</span> {
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Name too long&quot;</span>));
-            }
-            <span class="ident">offset</span> <span class="op">+=</span> <span class="ident">label_len</span> <span class="op">+</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">label_len</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">break</span>;
-            }
-        }
-        <span class="kw">let</span> <span class="ident">final_offset</span> <span class="op">=</span> <span class="ident">final_offset</span>.<span class="ident">unwrap_or</span>(<span class="ident">offset</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">final_offset</span>)
+    <span class="kw">fn</span> <span class="ident">check_compressed_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="ident">Compress</span>::<span class="ident">check_compressed_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>, <span class="ident">offset</span>)
     }
 
     <span class="doccomment">/// Verifies that a name has been properly encoded, and sets the internal</span>
     <span class="doccomment">/// offset to the location right after than name.</span>
     <span class="kw">fn</span> <span class="ident">skip_name</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">check_name</span>(<span class="self">self</span>.<span class="ident">offset</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">check_compressed_name</span>(<span class="self">self</span>.<span class="ident">offset</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">set_offset</span>(<span class="ident">offset</span>).<span class="ident">map</span>(<span class="op">|</span>_<span class="op">|</span> {})
     }
 
@@ -735,7 +738,9 @@
         }
         <span class="kw">let</span> <span class="ident">qdcount</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">qdcount</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>);
         <span class="kw">if</span> <span class="ident">qdcount</span> <span class="op">&gt;</span> <span class="number">1</span> {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(<span class="string">&quot;A DNS packet cannot contain more than one question&quot;</span>));
+            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                <span class="string">&quot;A DNS packet cannot contain more than one question&quot;</span>,
+            ));
         }
         <span class="self">self</span>.<span class="ident">set_offset</span>(<span class="ident">DNS_QUESTION_OFFSET</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">offset_question</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">qdcount</span> <span class="op">&gt;</span> <span class="number">0</span> { <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">offset</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
@@ -759,7 +764,9 @@
             <span class="self">self</span>.<span class="ident">parse_rr</span>(<span class="ident">Section</span>::<span class="ident">Additional</span>)<span class="question-mark">?</span>;
         }
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining_len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(<span class="string">&quot;Extra data found after the last record&quot;</span>));
+            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                <span class="string">&quot;Extra data found after the last record&quot;</span>,
+            ));
         }
         <span class="kw">let</span> <span class="ident">edns_start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edns_start</span>;
         <span class="kw">let</span> <span class="ident">ext_rcode</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ext_rcode</span>;
@@ -796,14 +803,73 @@
     <span class="kw">fn</span> <span class="ident">parse_rr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">section</span>: <span class="ident">Section</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">skip_name</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">rr_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rr_type</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">rr_type</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">OPT</span>.<span class="ident">into</span>() {
-            <span class="kw">if</span> <span class="ident">section</span> <span class="op">!=</span> <span class="ident">Section</span>::<span class="ident">Additional</span> {
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(<span class="string">&quot;OPT RRs must be in the additional section&quot;</span>));
+        <span class="kw">let</span> <span class="ident">rr_rdlen</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rr_rdlen</span>()<span class="question-mark">?</span>;
+        <span class="kw">match</span> <span class="ident">rr_type</span> {
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">OPT</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">section</span> <span class="op">!=</span> <span class="ident">Section</span>::<span class="ident">Additional</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                        <span class="string">&quot;OPT RRs must be in the additional section&quot;</span>,
+                    ));
+                }
+                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">parse_opt</span>();
             }
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">parse_opt</span>();
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">NS</span>.<span class="ident">into</span>() <span class="op">||</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">CNAME</span>.<span class="ident">into</span>() <span class="op">||</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">PTR</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">rr_rdlen</span> <span class="op">&lt;=</span> <span class="number">0</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">PacketTooSmall</span>);
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">final_offset</span> <span class="op">=</span> <span class="ident">Compress</span>::<span class="ident">check_compressed_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>, <span class="self">self</span>.<span class="ident">offset</span>)<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">final_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">!=</span> <span class="ident">rr_rdlen</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                        <span class="string">&quot;Unexpected data after name in rdata&quot;</span>,
+                    ))
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
+            }
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">MX</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">rr_rdlen</span> <span class="op">&lt;=</span> <span class="number">2</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">PacketTooSmall</span>);
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">final_offset</span> <span class="op">=</span> <span class="ident">Compress</span>::<span class="ident">check_compressed_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>, <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="number">2</span>)<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">final_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">!=</span> <span class="ident">rr_rdlen</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                        <span class="string">&quot;Unexpected data after name in MX rdata&quot;</span>,
+                    ))
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
+            }
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">SOA</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">rr_rdlen</span> <span class="op">&lt;=</span> <span class="number">1</span> <span class="op">+</span> <span class="number">20</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">PacketTooSmall</span>);
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">final_offset_1</span> <span class="op">=</span> <span class="ident">Compress</span>::<span class="ident">check_compressed_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>, <span class="self">self</span>.<span class="ident">offset</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">final_offset_2</span> <span class="op">=</span> <span class="ident">Compress</span>::<span class="ident">check_compressed_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>, <span class="ident">final_offset_1</span>)<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">final_offset_2</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">!=</span> <span class="ident">rr_rdlen</span> <span class="op">-</span> <span class="number">20</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                        <span class="string">&quot;Unexpected data after name in SOA rdata&quot;</span>,
+                    ))
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
+            }
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">DNAME</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">rr_rdlen</span> <span class="op">&lt;=</span> <span class="number">0</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">PacketTooSmall</span>);
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">final_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">check_uncompressed_name</span>(<span class="self">self</span>.<span class="ident">offset</span>)<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">final_offset</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">!=</span> <span class="ident">rr_rdlen</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                        <span class="string">&quot;Unexpected data after name in DNAME rdata&quot;</span>,
+                    ))
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
+            }            
+            _ <span class="op">=&gt;</span> {
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
+            }
         }
-        <span class="kw">let</span> <span class="ident">inc</span> <span class="op">=</span> <span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">rr_rdlen</span>()<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">inc</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -837,15 +903,19 @@
     <span class="kw">fn</span> <span class="ident">edns_be16_load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rr_offset</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">edns_ensure_remaining_len</span>(<span class="ident">rr_offset</span> <span class="op">+</span> <span class="number">2</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">rr_offset</span>;
-        <span class="prelude-val">Ok</span>((<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="kw">as</span> <span class="ident">u16</span>)
+        <span class="prelude-val">Ok</span>(
+            (<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span>] <span class="kw">as</span> <span class="ident">u16</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="kw">as</span> <span class="ident">u16</span>,
+        )
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">edns_be32_load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rr_offset</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">edns_ensure_remaining_len</span>(<span class="ident">rr_offset</span> <span class="op">+</span> <span class="number">4</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">rr_offset</span>;
-        <span class="prelude-val">Ok</span>((<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">24</span> <span class="op">|</span> (<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">16</span> <span class="op">|</span>
-           (<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">2</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">3</span>] <span class="kw">as</span> <span class="ident">u32</span>)
+        <span class="prelude-val">Ok</span>(
+            (<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">24</span> <span class="op">|</span> (<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">16</span> <span class="op">|</span>
+                (<span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">2</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">&lt;&lt;</span> <span class="number">8</span> <span class="op">|</span> <span class="self">self</span>.<span class="ident">packet</span>[<span class="ident">offset</span> <span class="op">+</span> <span class="number">3</span>] <span class="kw">as</span> <span class="ident">u32</span>,
+        )
     }
 
     <span class="doccomment">/// Returns the extended code of a record within the edns pseudo-section.</span>
@@ -857,8 +927,9 @@
     <span class="doccomment">/// Returns the record length of a record within the edns pseudo-section.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edns_rr_rdlen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edns_be16_load</span>(<span class="ident">DNS_EDNS_RR_RDLEN_OFFSET</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>)
+        <span class="self">self</span>.<span class="ident">edns_be16_load</span>(<span class="ident">DNS_EDNS_RR_RDLEN_OFFSET</span>).<span class="ident">map</span>(
+            <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        )
     }
 
     <span class="doccomment">/// Skips over a record of the edns pseudo-section.</span>
@@ -871,8 +942,9 @@
     <span class="doccomment">/// Returns the maximum payload size for UDP packets, from an optional `OPT` record.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">opt_rr_max_payload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">be16_load</span>(<span class="ident">DNS_OPT_RR_MAX_PAYLOAD_OFFSET</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>)
+        <span class="self">self</span>.<span class="ident">be16_load</span>(<span class="ident">DNS_OPT_RR_MAX_PAYLOAD_OFFSET</span>).<span class="ident">map</span>(
+            <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">usize</span>,
+        )
     }
 
     <span class="doccomment">/// Returns the extended return code, from an optional `OPT` record.</span>
@@ -917,7 +989,43 @@
             <span class="self">self</span>.<span class="ident">edns_skip_rr</span>()<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">edns_count</span> <span class="op">+=</span> <span class="number">1</span>;
         }
+        <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">edns_remaining_len</span>(), <span class="number">0</span>);
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Checks that an encoded DNS name is valid and does not contain any indirections.</span>
+    <span class="doccomment">/// Returns the location right after the name.</span>
+    <span class="kw">fn</span> <span class="ident">check_uncompressed_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">offset</span>: <span class="ident">usize</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">packet</span>;
+        <span class="kw">let</span> <span class="ident">packet_len</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name_len</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="ident">packet_len</span> {
+            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InternalError</span>(<span class="string">&quot;Offset outside packet boundaries&quot;</span>));
+        }
+        <span class="kw">if</span> <span class="number">1</span> <span class="op">&gt;</span> <span class="ident">packet_len</span> <span class="op">-</span> <span class="ident">offset</span> {
+            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Empty name&quot;</span>));
+        }
+        <span class="kw">loop</span> {
+            <span class="kw">let</span> <span class="ident">label_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">packet</span>[<span class="ident">offset</span>] {
+                <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&amp;</span> <span class="number">0xc0</span> <span class="op">==</span> <span class="number">0xc0</span> <span class="op">=&gt;</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Unexpected compression&quot;</span>))
+                }
+                <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0x3f</span> <span class="op">=&gt;</span> <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Label length too long&quot;</span>)),
+                <span class="ident">len</span> <span class="op">=&gt;</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
+            };
+            <span class="kw">if</span> <span class="ident">label_len</span> <span class="op">&gt;=</span> <span class="ident">packet_len</span> <span class="op">-</span> <span class="ident">offset</span> {
+                <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Out-of-bounds name&quot;</span>));
+            }
+            <span class="ident">name_len</span> <span class="op">+=</span> <span class="ident">label_len</span> <span class="op">+</span> <span class="number">1</span>;
+            <span class="kw">if</span> <span class="ident">name_len</span> <span class="op">&gt;</span> <span class="ident">DNS_MAX_HOSTNAME_LEN</span> {
+                <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidName</span>(<span class="string">&quot;Name too long&quot;</span>));
+            }
+            <span class="ident">offset</span> <span class="op">+=</span> <span class="ident">label_len</span> <span class="op">+</span> <span class="number">1</span>;
+            <span class="kw">if</span> <span class="ident">label_len</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="kw">break</span>;
+            }
+        }
+        <span class="prelude-val">Ok</span>(<span class="ident">offset</span>)
     }
 }
 </pre>

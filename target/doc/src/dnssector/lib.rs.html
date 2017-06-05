@@ -64,11 +64,14 @@
 <span id="19">19</span>
 <span id="20">20</span>
 <span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
 </pre><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">byteorder</span>;
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">error_chain</span>;
 
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">compress</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dns_sector</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">errors</span>;
@@ -78,6 +81,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">response_iterator</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rr_iterator</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">compress</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">constants</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dns_sector</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;

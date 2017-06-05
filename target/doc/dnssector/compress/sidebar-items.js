@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Compress",""],["UncompressedNameResult","Output of the `copy_uncompressed_name()` function."]]});

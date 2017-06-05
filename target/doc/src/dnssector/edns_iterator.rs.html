@@ -161,8 +161,8 @@
             <span class="ident">rr_iterator</span>.<span class="ident">rrs_left</span> <span class="op">-=</span> <span class="number">1</span>;
             <span class="ident">rr_iterator</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rr_iterator</span>.<span class="ident">offset_next</span>);
             <span class="ident">rr_iterator</span>.<span class="ident">name_end</span> <span class="op">=</span> <span class="ident">rr_iterator</span>.<span class="ident">offset</span>.<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">offset_next</span> <span class="op">=</span> <span class="ident">RRIterator</span>::<span class="ident">edns_skip_rr</span>(<span class="kw-2">&amp;</span><span class="ident">parsed_packet</span>.<span class="ident">dns_sector</span>.<span class="ident">packet</span>,
-                                                       <span class="ident">rr_iterator</span>.<span class="ident">name_end</span>);
+            <span class="kw">let</span> <span class="ident">offset_next</span> <span class="op">=</span>
+                <span class="ident">RRIterator</span>::<span class="ident">edns_skip_rr</span>(<span class="kw-2">&amp;</span><span class="ident">parsed_packet</span>.<span class="ident">dns_sector</span>.<span class="ident">packet</span>, <span class="ident">rr_iterator</span>.<span class="ident">name_end</span>);
             <span class="ident">rr_iterator</span>.<span class="ident">offset_next</span> <span class="op">=</span> <span class="ident">offset_next</span>;
         }
         <span class="prelude-val">Some</span>(<span class="self">self</span>)

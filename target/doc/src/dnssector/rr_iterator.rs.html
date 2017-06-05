@@ -257,9 +257,39 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ascii</span>::<span class="ident">AsciiExt</span>;
 <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ByteOrder</span>};
+<span class="kw">use</span> <span class="ident">compress</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">parsed_packet</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>;
@@ -285,7 +315,9 @@
 <span class="doccomment">/// The `DNSIterable` trait represents a set of records that can be iterated over.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DNSIterable</span> {
     <span class="doccomment">/// Returns the next record, or `None` if there aren&#39;t any left.</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">marker</span>::<span class="ident">Sized</span>;
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">marker</span>::<span class="ident">Sized</span>;
 
     <span class="doccomment">/// Returns the offset of the current RR, or `None` if we haven&#39;t started iterating yet.</span>
     <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
@@ -295,6 +327,13 @@
 
     <span class="doccomment">/// Accesses the mutable raw packet data.</span>
     <span class="kw">fn</span> <span class="ident">raw_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RRRawMut</span>;
+
+    <span class="doccomment">/// Raw packet data.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">fn</span> <span class="ident">packet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
+        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>();
+        <span class="ident">raw</span>.<span class="ident">packet</span>
+    }
 
     <span class="doccomment">/// Accesses the raw packet data, starting from the name.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -326,9 +365,10 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TypedIterable</span> {
-    <span class="doccomment">/// Returns the RR name, as a byte vector. The name is not supposed to be valid UTF-8.</span>
+    <span class="doccomment">/// Returns the RR name (labels are dot-telimited), as a byte vector. The name is not supposed to be valid UTF-8.</span>
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">DNSIterable</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span>,
     {
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">offset</span>;
@@ -339,7 +379,7 @@
         <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">packet</span>;
         <span class="kw">loop</span> {
             <span class="kw">let</span> <span class="ident">label_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">packet</span>[<span class="ident">offset</span>] {
-                <span class="number">0</span> <span class="op">=&gt;</span> <span class="kw">break</span>,                    
+                <span class="number">0</span> <span class="op">=&gt;</span> <span class="kw">break</span>,
                 <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&amp;</span> <span class="number">0xc0</span> <span class="op">==</span> <span class="number">0xc0</span> <span class="op">=&gt;</span> {
                     <span class="kw">let</span> <span class="ident">new_offset</span> <span class="op">=</span> (<span class="ident">BigEndian</span>::<span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="ident">packet</span>[<span class="ident">offset</span>..]) <span class="op">&amp;</span> <span class="number">0x3fff</span>) <span class="kw">as</span> <span class="ident">usize</span>;
                     <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">new_offset</span> <span class="op">&lt;</span> <span class="ident">offset</span>);
@@ -360,10 +400,25 @@
         <span class="ident">res</span>
     }
 
+    <span class="doccomment">/// Appends the uncompressed RR name (raw format, with labels prefixed by their length) to the given vector.</span>
+    <span class="doccomment">/// Returns the length of the uncompressed name.</span>
+    <span class="kw">fn</span> <span class="ident">copy_raw_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">-&gt;</span> <span class="ident">usize</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span>,
+    {
+        <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>();
+        <span class="kw">if</span> <span class="ident">raw</span>.<span class="ident">name_end</span> <span class="op">&lt;=</span> <span class="ident">raw</span>.<span class="ident">offset</span> {
+            <span class="kw">return</span> <span class="number">0</span>;
+        }
+        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">packet</span>;
+        <span class="ident">Compress</span>::<span class="ident">copy_uncompressed_name</span>(<span class="ident">name</span>, <span class="ident">raw</span>.<span class="ident">packet</span>, <span class="ident">raw</span>.<span class="ident">offset</span>).<span class="ident">name_len</span>
+    }
+
     <span class="doccomment">/// Returns the query type for the current RR.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">rr_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">DNSIterable</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span>,
     {
         <span class="ident">BigEndian</span>::<span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rdata_slice</span>()[<span class="ident">DNS_RR_TYPE_OFFSET</span>..])
     }
@@ -371,7 +426,8 @@
     <span class="doccomment">/// Returns the query class for the current RR.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">rr_class</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u16</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">DNSIterable</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span>,
     {
         <span class="ident">BigEndian</span>::<span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rdata_slice</span>()[<span class="ident">DNS_RR_CLASS_OFFSET</span>..])
     }
@@ -381,7 +437,8 @@
     <span class="doccomment">/// Returns the TTL for the current RR.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">rr_ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">u32</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">DNSIterable</span> <span class="op">+</span> <span class="ident">TypedIterable</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span> <span class="op">+</span> <span class="ident">TypedIterable</span>,
     {
         <span class="ident">BigEndian</span>::<span class="ident">read_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rdata_slice</span>()[<span class="ident">DNS_RR_TTL_OFFSET</span>..])
     }
@@ -389,7 +446,8 @@
     <span class="doccomment">/// Returns the record length for the current RR.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">rr_rdlen</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span>
-        <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">DNSIterable</span> <span class="op">+</span> <span class="ident">TypedIterable</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span> <span class="op">+</span> <span class="ident">TypedIterable</span>,
     {
         <span class="ident">BigEndian</span>::<span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rdata_slice</span>()[<span class="ident">DNS_RR_RDLEN_OFFSET</span>..]) <span class="kw">as</span> <span class="ident">usize</span>
     }
