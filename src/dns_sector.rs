@@ -455,7 +455,7 @@ impl DNSSector {
         Ok(())
     }
 
-    /// Checks that an encoded DNS name is valid and does not contain any indirections.
+    /// Checks that an untrusted encoded DNS name is valid and does not contain any indirections.
     /// Returns the location right after the name.
     fn check_uncompressed_name(&self, mut offset: usize) -> Result<usize> {
         let packet = &self.packet;
@@ -468,6 +468,9 @@ impl DNSSector {
             bail!(ErrorKind::InvalidName("Empty name"));
         }
         loop {
+            if offset >= packet_len {
+                bail!(ErrorKind::InvalidName("Truncated name"));
+            }
             let label_len = match packet[offset] {
                 len if len & 0xc0 == 0xc0 => {
                     bail!(ErrorKind::InvalidName("Unexpected compression"))
