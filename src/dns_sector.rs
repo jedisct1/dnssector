@@ -296,11 +296,38 @@ impl DNSSector {
                 let final_offset = Compress::check_compressed_name(&self.packet, self.offset + 2)?;
                 if final_offset - self.offset != rr_rdlen {
                     bail!(ErrorKind::InvalidPacket(
-                        "Unexpected data after name in rdata",
+                        "Unexpected data after name in MX rdata",
                     ))
                 }
                 self.increment_offset(rr_rdlen)?;
             }
+            x if x == Type::SOA.into() => {
+                if rr_rdlen <= 1 + 20 {
+                    bail!(ErrorKind::PacketTooSmall);
+                }
+                self.increment_offset(DNS_RR_HEADER_SIZE)?;
+                let final_offset_1 = Compress::check_compressed_name(&self.packet, self.offset)?;
+                let final_offset_2 = Compress::check_compressed_name(&self.packet, final_offset_1)?;
+                if final_offset_2 - self.offset != rr_rdlen - 20 {
+                    bail!(ErrorKind::InvalidPacket(
+                        "Unexpected data after name in SOA rdata",
+                    ))
+                }
+                self.increment_offset(rr_rdlen)?;
+            }
+            x if x == Type::DNAME.into() => {
+                if rr_rdlen <= 0 {
+                    bail!(ErrorKind::PacketTooSmall);
+                }
+                self.increment_offset(DNS_RR_HEADER_SIZE)?;
+                let final_offset = self.check_uncompressed_name(self.offset)?;
+                if final_offset - self.offset != rr_rdlen {
+                    bail!(ErrorKind::InvalidPacket(
+                        "Unexpected data after name in DNAME rdata",
+                    ))
+                }
+                self.increment_offset(rr_rdlen)?;
+            }            
             _ => {
                 self.increment_offset(DNS_RR_HEADER_SIZE + rr_rdlen)?;
             }
@@ -426,5 +453,40 @@ impl DNSSector {
         }
         debug_assert_eq!(self.edns_remaining_len(), 0);
         Ok(())
+    }
+
+    /// Checks that an encoded DNS name is valid and does not contain any indirections.
+    /// Returns the location right after the name.
+    fn check_uncompressed_name(&self, mut offset: usize) -> Result<usize> {
+        let packet = &self.packet;
+        let packet_len = packet.len();
+        let mut name_len = 0;
+        if offset >= packet_len {
+            bail!(ErrorKind::InternalError("Offset outside packet boundaries"));
+        }
+        if 1 > packet_len - offset {
+            bail!(ErrorKind::InvalidName("Empty name"));
+        }
+        loop {
+            let label_len = match packet[offset] {
+                len if len & 0xc0 == 0xc0 => {
+                    bail!(ErrorKind::InvalidName("Unexpected compression"))
+                }
+                len if len > 0x3f => bail!(ErrorKind::InvalidName("Label length too long")),
+                len => len as usize,
+            };
+            if label_len >= packet_len - offset {
+                bail!(ErrorKind::InvalidName("Out-of-bounds name"));
+            }
+            name_len += label_len + 1;
+            if name_len > DNS_MAX_HOSTNAME_LEN {
+                bail!(ErrorKind::InvalidName("Name too long"));
+            }
+            offset += label_len + 1;
+            if label_len == 0 {
+                break;
+            }
+        }
+        Ok(offset)
     }
 }
