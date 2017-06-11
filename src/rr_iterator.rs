@@ -154,6 +154,7 @@ pub trait RdataIterable {
         BigEndian::read_u32(&self.rdata_slice()[DNS_RR_TTL_OFFSET..])
     }
 
+    /// Changes the TTL of a record.
     fn set_rr_ttl(&mut self, ttl: u32)
     where
         Self: DNSIterable + TypedIterable,
