@@ -431,7 +431,6 @@ impl Compress {
                 assert!(offset < 65536 >> 2); // Checked in dict.insert()
                 compressed.push((ref_offset >> 8) as u8 | 0xc0);
                 compressed.push((ref_offset & 0xff) as u8);
-                offset += 2;
                 break;
             }
             let label_len = packet[offset] as usize;
