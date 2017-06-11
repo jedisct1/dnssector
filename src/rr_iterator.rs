@@ -154,6 +154,13 @@ pub trait RdataIterable {
         BigEndian::read_u32(&self.rdata_slice()[DNS_RR_TTL_OFFSET..])
     }
 
+    fn set_rr_ttl(&mut self, ttl: u32)
+    where
+        Self: DNSIterable + TypedIterable,
+    {
+        BigEndian::write_u32(&mut self.rdata_slice_mut()[DNS_RR_TTL_OFFSET..], ttl);
+    }
+
     /// Returns the record length for the current RR.
     #[inline]
     fn rr_rdlen(&self) -> usize

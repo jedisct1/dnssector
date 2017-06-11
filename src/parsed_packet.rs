@@ -69,6 +69,11 @@ impl ParsedPacket {
         BigEndian::read_u16(&self.dns_sector.packet[DNS_TID_OFFSET..])
     }
 
+    /// Changes the transaction ID.
+    pub fn set_tid(&mut self, tid: u16) {
+        BigEndian::write_u16(&mut self.dns_sector.packet[DNS_TID_OFFSET..], tid)
+    }
+
     /// Returns the flags, including extended flags.
     /// The extended flags optionally obtained using edns are exposed as the highest 16 bits,
     /// instead of having distinct sets of flags.
@@ -81,6 +86,19 @@ impl ParsedPacket {
         (self.ext_flags.unwrap_or(0) as u32) << 16 | (rflags as u32)
     }
 
+    /// Changes the flags.
+    /// Extended flags from the OPT section are currently ignored.
+    pub fn set_flags(&mut self, flags: u32) {
+        let mut rflags = (flags & 0xffff) as u16;
+        rflags &= !0x7800; // mask opcode
+        rflags &= !0x000f; // mask rcode
+        let mut v = BigEndian::read_u16(&self.dns_sector.packet[DNS_FLAGS_OFFSET..]);
+        v &= !0x7800;
+        v &= !0x000f;
+        v |= rflags;
+        BigEndian::write_u16(&mut self.dns_sector.packet[DNS_FLAGS_OFFSET..], v);
+    }
+
     /// Returns the return code.
     #[inline]
     pub fn rcode(&self) -> u8 {
@@ -88,10 +106,24 @@ impl ParsedPacket {
         rflags & 0x0f
     }
 
+    /// Changes the return code.
+    pub fn set_rcode(&mut self, rcode: u8) {
+        let p = &mut self.dns_sector.packet[DNS_FLAGS_OFFSET + 1];
+        *p &= !0x0f;
+        *p |= rcode & 0x0f;
+    }
+
     /// Returns the opcode.
     #[inline]
     pub fn opcode(&self) -> u8 {
         let rflags = self.dns_sector.packet[DNS_FLAGS_OFFSET];
         (rflags & 0x78) >> 3
+    }
+
+    /// Changes the operation code.
+    pub fn set_opcode(&mut self, opcode: u8) {
+        let p = &mut self.dns_sector.packet[DNS_FLAGS_OFFSET];
+        *p &= !0x78;
+        *p |= (opcode << 3) & 0x78;
     }
 }
