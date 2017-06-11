@@ -16,6 +16,10 @@ fuzz_target!(|packet: &[u8]| {
         Err(_) => {},
         Ok(packet) => {
             let dns_sector = DNSSector::new(packet).unwrap();
+            let parsed = dns_sector.parse().expect("Couldn't parse uncompressed packet");
+            let packet = parsed.into_packet();
+            let recompressed = Compress::compress(&packet).expect("Couldn't recompress packet");
+            let dns_sector = DNSSector::new(recompressed).unwrap();
             let _ = dns_sector.parse();
         }
     };
