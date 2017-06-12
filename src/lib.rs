@@ -2,6 +2,7 @@ extern crate byteorder;
 #[macro_use]
 extern crate error_chain;
 
+pub mod c_abi;
 pub mod compress;
 pub mod constants;
 pub mod dns_sector;
@@ -12,6 +13,7 @@ pub mod question_iterator;
 pub mod response_iterator;
 pub mod rr_iterator;
 
+pub use c_abi::*;
 pub use compress::*;
 pub use constants::*;
 pub use dns_sector::*;
