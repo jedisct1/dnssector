@@ -1,6 +1,6 @@
 use parsed_packet::*;
 
-const ABI_VERSION: u64 = 0x0;
+const ABI_VERSION: u64 = 0x1;
 
 unsafe extern "C" fn flags(parsed_packet: *const ParsedPacket) -> u32 {
     (*parsed_packet).flags()
