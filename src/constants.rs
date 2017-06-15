@@ -259,3 +259,9 @@ pub enum Section {
     Additional,
     Edns,
 }
+
+impl From<Section> for u8 {
+    fn from(v: Section) -> u8 {
+        unsafe { mem::transmute(v as u8) }
+    }
+}

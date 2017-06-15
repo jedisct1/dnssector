@@ -1,6 +1,7 @@
 extern crate byteorder;
 #[macro_use]
 extern crate error_chain;
+extern crate libc;
 
 pub mod c_abi;
 pub mod compress;

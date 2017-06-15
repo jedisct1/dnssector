@@ -54,8 +54,8 @@ impl Compress {
                     if 2 > packet_len - offset {
                         bail!(ErrorKind::InvalidName("Invalid internal offset"));
                     }
-                    let ref_offset =
-                        ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as usize;
+                    let ref_offset = ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as
+                        usize;
                     if ref_offset >= lowest_offset {
                         bail!(ErrorKind::InvalidName("Forward/self reference"));
                     }
@@ -87,10 +87,11 @@ impl Compress {
     /// Uncompresses a name starting at `offset`, and puts the result into `name`.
     /// This function assumes that the input is trusted and doesn't perform any checks.
     /// Returns the length of the name as well as the location right after the (possibly compressed) name.
-    pub fn copy_uncompressed_name(name: &mut Vec<u8>,
-                                  packet: &[u8],
-                                  mut offset: usize)
-                                  -> UncompressedNameResult {
+    pub fn copy_uncompressed_name(
+        name: &mut Vec<u8>,
+        packet: &[u8],
+        mut offset: usize,
+    ) -> UncompressedNameResult {
         let mut name_len = 0;
         let mut final_offset = None;
         loop {
@@ -120,10 +121,12 @@ impl Compress {
     }
 
     /// Uncompresses trusted record's data and puts the result into `name`.
-    fn uncompress_rdata(mut uncompressed: &mut Vec<u8>,
-                        raw: RRRaw,
-                        rr_type: Option<u16>,
-                        rr_rdlen: Option<usize>) {
+    fn uncompress_rdata(
+        mut uncompressed: &mut Vec<u8>,
+        raw: RRRaw,
+        rr_type: Option<u16>,
+        rr_rdlen: Option<usize>,
+    ) {
         let packet = &raw.packet;
         let offset_rdata = raw.name_end;
         let rdata = &packet[offset_rdata..];
@@ -183,11 +186,13 @@ impl Compress {
     }
 
     /// Compresses trusted record's data and puts the result into `name`.
-    fn compress_rdata(mut dict: &mut SuffixDict,
-                      mut compressed: &mut Vec<u8>,
-                      raw: RRRaw,
-                      rr_type: Option<u16>,
-                      rr_rdlen: Option<usize>) {
+    fn compress_rdata(
+        mut dict: &mut SuffixDict,
+        mut compressed: &mut Vec<u8>,
+        raw: RRRaw,
+        rr_type: Option<u16>,
+        rr_rdlen: Option<usize>,
+    ) {
         let packet = &raw.packet;
         let offset_rdata = raw.name_end;
         let rdata = &packet[offset_rdata..];
@@ -418,11 +423,12 @@ impl Compress {
     /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
     /// Returns the length of the name as well as the location right after the uncompressed name.
     //  XXX - TODO: `compressed` could be a slice, since compression will never increase the required capacity.
-    pub fn copy_compressed_name(dict: &mut SuffixDict,
-                                compressed: &mut Vec<u8>,
-                                packet: &[u8],
-                                mut offset: usize)
-                                -> CompressedNameResult {
+    pub fn copy_compressed_name(
+        dict: &mut SuffixDict,
+        compressed: &mut Vec<u8>,
+        packet: &[u8],
+        mut offset: usize,
+    ) -> CompressedNameResult {
         let uncompressed_name_len = Compress::raw_name_len(&packet[offset..]);
         let initial_compressed_len = compressed.len();
         let final_offset = offset + uncompressed_name_len;
