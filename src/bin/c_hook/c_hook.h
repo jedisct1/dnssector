@@ -3,6 +3,8 @@
 
 #define ABI_VERSION 0x1
 
+#define DNS_MAX_HOSTNAME_LEN 255
+
 typedef struct ParsedPacket ParsedPacket;
 
 typedef struct FnTable {
@@ -18,6 +20,8 @@ typedef struct FnTable {
     void     (*iter_additional)(ParsedPacket *parsed_packet, bool (*cb)(void *ctx, void *it), void *ctx);
     void     (*iter_edns)(ParsedPacket *parsed_packet, bool (*cb)(void *ctx, void *it), void *ctx);    
     uint16_t (*rr_type)(void *it);
+    uint16_t (*rr_class)(void *it);
+    void     (*name)(void *it, char name[DNS_MAX_HOSTNAME_LEN + 1]);
 } FnTable;   
 
 void hook(const FnTable *fn_table, ParsedPacket *parsed_packet);

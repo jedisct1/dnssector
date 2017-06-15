@@ -130,6 +130,35 @@ unsafe extern "C" fn rr_type(section_iterator: &mut SectionIterator) -> u16 {
     }
 }
 
+unsafe extern "C" fn rr_class(section_iterator: &mut SectionIterator) -> u16 {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    match section_iterator.section {
+        Section::Question => (&*(section_iterator.it as *mut QuestionIterator)).rr_class(),
+        Section::Answer | Section::NameServers | Section::Additional => {
+            (&*(section_iterator.it as *mut ResponseIterator)).rr_class()
+        }
+        _ => panic!("rr_class() called on a record with no class"),
+    }
+}
+
+unsafe extern "C" fn name(
+    section_iterator: &mut SectionIterator,
+    name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
+) {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    let name_vec = match section_iterator.section {
+        Section::Question => (&*(section_iterator.it as *mut QuestionIterator)).name(),
+        Section::Answer | Section::NameServers | Section::Additional => {
+            (&*(section_iterator.it as *mut ResponseIterator)).name()
+        }
+        _ => panic!("name() called on a record with no name"),
+    };
+    let name_len = name_vec.len();
+    assert!(name_len <= DNS_MAX_HOSTNAME_LEN);
+    name[..name_len].copy_from_slice(&name_vec);
+    name[name_len] = 0;
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -165,6 +194,9 @@ pub struct FnTable {
                                                       -> bool,
                              *mut c_void),
     pub rr_type: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
+    pub rr_class: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
+    pub name: unsafe extern "C" fn(section_iterator: &mut SectionIterator,
+                                   name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1]),
 }
 
 pub fn fn_table() -> FnTable {
@@ -181,5 +213,7 @@ pub fn fn_table() -> FnTable {
         iter_additional,
         iter_edns,
         rr_type,
+        rr_class,
+        name,
     }
 }

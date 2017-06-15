@@ -9,8 +9,12 @@
 
 static bool rr_it(void *ctx, void *it)
 {
+   char name[DNS_MAX_HOSTNAME_LEN + 1];
+   
    FnTable *fn_table = ctx;
-   printf("- found RR with type: %" PRIu32 "\n", fn_table->rr_type(it));
+   fn_table->name(it, name);
+   printf("- found RR [%s] with type: %" PRIu32 "\n",
+	  name, fn_table->rr_type(it));
    return 0;
 }
 
