@@ -159,6 +159,26 @@ unsafe extern "C" fn name(
     name[name_len] = 0;
 }
 
+unsafe extern "C" fn rr_ttl(section_iterator: &mut SectionIterator) -> u32 {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    match section_iterator.section {       
+        Section::Answer | Section::NameServers | Section::Additional => {
+            (&*(section_iterator.it as *mut ResponseIterator)).rr_ttl()
+        }
+        _ => panic!("ttl() called on a record with no TTL"),
+    }
+}
+
+unsafe extern "C" fn set_rr_ttl(section_iterator: &mut SectionIterator, ttl: u32) {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    match section_iterator.section {       
+        Section::Answer | Section::NameServers | Section::Additional => {
+            (&mut *(section_iterator.it as *mut ResponseIterator)).set_rr_ttl(ttl)
+        }
+        _ => panic!("set_ttl() called on a record with no TTL"),
+    }
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -193,10 +213,12 @@ pub struct FnTable {
                                                       section_iterator: *const EdnsIterator)
                                                       -> bool,
                              *mut c_void),
-    pub rr_type: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
-    pub rr_class: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
     pub name: unsafe extern "C" fn(section_iterator: &mut SectionIterator,
                                    name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1]),
+    pub rr_type: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
+    pub rr_class: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
+    pub rr_ttl: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u32,
+    pub set_rr_ttl: unsafe extern "C" fn(section_iterator: &mut SectionIterator, ttl: u32),
 }
 
 pub fn fn_table() -> FnTable {
@@ -212,8 +234,10 @@ pub fn fn_table() -> FnTable {
         iter_nameservers,
         iter_additional,
         iter_edns,
+        name,
         rr_type,
         rr_class,
-        name,
+        rr_ttl,
+        set_rr_ttl,
     }
 }

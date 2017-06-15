@@ -18,10 +18,12 @@ typedef struct FnTable {
     void     (*iter_answer)(ParsedPacket *parsed_packet, bool (*cb)(void *ctx, void *it), void *ctx);
     void     (*iter_nameservers)(ParsedPacket *parsed_packet, bool (*cb)(void *ctx, void *it), void *ctx);
     void     (*iter_additional)(ParsedPacket *parsed_packet, bool (*cb)(void *ctx, void *it), void *ctx);
-    void     (*iter_edns)(ParsedPacket *parsed_packet, bool (*cb)(void *ctx, void *it), void *ctx);    
+    void     (*iter_edns)(ParsedPacket *parsed_packet, bool (*cb)(void *ctx, void *it), void *ctx);
+    void     (*name)(void *it, char name[DNS_MAX_HOSTNAME_LEN + 1]);
     uint16_t (*rr_type)(void *it);
     uint16_t (*rr_class)(void *it);
-    void     (*name)(void *it, char name[DNS_MAX_HOSTNAME_LEN + 1]);
+    uint32_t (*rr_ttl)(void *it);
+    void     (*rr_set_ttl)(void *it, uint32_t ttl);
 } FnTable;   
 
 void hook(const FnTable *fn_table, ParsedPacket *parsed_packet);
