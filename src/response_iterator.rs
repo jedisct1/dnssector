@@ -1,5 +1,8 @@
+use compress::*;
 use constants::*;
 use dns_sector::*;
+use errors::*;
+use parsed_packet::*;
 use rr_iterator::*;
 
 #[derive(Debug)]
@@ -38,10 +41,13 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
         }
     }
 
+    fn parsed_packet(&mut self) -> &mut ParsedPacket {
+        &mut self.rr_iterator.parsed_packet
+    }
+
     fn next(self) -> Option<Self> {
-        self.next_including_opt().and_then(move |this| {
-            this.maybe_skip_opt_section()
-        })
+        self.next_including_opt()
+            .and_then(move |this| this.maybe_skip_opt_section())
     }
 }
 

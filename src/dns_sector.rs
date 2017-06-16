@@ -389,9 +389,8 @@ impl DNSSector {
     /// Returns the record length of a record within the edns pseudo-section.
     #[inline]
     pub fn edns_rr_rdlen(&self) -> Result<usize> {
-        self.edns_be16_load(DNS_EDNS_RR_RDLEN_OFFSET).map(
-            |x| x as usize,
-        )
+        self.edns_be16_load(DNS_EDNS_RR_RDLEN_OFFSET)
+            .map(|x| x as usize)
     }
 
     /// Skips over a record of the edns pseudo-section.
@@ -404,9 +403,8 @@ impl DNSSector {
     /// Returns the maximum payload size for UDP packets, from an optional `OPT` record.
     #[inline]
     fn opt_rr_max_payload(&self) -> Result<usize> {
-        self.be16_load(DNS_OPT_RR_MAX_PAYLOAD_OFFSET).map(
-            |x| x as usize,
-        )
+        self.be16_load(DNS_OPT_RR_MAX_PAYLOAD_OFFSET)
+            .map(|x| x as usize)
     }
 
     /// Returns the extended return code, from an optional `OPT` record.

@@ -1,5 +1,6 @@
 use constants::*;
 use dns_sector::*;
+use parsed_packet::*;
 use rr_iterator::*;
 
 #[derive(Debug)]
@@ -31,6 +32,10 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
+    }
+
+    fn parsed_packet(&mut self) -> &mut ParsedPacket {
+        &mut self.rr_iterator.parsed_packet
     }
 
     fn next(mut self) -> Option<Self> {

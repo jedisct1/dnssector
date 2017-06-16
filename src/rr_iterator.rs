@@ -2,6 +2,7 @@ use std::ascii::AsciiExt;
 use byteorder::{BigEndian, ByteOrder};
 use compress::*;
 use constants::*;
+use errors::*;
 use parsed_packet::*;
 use std::marker;
 
@@ -39,6 +40,9 @@ pub trait DNSIterable {
     /// Accesses the mutable raw packet data.
     fn raw_mut(&mut self) -> RRRawMut;
 
+    /// Accesses the parsed packet structure.
+    fn parsed_packet(&mut self) -> &mut ParsedPacket;
+
     /// Raw packet data.
     #[inline]
     fn packet(&self) -> &[u8] {
@@ -72,6 +76,18 @@ pub trait DNSIterable {
     fn rdata_slice_mut(&mut self) -> &mut [u8] {
         let raw = self.raw_mut();
         &mut raw.packet[raw.name_end..]
+    }
+
+    /// Decompresses the whole packet while keeping the iterator available.
+    fn uncompress(&mut self) -> Result<()> {
+        let uncompressed = {
+            let compressed = self.raw_mut().packet;
+            Compress::uncompress(compressed)?
+        };
+        let parsed_packet = self.parsed_packet();
+        let dns_sector = &mut parsed_packet.dns_sector;
+        dns_sector.packet = uncompressed;
+        Ok(())
     }
 }
 
