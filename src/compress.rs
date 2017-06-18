@@ -258,17 +258,24 @@ impl Compress {
         }
     }
 
-    pub fn uncompress(packet: &[u8]) -> Result<Vec<u8>> {
+    pub fn uncompress_with_previous_offset(
+        packet: &[u8],
+        ref_offset: usize,
+    ) -> Result<(Vec<u8>, usize)> {
         let packet = packet.to_owned(); // XXX - TODO: use `ParsedPacket` directly after having removed its dependency on `dns_sector`
         if packet.len() < DNS_HEADER_SIZE {
             bail!(ErrorKind::PacketTooSmall);
         }
+        let mut new_offset = None;
         let mut uncompressed = Vec::new();
         uncompressed.extend_from_slice(&packet[..DNS_HEADER_SIZE]);
         let mut parsed_packet = DNSSector::new(packet)?.parse()?;
         {
             let mut it = parsed_packet.into_iter_question();
             while let Some(item) = it {
+                if Some(ref_offset) == item.offset() {
+                    new_offset = Some(uncompressed.len());
+                }
                 item.copy_raw_name(&mut uncompressed);
                 Self::uncompress_rdata(&mut uncompressed, item.raw(), None, None);
                 it = item.next();
@@ -277,6 +284,9 @@ impl Compress {
         {
             let mut it = parsed_packet.into_iter_answer();
             while let Some(item) = it {
+                if Some(ref_offset) == item.offset() {
+                    new_offset = Some(uncompressed.len());
+                }
                 item.copy_raw_name(&mut uncompressed);
                 Self::uncompress_rdata(
                     &mut uncompressed,
@@ -290,6 +300,9 @@ impl Compress {
         {
             let mut it = parsed_packet.into_iter_nameservers();
             while let Some(item) = it {
+                if Some(ref_offset) == item.offset() {
+                    new_offset = Some(uncompressed.len());
+                }
                 item.copy_raw_name(&mut uncompressed);
                 Self::uncompress_rdata(
                     &mut uncompressed,
@@ -303,6 +316,9 @@ impl Compress {
         {
             let mut it = parsed_packet.into_iter_additional_including_opt();
             while let Some(item) = it {
+                if Some(ref_offset) == item.offset() {
+                    new_offset = Some(uncompressed.len());
+                }
                 item.copy_raw_name(&mut uncompressed);
                 Self::uncompress_rdata(
                     &mut uncompressed,
@@ -313,7 +329,14 @@ impl Compress {
                 it = item.next_including_opt();
             }
         }
-        Ok(uncompressed)
+        Ok((
+            uncompressed,
+            new_offset.expect("Previous offset not found at a record boundary"),
+        ))
+    }
+
+    pub fn uncompress(packet: &[u8]) -> Result<Vec<u8>> {
+        Self::uncompress_with_previous_offset(packet, 0).map(|x| x.0)
     }
 
     pub fn compress(packet: &[u8]) -> Result<Vec<u8>> {

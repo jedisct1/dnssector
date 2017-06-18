@@ -2,6 +2,7 @@ use byteorder::{BigEndian, ByteOrder};
 use constants::*;
 use dns_sector::*;
 use edns_iterator::*;
+use errors::*;
 use response_iterator::*;
 use question_iterator::*;
 use rr_iterator::*;
@@ -23,11 +24,6 @@ pub struct ParsedPacket {
 }
 
 impl ParsedPacket {
-    /// Converts a `ParsedPacket` back into a `DNSSector`.
-    pub fn into_dns_sector(self) -> DNSSector {
-        self.dns_sector
-    }
-
     /// Converts a `ParsedPacket` back into a raw packet.
     pub fn into_packet(self) -> Vec<u8> {
         self.dns_sector.packet
@@ -125,5 +121,20 @@ impl ParsedPacket {
         let p = &mut self.dns_sector.packet[DNS_FLAGS_OFFSET];
         *p &= !0x78;
         *p |= (opcode << 3) & 0x78;
+    }
+
+    /// Recomputes all offsets after an in-place update of the packet.
+    /// This is commonly required after a forced decompression.
+    /// It is currently re-parsing everything by calling `parse()`, but this can be
+    /// optimized later to skip over RDATA, and maybe assume that the input
+    /// is always well-formed.
+    pub fn recompute(&mut self) -> Result<()> {
+        let dns_sector = DNSSector::new(self.dns_sector.packet.clone())?;
+        let parsed_packet = dns_sector.parse()?;
+        self.offset_question = parsed_packet.offset_question;
+        self.offset_answers = parsed_packet.offset_answers;
+        self.offset_nameservers = parsed_packet.offset_nameservers;
+        self.offset_edns = parsed_packet.offset_edns;
+        Ok(())
     }
 }

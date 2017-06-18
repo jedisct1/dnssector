@@ -79,10 +79,12 @@ pub trait DNSIterable {
     }
 
     /// Decompresses the whole packet while keeping the iterator available.
-    fn uncompress(&mut self) -> Result<()> {
-        let uncompressed = {
+    fn uncompress(&mut self, ref_offset: usize) -> Result<()> {
+        let (uncompressed, new_offset) = {
+            let ref_offset = self.offset()
+                .expect("No offset yet, but decompression attempted");
             let compressed = self.raw_mut().packet;
-            Compress::uncompress(compressed)?
+            Compress::uncompress_with_previous_offset(compressed, ref_offset)?
         };
         let parsed_packet = self.parsed_packet();
         let dns_sector = &mut parsed_packet.dns_sector;
