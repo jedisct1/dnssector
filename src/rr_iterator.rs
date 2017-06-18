@@ -34,6 +34,12 @@ pub trait DNSIterable {
     /// Returns the offset of the current RR, or `None` if we haven't started iterating yet.
     fn offset(&self) -> Option<usize>;
 
+    /// Returns the offset right after the current RR
+    fn offset_next(&self) -> usize;
+
+    /// Sets the offset of the next RR
+    fn set_offset_next(&mut self, offset: usize);
+
     /// Accesses the raw packet data.
     fn raw(&self) -> RRRaw;
 
@@ -79,16 +85,14 @@ pub trait DNSIterable {
     }
 
     /// Decompresses the whole packet while keeping the iterator available.
-    fn uncompress(&mut self, ref_offset: usize) -> Result<()> {
-        let (uncompressed, new_offset) = {
-            let ref_offset = self.offset()
-                .expect("No offset yet, but decompression attempted");
+    fn uncompress(&mut self) -> Result<()> {
+        let (uncompressed, new_offset_next) = {
+            let ref_offset_next = self.offset_next();
             let compressed = self.raw_mut().packet;
-            Compress::uncompress_with_previous_offset(compressed, ref_offset)?
+            Compress::uncompress_with_previous_offset(compressed, ref_offset_next)?
         };
-        let parsed_packet = self.parsed_packet();
-        let dns_sector = &mut parsed_packet.dns_sector;
-        dns_sector.packet = uncompressed;
+        self.parsed_packet().packet = uncompressed;
+        self.set_offset_next(new_offset_next);
         Ok(())
     }
 }

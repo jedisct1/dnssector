@@ -329,6 +329,9 @@ impl Compress {
                 it = item.next_including_opt();
             }
         }
+        if ref_offset == parsed_packet.packet.len() {
+            new_offset = Some(uncompressed.len());
+        }
         Ok((
             uncompressed,
             new_offset.expect("Previous offset not found at a record boundary"),
@@ -336,7 +339,7 @@ impl Compress {
     }
 
     pub fn uncompress(packet: &[u8]) -> Result<Vec<u8>> {
-        Self::uncompress_with_previous_offset(packet, 0).map(|x| x.0)
+        Self::uncompress_with_previous_offset(packet, DNS_HEADER_SIZE).map(|x| x.0)
     }
 
     pub fn compress(packet: &[u8]) -> Result<Vec<u8>> {

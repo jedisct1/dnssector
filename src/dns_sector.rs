@@ -236,7 +236,7 @@ impl DNSSector {
         let ext_flags = self.ext_flags;
         let edns_count = self.edns_count;
         let parsed_packet = ParsedPacket {
-            dns_sector: self,
+            packet: self.packet,
             offset_question: offset_question,
             offset_answers: offset_answers,
             offset_nameservers: offset_nameservers,
@@ -246,6 +246,7 @@ impl DNSSector {
             edns_version: edns_version,
             ext_flags: ext_flags,
             edns_count: edns_count,
+            maybe_packed: true,
         };
         Ok(parsed_packet)
     }

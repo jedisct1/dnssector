@@ -175,6 +175,7 @@ unsafe extern "C" fn rr_ttl(section_iterator: &mut SectionIterator) -> u32 {
 
 unsafe extern "C" fn set_rr_ttl(section_iterator: &mut SectionIterator, ttl: u32) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    let it = &mut *(section_iterator.it as *mut ResponseIterator);
     match section_iterator.section {       
         Section::Answer | Section::NameServers | Section::Additional => {
             (&mut *(section_iterator.it as *mut ResponseIterator)).set_rr_ttl(ttl)

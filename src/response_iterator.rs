@@ -24,9 +24,20 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
     }
 
     #[inline]
+    fn offset_next(&self) -> usize {
+        self.rr_iterator.offset_next
+    }
+
+    fn set_offset_next(&mut self, offset: usize) {
+        debug_assert!(offset <= self.packet().len());
+        self.rr_iterator.offset_next = offset;
+        self.rr_iterator.parsed_packet.recompute();
+    }
+
+    #[inline]
     fn raw(&self) -> RRRaw {
         RRRaw {
-            packet: &self.rr_iterator.parsed_packet.dns_sector.packet,
+            packet: &self.rr_iterator.parsed_packet.packet,
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -35,7 +46,7 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
     #[inline]
     fn raw_mut(&mut self) -> RRRawMut {
         RRRawMut {
-            packet: &mut self.rr_iterator.parsed_packet.dns_sector.packet,
+            packet: &mut self.rr_iterator.parsed_packet.packet,
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -64,19 +75,19 @@ impl<'t> ResponseIterator<'t> {
                 let (count, offset) = match rr_iterator.section {
                     Section::Answer => {
                         (
-                            DNSSector::ancount(&parsed_packet.dns_sector.packet),
+                            DNSSector::ancount(&parsed_packet.packet),
                             parsed_packet.offset_answers,
                         )
                     }
                     Section::NameServers => {
                         (
-                            DNSSector::nscount(&parsed_packet.dns_sector.packet),
+                            DNSSector::nscount(&parsed_packet.packet),
                             parsed_packet.offset_nameservers,
                         )
                     }
                     Section::Additional => {
                         (
-                            DNSSector::arcount(&parsed_packet.dns_sector.packet),
+                            DNSSector::arcount(&parsed_packet.packet),
                             parsed_packet.offset_additional,
                         )
                     }                    
@@ -93,12 +104,9 @@ impl<'t> ResponseIterator<'t> {
             }
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
-            rr_iterator.name_end = RRIterator::skip_name(
-                &parsed_packet.dns_sector.packet,
-                rr_iterator.offset.unwrap(),
-            );
-            let offset_next =
-                RRIterator::skip_rdata(&parsed_packet.dns_sector.packet, rr_iterator.name_end);
+            rr_iterator.name_end =
+                RRIterator::skip_name(&parsed_packet.packet, rr_iterator.offset.unwrap());
+            let offset_next = RRIterator::skip_rdata(&parsed_packet.packet, rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         Some(self)
@@ -113,12 +121,9 @@ impl<'t> ResponseIterator<'t> {
                 return None;
             }
             rr_iterator.offset = Some(rr_iterator.offset_next);
-            rr_iterator.name_end = RRIterator::skip_name(
-                &parsed_packet.dns_sector.packet,
-                rr_iterator.offset.unwrap(),
-            );
-            let offset_next =
-                RRIterator::skip_rdata(&parsed_packet.dns_sector.packet, rr_iterator.name_end);
+            rr_iterator.name_end =
+                RRIterator::skip_name(&parsed_packet.packet, rr_iterator.offset.unwrap());
+            let offset_next = RRIterator::skip_rdata(&parsed_packet.packet, rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         debug_assert!(self.rr_type() != Type::OPT.into());

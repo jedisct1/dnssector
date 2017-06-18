@@ -17,9 +17,20 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
     }
 
     #[inline]
+    fn offset_next(&self) -> usize {
+        self.rr_iterator.offset_next
+    }
+
+    fn set_offset_next(&mut self, offset: usize) {
+        debug_assert!(offset <= self.packet().len());
+        self.rr_iterator.offset_next = offset;
+        self.rr_iterator.parsed_packet.recompute();
+    }
+
+    #[inline]
     fn raw(&self) -> RRRaw {
         RRRaw {
-            packet: &self.rr_iterator.parsed_packet.dns_sector.packet,
+            packet: &self.rr_iterator.parsed_packet.packet,
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -28,7 +39,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
     #[inline]
     fn raw_mut(&mut self) -> RRRawMut {
         RRRawMut {
-            packet: &mut self.rr_iterator.parsed_packet.dns_sector.packet,
+            packet: &mut self.rr_iterator.parsed_packet.packet,
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -43,7 +54,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
             let rr_iterator = &mut self.rr_iterator;
             debug_assert_eq!(rr_iterator.section, Section::Question);
             if rr_iterator.offset.is_none() {
-                let count = DNSSector::qdcount(&rr_iterator.parsed_packet.dns_sector.packet);
+                let count = DNSSector::qdcount(&rr_iterator.parsed_packet.packet);
                 if count == 0 {
                     return None;
                 }
@@ -57,7 +68,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
             rr_iterator.name_end = RRIterator::skip_name(
-                &rr_iterator.parsed_packet.dns_sector.packet,
+                &rr_iterator.parsed_packet.packet,
                 rr_iterator.offset.unwrap(),
             );
             let offset_next = rr_iterator.name_end + DNS_RR_QUESTION_HEADER_SIZE;

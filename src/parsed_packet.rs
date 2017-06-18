@@ -11,7 +11,7 @@ use rr_iterator::*;
 /// DNS packet, that allows quick access to (extended) flags and to individual sections.
 #[derive(Debug)]
 pub struct ParsedPacket {
-    pub dns_sector: DNSSector,
+    pub packet: Vec<u8>,
     pub offset_question: Option<usize>,
     pub offset_answers: Option<usize>,
     pub offset_nameservers: Option<usize>,
@@ -21,12 +21,13 @@ pub struct ParsedPacket {
     pub ext_rcode: Option<u8>,
     pub edns_version: Option<u8>,
     pub ext_flags: Option<u16>,
+    pub maybe_packed: bool,
 }
 
 impl ParsedPacket {
     /// Converts a `ParsedPacket` back into a raw packet.
     pub fn into_packet(self) -> Vec<u8> {
-        self.dns_sector.packet
+        self.packet
     }
 
     /// Iterates over the question section.
@@ -62,12 +63,12 @@ impl ParsedPacket {
     /// Returns the transaction ID.
     #[inline]
     pub fn tid(&self) -> u16 {
-        BigEndian::read_u16(&self.dns_sector.packet[DNS_TID_OFFSET..])
+        BigEndian::read_u16(&self.packet[DNS_TID_OFFSET..])
     }
 
     /// Changes the transaction ID.
     pub fn set_tid(&mut self, tid: u16) {
-        BigEndian::write_u16(&mut self.dns_sector.packet[DNS_TID_OFFSET..], tid)
+        BigEndian::write_u16(&mut self.packet[DNS_TID_OFFSET..], tid)
     }
 
     /// Returns the flags, including extended flags.
@@ -76,7 +77,7 @@ impl ParsedPacket {
     /// The opcode and rcode are intentionally masked in order to prevent misuse:
     /// these bits are never supposed to be accessed individually.
     pub fn flags(&self) -> u32 {
-        let mut rflags = BigEndian::read_u16(&self.dns_sector.packet[DNS_FLAGS_OFFSET..]);
+        let mut rflags = BigEndian::read_u16(&self.packet[DNS_FLAGS_OFFSET..]);
         rflags &= !0x7800; // mask opcode
         rflags &= !0x000f; // mask rcode
         (self.ext_flags.unwrap_or(0) as u32) << 16 | (rflags as u32)
@@ -88,23 +89,23 @@ impl ParsedPacket {
         let mut rflags = (flags & 0xffff) as u16;
         rflags &= !0x7800; // mask opcode
         rflags &= !0x000f; // mask rcode
-        let mut v = BigEndian::read_u16(&self.dns_sector.packet[DNS_FLAGS_OFFSET..]);
+        let mut v = BigEndian::read_u16(&self.packet[DNS_FLAGS_OFFSET..]);
         v &= !0x7800;
         v &= !0x000f;
         v |= rflags;
-        BigEndian::write_u16(&mut self.dns_sector.packet[DNS_FLAGS_OFFSET..], v);
+        BigEndian::write_u16(&mut self.packet[DNS_FLAGS_OFFSET..], v);
     }
 
     /// Returns the return code.
     #[inline]
     pub fn rcode(&self) -> u8 {
-        let rflags = self.dns_sector.packet[DNS_FLAGS_OFFSET + 1];
+        let rflags = self.packet[DNS_FLAGS_OFFSET + 1];
         rflags & 0x0f
     }
 
     /// Changes the return code.
     pub fn set_rcode(&mut self, rcode: u8) {
-        let p = &mut self.dns_sector.packet[DNS_FLAGS_OFFSET + 1];
+        let p = &mut self.packet[DNS_FLAGS_OFFSET + 1];
         *p &= !0x0f;
         *p |= rcode & 0x0f;
     }
@@ -112,29 +113,35 @@ impl ParsedPacket {
     /// Returns the opcode.
     #[inline]
     pub fn opcode(&self) -> u8 {
-        let rflags = self.dns_sector.packet[DNS_FLAGS_OFFSET];
+        let rflags = self.packet[DNS_FLAGS_OFFSET];
         (rflags & 0x78) >> 3
     }
 
     /// Changes the operation code.
     pub fn set_opcode(&mut self, opcode: u8) {
-        let p = &mut self.dns_sector.packet[DNS_FLAGS_OFFSET];
+        let p = &mut self.packet[DNS_FLAGS_OFFSET];
         *p &= !0x78;
         *p |= (opcode << 3) & 0x78;
     }
 
-    /// Recomputes all offsets after an in-place update of the packet.
-    /// This is commonly required after a forced decompression.
+    /// Recomputes all offsets after an in-place decompression of the packet.
+    /// The `set_offset_next()` method of RR iterators calls it: if we force the next offset
+    /// to be something different, we changed the packet while iterating.
+    /// Updating the section offsets is thus mandatory.
     /// It is currently re-parsing everything by calling `parse()`, but this can be
-    /// optimized later to skip over RDATA, and maybe assume that the input
+    /// optimized later to skip over RDATA, and by assuming that the input
     /// is always well-formed.
     pub fn recompute(&mut self) -> Result<()> {
-        let dns_sector = DNSSector::new(self.dns_sector.packet.clone())?;
+        if !self.maybe_packed {
+            return Ok(());
+        }
+        let dns_sector = DNSSector::new(self.packet.clone())?; // XXX - TODO: This doesnt't require cloning.
         let parsed_packet = dns_sector.parse()?;
         self.offset_question = parsed_packet.offset_question;
         self.offset_answers = parsed_packet.offset_answers;
         self.offset_nameservers = parsed_packet.offset_nameservers;
         self.offset_edns = parsed_packet.offset_edns;
+        self.maybe_packed = false;
         Ok(())
     }
 }
