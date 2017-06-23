@@ -28,6 +28,13 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
         self.rr_iterator.offset_next
     }
 
+    fn set_offset(&mut self, offset: usize) {
+        debug_assert!(offset <= self.packet().len());
+        self.rr_iterator.offset = Some(offset);
+        self.rr_iterator.parsed_packet.recompute();
+        self.rr_iterator.recompute();
+    }
+
     fn set_offset_next(&mut self, offset: usize) {
         debug_assert!(offset <= self.packet().len());
         self.rr_iterator.offset_next = offset;

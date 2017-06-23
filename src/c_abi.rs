@@ -6,7 +6,7 @@ use question_iterator::*;
 use response_iterator::*;
 use rr_iterator::*;
 use std::convert::From;
-use std::ptr;
+use std::{ptr, slice};
 
 const ABI_VERSION: u64 = 0x1;
 
@@ -184,6 +184,22 @@ unsafe extern "C" fn set_rr_ttl(section_iterator: &mut SectionIterator, ttl: u32
     }
 }
 
+unsafe extern "C" fn set_raw_name(
+    section_iterator: &mut SectionIterator,
+    name: *const u8,
+    len: usize,
+) {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    let name = slice::from_raw_parts(name, len);
+    let it = &mut *(section_iterator.it as *mut ResponseIterator);
+    match section_iterator.section {       
+        Section::Answer | Section::NameServers | Section::Additional => {
+            (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(name);
+        }
+        _ => panic!("set_raw_name() called on a record with no name"),
+    }
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -238,6 +254,8 @@ pub struct FnTable {
     pub rr_class: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
     pub rr_ttl: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u32,
     pub set_rr_ttl: unsafe extern "C" fn(section_iterator: &mut SectionIterator, ttl: u32),
+    pub set_raw_name:
+        unsafe extern "C" fn(section_iterator: &mut SectionIterator, name: *const u8, len: usize),
 }
 
 pub fn fn_table() -> FnTable {
@@ -258,5 +276,6 @@ pub fn fn_table() -> FnTable {
         rr_class,
         rr_ttl,
         set_rr_ttl,
+        set_raw_name,
     }
 }

@@ -24,6 +24,7 @@ typedef struct FnTable {
     uint16_t (*rr_class)(void *it);
     uint32_t (*rr_ttl)(void *it);
     void     (*set_rr_ttl)(void *it, uint32_t ttl);
+    void     (*set_raw_name)(void *it, const uint8_t *name, size_t len);
 } FnTable;   
 
 void hook(const FnTable *fn_table, ParsedPacket *parsed_packet);

@@ -246,7 +246,7 @@ impl DNSSector {
             edns_version: edns_version,
             ext_flags: ext_flags,
             edns_count: edns_count,
-            maybe_packed: true,
+            maybe_compressed: true,
         };
         Ok(parsed_packet)
     }
@@ -321,7 +321,7 @@ impl DNSSector {
                     bail!(ErrorKind::PacketTooSmall);
                 }
                 self.increment_offset(DNS_RR_HEADER_SIZE)?;
-                let final_offset = self.check_uncompressed_name(self.offset)?;
+                let final_offset = Self::check_uncompressed_name(&self.packet, self.offset)?;
                 if final_offset - self.offset != rr_rdlen {
                     bail!(ErrorKind::InvalidPacket(
                         "Unexpected data after name in DNAME rdata",
@@ -456,8 +456,7 @@ impl DNSSector {
 
     /// Checks that an untrusted encoded DNS name is valid and does not contain any indirections.
     /// Returns the location right after the name.
-    fn check_uncompressed_name(&self, mut offset: usize) -> Result<usize> {
-        let packet = &self.packet;
+    pub fn check_uncompressed_name(packet: &[u8], mut offset: usize) -> Result<usize> {
         let packet_len = packet.len();
         let mut name_len = 0;
         if offset >= packet_len {

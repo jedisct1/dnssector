@@ -2,9 +2,11 @@ use std::ascii::AsciiExt;
 use byteorder::{BigEndian, ByteOrder};
 use compress::*;
 use constants::*;
+use dns_sector::*;
 use errors::*;
 use parsed_packet::*;
 use std::marker;
+use std::ptr;
 
 /// Accessor to the raw packet data.
 /// `offset` is the offset to the current RR.
@@ -36,6 +38,9 @@ pub trait DNSIterable {
 
     /// Returns the offset right after the current RR
     fn offset_next(&self) -> usize;
+
+    /// Sets the offset of the current RR
+    fn set_offset(&mut self, offset: usize);
 
     /// Sets the offset of the next RR
     fn set_offset_next(&mut self, offset: usize);
@@ -86,6 +91,9 @@ pub trait DNSIterable {
 
     /// Decompresses the whole packet while keeping the iterator available.
     fn uncompress(&mut self) -> Result<()> {
+        if !self.parsed_packet().maybe_compressed {
+            return Ok(());
+        }
         let (uncompressed, new_offset_next) = {
             let ref_offset_next = self.offset_next();
             let compressed = self.raw_mut().packet;
@@ -145,6 +153,105 @@ pub trait TypedIterable {
         }
         let packet = raw.packet;
         Compress::copy_uncompressed_name(name, raw.packet, raw.offset).name_len
+    }
+
+    /// Returns the section the current record belongs to.
+    fn current_section(&mut self) -> Result<Section>
+    where
+        Self: DNSIterable,
+    {
+        let offset = self.offset();
+        let parsed_packet = self.parsed_packet();
+        let section = match offset {
+            x if x < parsed_packet.offset_question => {
+                bail!(ErrorKind::InternalError("name before the question section"))
+            }
+            x if x < parsed_packet.offset_answers => Section::Question,
+            x if x < parsed_packet.offset_nameservers => Section::Answer,
+            x if x < parsed_packet.offset_additional => Section::NameServers,                
+            _ => Section::Additional,
+        };
+        Ok(section)
+    }
+
+    /// Changes the name (raw format, untrusted content).
+    fn set_raw_name(&mut self, name: &[u8]) -> Result<()>
+    where
+        Self: DNSIterable,
+    {
+        let section = self.current_section()?;
+        let new_name_len = DNSSector::check_uncompressed_name(name, 0)?;
+        let name = &name[..new_name_len];
+        if self.parsed_packet().maybe_compressed {
+            let (uncompressed, new_offset) = {
+                let ref_offset = self.offset()
+                    .expect("Setting raw name with no known offset");
+                let compressed = self.raw_mut().packet;
+                Compress::uncompress_with_previous_offset(compressed, ref_offset)?
+            };
+            self.parsed_packet().packet = uncompressed;
+            self.set_offset(new_offset);
+        }
+        let offset = self.offset()
+            .expect("Setting raw name with no known offset");
+        let current_name_len = Compress::raw_name_len(self.name_slice());
+        let shift = new_name_len as isize - current_name_len as isize;
+        {
+            let mut packet = &mut self.parsed_packet().packet;
+            let packet_len = packet.len();
+            let packet_ptr = packet.as_mut_ptr();
+            if new_name_len > current_name_len {
+                let new_packet_len = packet_len + shift as usize;
+                if new_packet_len > 0xffff {
+                    bail!(ErrorKind::PacketTooLarge);
+                }
+                packet.resize(new_packet_len, 0);
+                debug_assert_eq!(
+                    new_packet_len,
+                    (offset as isize + shift) as usize + (packet_len - offset) as usize
+                );
+            }
+            if shift > 0 {
+                unsafe {
+                    ptr::copy(
+                        packet_ptr.offset(offset as isize),
+                        packet_ptr.offset((offset as isize + shift) as isize),
+                        packet_len - offset,
+                    );
+                }
+            } else if shift < 0 {
+                unsafe {
+                    ptr::copy(
+                        packet_ptr.offset((offset as isize - shift) as isize),
+                        packet_ptr.offset(offset as isize),
+                        packet_len - (offset as isize - shift) as usize,
+                    );
+                }
+                packet.truncate((packet_len as isize - shift) as usize);
+            }
+            &mut packet[offset..offset + new_name_len].copy_from_slice(name);
+        }
+        let new_offset_next = (self.offset_next() as isize + shift) as usize;
+        self.set_offset_next(new_offset_next);
+        let parsed_packet = self.parsed_packet();
+        if section == Section::NameServers || section == Section::Answer ||
+            section == Section::Question
+        {
+            parsed_packet.offset_additional = Some(
+                (parsed_packet.offset_additional.unwrap() as isize + shift) as usize,
+            )
+        }
+        if section == Section::Answer || section == Section::Question {
+            parsed_packet.offset_nameservers = Some(
+                (parsed_packet.offset_nameservers.unwrap() as isize + shift) as usize,
+            )
+        }
+        if section == Section::Question {
+            parsed_packet.offset_answers = Some(
+                (parsed_packet.offset_answers.unwrap() as isize + shift) as usize,
+            )
+        }
+        Ok(())
     }
 
     /// Returns the query type for the current RR.
@@ -222,6 +329,15 @@ impl<'t> RRIterator<'t> {
             name_end: 0,
             rrs_left: 0,
         }
+    }
+
+    pub fn recompute(&mut self) {
+        let offset = self.offset
+            .expect("recompute() called prior to iterating over RRs");
+        let name_end = Self::skip_name(&self.parsed_packet.packet, offset);
+        let offset_next = Self::skip_rdata(&self.parsed_packet.packet, name_end);
+        self.name_end = name_end;
+        self.offset_next = offset_next;
     }
 
     /// Quickly skips over a DNS name, without validation/decompression.

@@ -21,7 +21,7 @@ pub struct ParsedPacket {
     pub ext_rcode: Option<u8>,
     pub edns_version: Option<u8>,
     pub ext_flags: Option<u16>,
-    pub maybe_packed: bool,
+    pub maybe_compressed: bool,
 }
 
 impl ParsedPacket {
@@ -132,7 +132,7 @@ impl ParsedPacket {
     /// optimized later to skip over RDATA, and by assuming that the input
     /// is always well-formed.
     pub fn recompute(&mut self) -> Result<()> {
-        if !self.maybe_packed {
+        if !self.maybe_compressed {
             return Ok(());
         }
         let dns_sector = DNSSector::new(self.packet.clone())?; // XXX - TODO: This doesnt't require cloning.
@@ -141,7 +141,7 @@ impl ParsedPacket {
         self.offset_answers = parsed_packet.offset_answers;
         self.offset_nameservers = parsed_packet.offset_nameservers;
         self.offset_edns = parsed_packet.offset_edns;
-        self.maybe_packed = false;
+        self.maybe_compressed = false;
         Ok(())
     }
 }

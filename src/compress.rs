@@ -436,7 +436,7 @@ impl Compress {
         Ok(compressed)
     }
 
-    /// Returns the total length of a raw name, including the final `0` label length.
+    /// Returns the total length of an uncompressed raw name, including the final `0` label length.
     pub fn raw_name_len(name: &[u8]) -> usize {
         let mut i = 0;
         while name[i] != 0 {
