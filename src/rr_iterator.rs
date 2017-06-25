@@ -151,7 +151,6 @@ pub trait TypedIterable {
         if raw.name_end <= raw.offset {
             return 0;
         }
-        let packet = raw.packet;
         Compress::copy_uncompressed_name(name, raw.packet, raw.offset).name_len
     }
 
@@ -174,33 +173,22 @@ pub trait TypedIterable {
         Ok(section)
     }
 
-    /// Changes the name (raw format, untrusted content).
-    fn set_raw_name(&mut self, name: &[u8]) -> Result<()>
+    /// Resizes the current record, by growing or shrinking (with a negative value) the current
+    /// record size by `shift` bytes.
+    fn resize_rr(&mut self, shift: isize) -> Result<()>
     where
         Self: DNSIterable,
     {
-        let section = self.current_section()?;
-        let new_name_len = DNSSector::check_uncompressed_name(name, 0)?;
-        let name = &name[..new_name_len];
-        if self.parsed_packet().maybe_compressed {
-            let (uncompressed, new_offset) = {
-                let ref_offset = self.offset()
-                    .expect("Setting raw name with no known offset");
-                let compressed = self.raw_mut().packet;
-                Compress::uncompress_with_previous_offset(compressed, ref_offset)?
-            };
-            self.parsed_packet().packet = uncompressed;
-            self.set_offset(new_offset);
-        }
-        let offset = self.offset()
-            .expect("Setting raw name with no known offset");
-        let current_name_len = Compress::raw_name_len(self.name_slice());
-        let shift = new_name_len as isize - current_name_len as isize;
         {
+            if shift == 0 {
+                return Ok(());
+            }
+            let offset = self.offset()
+                .expect("Setting raw name with no known offset");
             let mut packet = &mut self.parsed_packet().packet;
             let packet_len = packet.len();
             let packet_ptr = packet.as_mut_ptr();
-            if new_name_len > current_name_len {
+            if shift > 0 {
                 let new_packet_len = packet_len + shift as usize;
                 if new_packet_len > 0xffff {
                     bail!(ErrorKind::PacketTooLarge);
@@ -210,8 +198,6 @@ pub trait TypedIterable {
                     new_packet_len,
                     (offset as isize + shift) as usize + (packet_len - offset) as usize
                 );
-            }
-            if shift > 0 {
                 unsafe {
                     ptr::copy(
                         packet_ptr.offset(offset as isize),
@@ -220,6 +206,7 @@ pub trait TypedIterable {
                     );
                 }
             } else if shift < 0 {
+                assert!(packet_len >= (-shift) as usize);
                 unsafe {
                     ptr::copy(
                         packet_ptr.offset((offset as isize - shift) as isize),
@@ -229,10 +216,10 @@ pub trait TypedIterable {
                 }
                 packet.truncate((packet_len as isize - shift) as usize);
             }
-            &mut packet[offset..offset + new_name_len].copy_from_slice(name);
         }
         let new_offset_next = (self.offset_next() as isize + shift) as usize;
         self.set_offset_next(new_offset_next);
+        let section = self.current_section()?;
         let parsed_packet = self.parsed_packet();
         if section == Section::NameServers || section == Section::Answer ||
             section == Section::Question
@@ -251,6 +238,34 @@ pub trait TypedIterable {
                 (parsed_packet.offset_answers.unwrap() as isize + shift) as usize,
             )
         }
+        Ok(())
+    }
+
+    /// Changes the name (raw format, untrusted content).
+    fn set_raw_name(&mut self, name: &[u8]) -> Result<()>
+    where
+        Self: DNSIterable,
+    {
+        let new_name_len = DNSSector::check_uncompressed_name(name, 0)?;
+        let name = &name[..new_name_len];
+        if self.parsed_packet().maybe_compressed {
+            let (uncompressed, new_offset) = {
+                let ref_offset = self.offset()
+                    .expect("Setting raw name with no known offset");
+                let compressed = self.raw_mut().packet;
+                Compress::uncompress_with_previous_offset(compressed, ref_offset)?
+            };
+            self.parsed_packet().packet = uncompressed;
+            self.set_offset(new_offset);
+        }
+        let offset = self.offset()
+            .expect("Setting raw name with no known offset");
+        debug_assert_eq!(self.parsed_packet().maybe_compressed, false);
+        let current_name_len = Compress::raw_name_len(self.name_slice());
+        let shift = new_name_len as isize - current_name_len as isize;
+        self.resize_rr(shift)?;
+        let mut packet = &mut self.parsed_packet().packet;
+        &mut packet[offset..offset + new_name_len].copy_from_slice(name);
         Ok(())
     }
 
