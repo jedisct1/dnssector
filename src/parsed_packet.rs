@@ -124,10 +124,7 @@ impl ParsedPacket {
         *p |= (opcode << 3) & 0x78;
     }
 
-    /// Recomputes all offsets after an in-place decompression of the packet.
-    /// The `set_offset_next()` method of RR iterators calls it: if we force the next offset
-    /// to be something different, we changed the packet while iterating.
-    /// Updating the section offsets is thus mandatory.
+    /// Recomputes all section offsets after an in-place decompression of the packet.
     /// It is currently re-parsing everything by calling `parse()`, but this can be
     /// optimized later to skip over RDATA, and by assuming that the input
     /// is always well-formed.

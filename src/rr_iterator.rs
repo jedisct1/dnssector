@@ -45,6 +45,12 @@ pub trait DNSIterable {
     /// Sets the offset of the next RR
     fn set_offset_next(&mut self, offset: usize);
 
+    /// Updates the precomputed RR information
+    fn recompute_rr(&mut self);
+
+    /// Updates the precomputed offsets of each section.
+    fn recompute_sections(&mut self);
+
     /// Accesses the raw packet data.
     fn raw(&self) -> RRRaw;
 
@@ -101,6 +107,8 @@ pub trait DNSIterable {
         };
         self.parsed_packet().packet = uncompressed;
         self.set_offset_next(new_offset_next);
+        self.recompute_sections();
+        self.recompute_rr();
         Ok(())
     }
 }
@@ -214,7 +222,7 @@ pub trait TypedIterable {
                         packet_len - (offset as isize - shift) as usize,
                     );
                 }
-                packet.truncate((packet_len as isize - shift) as usize);
+                packet.truncate((packet_len as isize + shift) as usize);
             }
         }
         let new_offset_next = (self.offset_next() as isize + shift) as usize;
@@ -257,15 +265,22 @@ pub trait TypedIterable {
             };
             self.parsed_packet().packet = uncompressed;
             self.set_offset(new_offset);
+            self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
+            self.recompute_sections();
         }
+
         let offset = self.offset()
             .expect("Setting raw name with no known offset");
         debug_assert_eq!(self.parsed_packet().maybe_compressed, false);
         let current_name_len = Compress::raw_name_len(self.name_slice());
         let shift = new_name_len as isize - current_name_len as isize;
         self.resize_rr(shift)?;
-        let mut packet = &mut self.parsed_packet().packet;
-        &mut packet[offset..offset + new_name_len].copy_from_slice(name);
+        {
+            let mut packet = &mut self.parsed_packet().packet;
+            &mut packet[offset..offset + new_name_len].copy_from_slice(name);
+        }
+        self.recompute_rr();
+
         Ok(())
     }
 
