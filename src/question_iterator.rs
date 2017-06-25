@@ -24,13 +24,13 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
     fn set_offset(&mut self, offset: usize) {
         debug_assert!(offset <= self.packet().len());
         self.rr_iterator.offset = Some(offset);
-        self.rr_iterator.parsed_packet.recompute();
+        self.rr_iterator.parsed_packet.recompute().unwrap();
     }
 
     fn set_offset_next(&mut self, offset: usize) {
         debug_assert!(offset <= self.packet().len());
         self.rr_iterator.offset_next = offset;
-        self.rr_iterator.parsed_packet.recompute();
+        self.rr_iterator.parsed_packet.recompute().unwrap();
     }
 
     #[inline]
