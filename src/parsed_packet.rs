@@ -140,7 +140,12 @@ impl ParsedPacket {
         self.offset_question = parsed_packet.offset_question;
         self.offset_answers = parsed_packet.offset_answers;
         self.offset_nameservers = parsed_packet.offset_nameservers;
+        self.offset_additional = parsed_packet.offset_additional;
         self.offset_edns = parsed_packet.offset_edns;
+        assert_eq!(self.edns_count, parsed_packet.edns_count);
+        assert_eq!(self.ext_rcode, parsed_packet.ext_rcode);
+        assert_eq!(self.edns_version, parsed_packet.edns_version);
+        assert_eq!(self.ext_flags, parsed_packet.ext_flags);
         self.maybe_compressed = false;
         Ok(())
     }
