@@ -31,6 +31,10 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
         self.rr_iterator.offset_next = offset;
     }
 
+    fn invalidate(&mut self) {
+        self.rr_iterator.offset = None;
+    }
+
     fn recompute_rr(&mut self) {
         self.rr_iterator.recompute();
     }

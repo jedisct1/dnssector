@@ -160,7 +160,6 @@ impl ParsedPacket {
 
     /// Decrements the number of records in a given section
     pub fn rrcount_dec(&mut self, section: Section) -> Result<u16> {
-        println!("section={:?}", section);
         let mut packet = &mut self.packet;
         let mut rrcount = match section {
             Section::Question => DNSSector::qdcount(&mut packet),
@@ -180,7 +179,6 @@ impl ParsedPacket {
             Section::Additional => DNSSector::set_arcount(&mut packet, rrcount),
             _ => panic!("EDNS section doesn't have a records count"),
         }
-        println!("rrcount={}", rrcount);
         Ok(rrcount)
     }
 

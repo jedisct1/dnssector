@@ -38,6 +38,10 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
         self.rr_iterator.offset_next = offset;
     }
 
+    fn invalidate(&mut self) {
+        self.rr_iterator.offset = None;
+    }
+
     fn recompute_rr(&mut self) {
         self.rr_iterator.recompute();
     }

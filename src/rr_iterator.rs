@@ -36,14 +36,19 @@ pub trait DNSIterable {
     /// Returns the offset of the current RR, or `None` if we haven't started iterating yet.
     fn offset(&self) -> Option<usize>;
 
-    /// Returns the offset right after the current RR
+    /// Returns the offset right after the current RR.
     fn offset_next(&self) -> usize;
 
-    /// Sets the offset of the current RR
+    /// Sets the offset of the current RR.
     fn set_offset(&mut self, offset: usize);
 
-    /// Sets the offset of the next RR
+    /// Sets the offset of the next RR.
     fn set_offset_next(&mut self, offset: usize);
+
+    /// Prevents access to the current record.
+    /// This is useful after a delete operation: from a user perspective, the current
+    /// iterator doesn't point to a valid RR any more.
+    fn invalidate(&mut self);
 
     /// Updates the precomputed RR information
     fn recompute_rr(&mut self);
@@ -290,7 +295,6 @@ pub trait TypedIterable {
         Self: DNSIterable,
     {
         let section = self.current_section()?;
-        println!("guessed section={:?}", section);
         if self.parsed_packet().maybe_compressed {
             let (uncompressed, new_offset) = {
                 let ref_offset = self.offset().expect("Deleting record with no known offset");
@@ -308,7 +312,9 @@ pub trait TypedIterable {
             );
         assert!(rr_len > 0);
         self.resize_rr(-(rr_len as isize))?;
-        self.recompute_rr();
+        let offset = self.offset().unwrap();
+        self.set_offset_next(offset);
+        self.invalidate();
         let parsed_packet = self.parsed_packet();
         let rrcount = parsed_packet.rrcount_dec(section)?;
         if rrcount <= 0 {
