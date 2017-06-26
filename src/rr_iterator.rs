@@ -284,6 +284,46 @@ pub trait TypedIterable {
         Ok(())
     }
 
+    /// Deletes the record
+    fn delete(&mut self) -> Result<()>
+    where
+        Self: DNSIterable,
+    {
+        let section = self.current_section()?;
+        println!("guessed section={:?}", section);
+        if self.parsed_packet().maybe_compressed {
+            let (uncompressed, new_offset) = {
+                let ref_offset = self.offset().expect("Deleting record with no known offset");
+                let compressed = self.raw_mut().packet;
+                Compress::uncompress_with_previous_offset(compressed, ref_offset)?
+            };
+            self.parsed_packet().packet = uncompressed;
+            self.set_offset(new_offset);
+            self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
+            self.recompute_sections();
+        }
+        let rr_len = self.offset_next() -
+            self.offset().expect(
+                "Deleting record with no known offset after optional decompression",
+            );
+        assert!(rr_len > 0);
+        self.resize_rr(-(rr_len as isize))?;
+        self.recompute_rr();
+        let parsed_packet = self.parsed_packet();
+        let rrcount = parsed_packet.rrcount_dec(section)?;
+        if rrcount <= 0 {
+            let offset = match section {
+                Section::Question => &mut parsed_packet.offset_question,
+                Section::Answer => &mut parsed_packet.offset_answers,
+                Section::NameServers => &mut parsed_packet.offset_nameservers,
+                Section::Additional => &mut parsed_packet.offset_additional,
+                _ => panic!("delete() cannot be used to delete EDNS pseudo-records"),            
+            };
+            *offset = None;
+        }
+        Ok(())
+    }
+
     /// Returns the query type for the current RR.
     #[inline]
     fn rr_type(&self) -> u16

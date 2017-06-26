@@ -198,6 +198,16 @@ unsafe extern "C" fn set_raw_name(
     }
 }
 
+unsafe extern "C" fn delete(section_iterator: &mut SectionIterator) {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    match section_iterator.section {
+        Section::Question | Section::Answer | Section::NameServers | Section::Additional => {
+            let _ = (&mut *(section_iterator.it as *mut ResponseIterator)).delete();
+        }
+        _ => panic!("delete() called in a pseudosection"),
+    }
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -254,6 +264,7 @@ pub struct FnTable {
     pub set_rr_ttl: unsafe extern "C" fn(section_iterator: &mut SectionIterator, ttl: u32),
     pub set_raw_name:
         unsafe extern "C" fn(section_iterator: &mut SectionIterator, name: *const u8, len: usize),
+    pub delete: unsafe extern "C" fn(section_iterator: &mut SectionIterator),
 }
 
 pub fn fn_table() -> FnTable {
@@ -275,5 +286,6 @@ pub fn fn_table() -> FnTable {
         rr_ttl,
         set_rr_ttl,
         set_raw_name,
+        delete,
     }
 }

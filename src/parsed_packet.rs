@@ -124,6 +124,66 @@ impl ParsedPacket {
         *p |= (opcode << 3) & 0x78;
     }
 
+    /// Increments the number of records in a given section
+    pub fn rrcount_inc(&mut self, section: Section) -> Result<u16> {
+        let mut packet = &mut self.packet;
+        let mut rrcount = match section {
+            Section::Question => {
+                let rrcount = DNSSector::qdcount(&mut packet);
+                if rrcount >= 1 {
+                    bail!(ErrorKind::InvalidPacket(
+                        "A DNS packet can only contain up to one question"
+                    ));
+                }
+                rrcount
+            }
+            Section::Answer => DNSSector::ancount(&mut packet),
+            Section::NameServers => DNSSector::nscount(&mut packet),
+            Section::Additional => DNSSector::arcount(&mut packet),
+            _ => panic!("Trying to increment a the number of records in a pseudosection"),
+        };
+        if rrcount >= 0xffff {
+            bail!(ErrorKind::InvalidPacket(
+                "Too many records in the same question"
+            ));
+        }
+        rrcount += 1;
+        match section {
+            Section::Question => DNSSector::set_qdcount(&mut packet, rrcount),
+            Section::Answer => DNSSector::set_ancount(&mut packet, rrcount),
+            Section::NameServers => DNSSector::set_nscount(&mut packet, rrcount),
+            Section::Additional => DNSSector::set_arcount(&mut packet, rrcount),
+            _ => panic!("EDNS section doesn't have a records count"),
+        }
+        Ok(rrcount)
+    }
+
+    /// Decrements the number of records in a given section
+    pub fn rrcount_dec(&mut self, section: Section) -> Result<u16> {
+        println!("section={:?}", section);
+        let mut packet = &mut self.packet;
+        let mut rrcount = match section {
+            Section::Question => DNSSector::qdcount(&mut packet),
+            Section::Answer => DNSSector::ancount(&mut packet),
+            Section::NameServers => DNSSector::nscount(&mut packet),
+            Section::Additional => DNSSector::arcount(&mut packet),
+            _ => panic!("Trying to decrement a the number of records in a pseudosection"),
+        };
+        if rrcount <= 0 {
+            panic!("Trying to decrement a number of records that was already 0");
+        }
+        rrcount -= 1;
+        match section {
+            Section::Question => DNSSector::set_qdcount(&mut packet, rrcount),
+            Section::Answer => DNSSector::set_ancount(&mut packet, rrcount),
+            Section::NameServers => DNSSector::set_nscount(&mut packet, rrcount),
+            Section::Additional => DNSSector::set_arcount(&mut packet, rrcount),
+            _ => panic!("EDNS section doesn't have a records count"),
+        }
+        println!("rrcount={}", rrcount);
+        Ok(rrcount)
+    }
+
     /// Recomputes all section offsets after an in-place decompression of the packet.
     /// It is currently re-parsing everything by calling `parse()`, but this can be
     /// optimized later to skip over RDATA, and by assuming that the input
