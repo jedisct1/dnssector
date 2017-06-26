@@ -48,9 +48,11 @@
                    <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
                        [<span class='inner'>&#x2212;</span>]
                    </a>
-               </span><a class='srclink' href='../../src/dnssector/rr_iterator.rs.html#147-165' title='goto source code'>[src]</a></span></h1>
+               </span><a class='srclink' href='../../src/dnssector/rr_iterator.rs.html#306-332' title='goto source code'>[src]</a></span></h1>
 <pre class='rust trait'>pub trait RdataIterable {
     fn <a href='#method.rr_ttl' class='fnname'>rr_ttl</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a><br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../../dnssector/rr_iterator/trait.DNSIterable.html" title="trait dnssector::rr_iterator::DNSIterable">DNSIterable</a> + <a class="trait" href="../../dnssector/rr_iterator/trait.TypedIterable.html" title="trait dnssector::rr_iterator::TypedIterable">TypedIterable</a></span>,
+    { ... }
+    fn <a href='#method.set_rr_ttl' class='fnname'>set_rr_ttl</a>(&amp;mut self, ttl: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)<br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../../dnssector/rr_iterator/trait.DNSIterable.html" title="trait dnssector::rr_iterator::DNSIterable">DNSIterable</a> + <a class="trait" href="../../dnssector/rr_iterator/trait.TypedIterable.html" title="trait dnssector::rr_iterator::TypedIterable">TypedIterable</a></span>,
     { ... }
     fn <a href='#method.rr_rdlen' class='fnname'>rr_rdlen</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a><br>&nbsp;&nbsp;&nbsp; <span class="where">where<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../../dnssector/rr_iterator/trait.DNSIterable.html" title="trait dnssector::rr_iterator::DNSIterable">DNSIterable</a> + <a class="trait" href="../../dnssector/rr_iterator/trait.TypedIterable.html" title="trait dnssector::rr_iterator::TypedIterable">TypedIterable</a></span>,
     { ... }
@@ -58,6 +60,7 @@
             <h2 id='provided-methods'>Provided Methods</h2>
             <div class='methods'>
         <h3 id='method.rr_ttl' class='method'><span id='rr_ttl.v' class='invisible'><code>fn <a href='#method.rr_ttl' class='fnname'>rr_ttl</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a> <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../../dnssector/rr_iterator/trait.DNSIterable.html" title="trait dnssector::rr_iterator::DNSIterable">DNSIterable</a> + <a class="trait" href="../../dnssector/rr_iterator/trait.TypedIterable.html" title="trait dnssector::rr_iterator::TypedIterable">TypedIterable</a>,&nbsp;</span></code></span></h3><div class='docblock'><p>Returns the TTL for the current RR.</p>
+</div><h3 id='method.set_rr_ttl' class='method'><span id='set_rr_ttl.v' class='invisible'><code>fn <a href='#method.set_rr_ttl' class='fnname'>set_rr_ttl</a>(&amp;mut self, ttl: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>) <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../../dnssector/rr_iterator/trait.DNSIterable.html" title="trait dnssector::rr_iterator::DNSIterable">DNSIterable</a> + <a class="trait" href="../../dnssector/rr_iterator/trait.TypedIterable.html" title="trait dnssector::rr_iterator::TypedIterable">TypedIterable</a>,&nbsp;</span></code></span></h3><div class='docblock'><p>Changes the TTL of a record.</p>
 </div><h3 id='method.rr_rdlen' class='method'><span id='rr_rdlen.v' class='invisible'><code>fn <a href='#method.rr_rdlen' class='fnname'>rr_rdlen</a>(&amp;self) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a> <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="../../dnssector/rr_iterator/trait.DNSIterable.html" title="trait dnssector::rr_iterator::DNSIterable">DNSIterable</a> + <a class="trait" href="../../dnssector/rr_iterator/trait.TypedIterable.html" title="trait dnssector::rr_iterator::TypedIterable">TypedIterable</a>,&nbsp;</span></code></span></h3><div class='docblock'><p>Returns the record length for the current RR.</p>
 </div></div>
         <h2 id='implementors'>Implementors</h2>
@@ -122,6 +125,7 @@
         window.rootPath = "../../";
         window.currentCrate = "dnssector";
     </script>
+    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

@@ -1,6 +1,7 @@
 (function() {var implementors = {};
 implementors["error_chain"] = [];
 implementors["libc"] = [];
+implementors["libloading"] = [];
 implementors["syn"] = [];
 
             if (window.register_implementors) {

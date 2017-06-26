@@ -55,7 +55,7 @@
     pub sin_family: <a class="type" href="../libc/type.sa_family_t.html" title="type libc::sa_family_t">sa_family_t</a>,
     pub sin_port: <a class="type" href="../libc/type.in_port_t.html" title="type libc::in_port_t">in_port_t</a>,
     pub sin_addr: <a class="struct" href="../libc/struct.in_addr.html" title="struct libc::in_addr">in_addr</a>,
-    pub sin_zero: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="type" href="../libc/type.c_char.html" title="type libc::c_char">c_char</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 8]</a>,
+    pub sin_zero: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="type" href="../libc/type.int8_t.html" title="type libc::int8_t">int8_t</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 8]</a>,
 }</pre><h2 id='fields' class='fields'>Fields</h2><span id='structfield.sin_len' class="structfield">
                            <span id='sin_len.v' class='invisible'>
                            <code>sin_len: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code>
@@ -70,7 +70,7 @@
                            <code>sin_addr: <a class="struct" href="../libc/struct.in_addr.html" title="struct libc::in_addr">in_addr</a></code>
                            </span></span><span id='structfield.sin_zero' class="structfield">
                            <span id='sin_zero.v' class='invisible'>
-                           <code>sin_zero: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="type" href="../libc/type.c_char.html" title="type libc::c_char">c_char</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 8]</a></code>
+                           <code>sin_zero: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="type" href="../libc/type.int8_t.html" title="type libc::int8_t">int8_t</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 8]</a></code>
                            </span></span><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/marker/trait.Copy.html" title="trait core::marker::Copy">Copy</a> for <a class="struct" href="../libc/struct.sockaddr_in.html" title="struct libc::sockaddr_in">sockaddr_in</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/libc/macros.rs.html#44' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'></div><h3 class='impl'><span class='in-band'><code>impl <a class="trait" href="https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a> for <a class="struct" href="../libc/struct.sockaddr_in.html" title="struct libc::sockaddr_in">sockaddr_in</a></code></span><span class='out-of-band'><div class='ghost'></div><a class='srclink' href='../src/libc/macros.rs.html#45-47' title='goto source code'>[src]</a></span></h3>
 <div class='impl-items'><h4 id='method.clone' class="method"><span id='clone.v' class='invisible'><code>fn <a href='https://doc.rust-lang.org/nightly/core/clone/trait.Clone.html#tymethod.clone' class='fnname'>clone</a>(&amp;self) -&gt; <a class="struct" href="../libc/struct.sockaddr_in.html" title="struct libc::sockaddr_in">sockaddr_in</a></code></span></h4>
@@ -134,6 +134,7 @@
         window.rootPath = "../";
         window.currentCrate = "libc";
     </script>
+    <script src="../jquery.js"></script>
     <script src="../main.js"></script>
     <script defer src="../search-index.js"></script>
 </body>

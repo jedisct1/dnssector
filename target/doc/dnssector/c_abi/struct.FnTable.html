@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `FnTable` struct in crate `dnssector`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, FnTable">
+
+    <title>dnssector::c_abi::FnTable - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../normalize.css">
+    <link rel="stylesheet" type="text/css" href="../../rustdoc.css">
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+    
+
+    
+    
+</head>
+<body class="rustdoc struct">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'>Struct FnTable</p><div class="block items"><ul><li><a href="#fields">Fields</a></li></ul></div><p class='location'><a href='../index.html'>dnssector</a>::<wbr><a href='index.html'>c_abi</a></p><script>window.sidebarCurrent = {name: 'FnTable', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../index.html'>dnssector</a>::<wbr><a href='index.html'>c_abi</a>::<wbr><a class="struct" href=''>FnTable</a></span><span class='out-of-band'><span id='render-detail'>
+                   <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                       [<span class='inner'>&#x2212;</span>]
+                   </a>
+               </span><a class='srclink' href='../../src/dnssector/c_abi.rs.html#203-257' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'><div class="docblock attributes">#[repr(C)]
+</div>pub struct FnTable {
+    pub abi_version: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>,
+    pub flags: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>,
+    pub set_flags: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>),
+    pub rcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>,
+    pub set_rcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>),
+    pub opcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>,
+    pub set_opcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>),
+    pub iter_answer: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>),
+    pub iter_nameservers: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>),
+    pub iter_additional: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>),
+    pub iter_edns: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/edns_iterator/struct.EdnsIterator.html" title="struct dnssector::edns_iterator::EdnsIterator">EdnsIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>),
+    pub name: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>, _: &amp;mut <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 256]</a>),
+    pub rr_type: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>,
+    pub rr_class: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a>,
+    pub rr_ttl: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>,
+    pub set_rr_ttl: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>),
+    pub set_raw_name: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>),
+}</pre><div class='docblock'><p>C wrappers to the internal API</p>
+</div><h2 id='fields' class='fields'>Fields</h2><span id='structfield.abi_version' class="structfield">
+                           <span id='abi_version.v' class='invisible'>
+                           <code>abi_version: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a></code>
+                           </span></span><span id='structfield.flags' class="structfield">
+                           <span id='flags.v' class='invisible'>
+                           <code>flags: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code>
+                           </span></span><span id='structfield.set_flags' class="structfield">
+                           <span id='set_flags.v' class='invisible'>
+                           <code>set_flags: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)</code>
+                           </span></span><span id='structfield.rcode' class="structfield">
+                           <span id='rcode.v' class='invisible'>
+                           <code>rcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code>
+                           </span></span><span id='structfield.set_rcode' class="structfield">
+                           <span id='set_rcode.v' class='invisible'>
+                           <code>set_rcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</code>
+                           </span></span><span id='structfield.opcode' class="structfield">
+                           <span id='opcode.v' class='invisible'>
+                           <code>opcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a></code>
+                           </span></span><span id='structfield.set_opcode' class="structfield">
+                           <span id='set_opcode.v' class='invisible'>
+                           <code>set_opcode: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</code>
+                           </span></span><span id='structfield.iter_answer' class="structfield">
+                           <span id='iter_answer.v' class='invisible'>
+                           <code>iter_answer: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>)</code>
+                           </span></span><span id='structfield.iter_nameservers' class="structfield">
+                           <span id='iter_nameservers.v' class='invisible'>
+                           <code>iter_nameservers: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>)</code>
+                           </span></span><span id='structfield.iter_additional' class="structfield">
+                           <span id='iter_additional.v' class='invisible'>
+                           <code>iter_additional: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>)</code>
+                           </span></span><span id='structfield.iter_edns' class="structfield">
+                           <span id='iter_edns.v' class='invisible'>
+                           <code>iter_edns: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="struct" href="../../dnssector/parsed_packet/struct.ParsedPacket.html" title="struct dnssector::parsed_packet::ParsedPacket">ParsedPacket</a>, _: unsafe extern fn(_: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="struct" href="../../dnssector/edns_iterator/struct.EdnsIterator.html" title="struct dnssector::edns_iterator::EdnsIterator">EdnsIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*mut </a><a class="enum" href="../../libc/enum.c_void.html" title="enum libc::c_void">c_void</a>)</code>
+                           </span></span><span id='structfield.name' class="structfield">
+                           <span id='name.v' class='invisible'>
+                           <code>name: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>, _: &amp;mut <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">[</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.array.html">; 256]</a>)</code>
+                           </span></span><span id='structfield.rr_type' class="structfield">
+                           <span id='rr_type.v' class='invisible'>
+                           <code>rr_type: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a></code>
+                           </span></span><span id='structfield.rr_class' class="structfield">
+                           <span id='rr_class.v' class='invisible'>
+                           <code>rr_class: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u16.html">u16</a></code>
+                           </span></span><span id='structfield.rr_ttl' class="structfield">
+                           <span id='rr_ttl.v' class='invisible'>
+                           <code>rr_ttl: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a></code>
+                           </span></span><span id='structfield.set_rr_ttl' class="structfield">
+                           <span id='set_rr_ttl.v' class='invisible'>
+                           <code>set_rr_ttl: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>)</code>
+                           </span></span><span id='structfield.set_raw_name' class="structfield">
+                           <span id='set_raw_name.v' class='invisible'>
+                           <code>set_raw_name: unsafe extern fn(_: &amp;mut <a class="struct" href="../../dnssector/c_abi/struct.SectionIterator.html" title="struct dnssector::c_abi::SectionIterator">SectionIterator</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.pointer.html">*const </a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>, _: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code>
+                           </span></span></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                    <dt>+</dt>
+                    <dd>Collapse/expand all sections</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code> or <code>* -> vec</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "dnssector";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    <script defer src="../../search-index.js"></script>
+</body>
+</html>

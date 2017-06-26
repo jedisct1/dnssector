@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="generator" content="rustdoc">
-    <meta name="description" content="Source to the Rust file `/Users/j/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.23/src/unix/bsd/mod.rs`.">
+    <meta name="description" content="Source to the Rust file `/home/j/.cargo/registry/src/github.com-1ecc6299db9ec823/libc-0.2.24/src/unix/bsd/mod.rs`.">
     <meta name="keywords" content="rust, rustlang, rust-lang">
 
     <title>mod.rs.html -- source</title>
@@ -494,6 +494,8 @@
 <span id="449">449</span>
 <span id="450">450</span>
 <span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">dox</span>::{<span class="ident">mem</span>, <span class="prelude-ty">Option</span>};
 
@@ -929,6 +931,8 @@
                <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;recvmsg$UNIX2003&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recvmsg</span>(<span class="ident">fd</span>: ::<span class="ident">c_int</span>, <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> ::<span class="ident">msghdr</span>, <span class="ident">flags</span>: ::<span class="ident">c_int</span>)
                    <span class="op">-&gt;</span> ::<span class="ident">ssize_t</span>;
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sync</span>();
 }
 
 <span class="macro">cfg_if</span><span class="macro">!</span> {
@@ -1004,6 +1008,7 @@
         window.rootPath = "../../../../";
         window.currentCrate = "libc";
     </script>
+    <script src="../../../../jquery.js"></script>
     <script src="../../../../main.js"></script>
     <script defer src="../../../../search-index.js"></script>
 </body>
