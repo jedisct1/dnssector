@@ -33,7 +33,10 @@ pub trait DNSIterable {
     where
         Self: marker::Sized;
 
-    /// Returns the offset of the current RR, or `None` if we haven't started iterating yet.
+    /// Returns the offset of the current RR, or `None` if we haven't started iterating yet
+    /// or if the current record has been deleted.
+    ///
+    /// In order to check for the later, please use `is_tombstone()` instead for clarity.
     fn offset(&self) -> Option<usize>;
 
     /// Returns the offset right after the current RR.
@@ -49,6 +52,11 @@ pub trait DNSIterable {
     /// This is useful after a delete operation: from a user perspective, the current
     /// iterator doesn't point to a valid RR any more.
     fn invalidate(&mut self);
+
+    /// Returns `true` if the record has been invalidated by a previous call to `delete()`
+    fn is_tombstone(&self) -> bool {
+        self.offset().is_none()
+    }
 
     /// Updates the precomputed RR information
     fn recompute_rr(&mut self);
@@ -196,8 +204,7 @@ pub trait TypedIterable {
             if shift == 0 {
                 return Ok(());
             }
-            let offset = self.offset()
-                .expect("Setting raw name with no known offset");
+            let offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
             let mut packet = &mut self.parsed_packet().packet;
             let packet_len = packet.len();
             let packet_ptr = packet.as_mut_ptr();
@@ -263,8 +270,7 @@ pub trait TypedIterable {
         let name = &name[..new_name_len];
         if self.parsed_packet().maybe_compressed {
             let (uncompressed, new_offset) = {
-                let ref_offset = self.offset()
-                    .expect("Setting raw name with no known offset");
+                let ref_offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
                 let compressed = self.raw_mut().packet;
                 Compress::uncompress_with_previous_offset(compressed, ref_offset)?
             };
@@ -273,9 +279,7 @@ pub trait TypedIterable {
             self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
             self.recompute_sections();
         }
-
-        let offset = self.offset()
-            .expect("Setting raw name with no known offset");
+        let offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
         debug_assert_eq!(self.parsed_packet().maybe_compressed, false);
         let current_name_len = Compress::raw_name_len(self.name_slice());
         let shift = new_name_len as isize - current_name_len as isize;
@@ -297,7 +301,7 @@ pub trait TypedIterable {
         let section = self.current_section()?;
         if self.parsed_packet().maybe_compressed {
             let (uncompressed, new_offset) = {
-                let ref_offset = self.offset().expect("Deleting record with no known offset");
+                let ref_offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
                 let compressed = self.raw_mut().packet;
                 Compress::uncompress_with_previous_offset(compressed, ref_offset)?
             };

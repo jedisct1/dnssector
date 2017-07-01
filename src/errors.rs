@@ -15,5 +15,6 @@ error_chain! {
             description("Invalid DNS packet")
             display("Invalid DNS packet: '{}'", t)
         }
+        VoidRecord
     }
 }
