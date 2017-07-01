@@ -328,7 +328,23 @@ impl DNSSector {
                     ))
                 }
                 self.increment_offset(rr_rdlen)?;
-            }            
+            }
+            x if x == Type::A.into() => {
+                if rr_rdlen != 4 {
+                    bail!(ErrorKind::InvalidPacket(
+                        "A record doesn't include a 4 bytes IP address"
+                    ))
+                }
+                self.increment_offset(DNS_RR_HEADER_SIZE + rr_rdlen)?;
+            }
+            x if x == Type::AAAA.into() => {
+                if rr_rdlen != 16 {
+                    bail!(ErrorKind::InvalidPacket(
+                        "AAAA record doesn't include a 16 bytes IP address"
+                    ))
+                }
+                self.increment_offset(DNS_RR_HEADER_SIZE + rr_rdlen)?;
+            }
             _ => {
                 self.increment_offset(DNS_RR_HEADER_SIZE + rr_rdlen)?;
             }

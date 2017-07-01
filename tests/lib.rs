@@ -603,7 +603,11 @@ mod tests {
             0,
             0,
             0,
-            0,
+            4,
+            1,
+            2,
+            3,
+            4,
         ]);
 
         /* 2nd answer */
@@ -683,7 +687,11 @@ mod tests {
             0,
             0,
             0,
-            0,
+            4,
+            1,
+            2,
+            3,
+            4,
         ]);
 
         /* 3rd answer */
@@ -763,16 +771,46 @@ mod tests {
             0,
             0,
             0,
-            0,
+            4,
+            1,
+            2,
+            3,
+            4,
         ]);
 
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(errors::Error(errors::ErrorKind::InvalidName("Name too long"), _)) => {
+            Some(errors::Error(errors::ErrorKind::InvalidName("Label length too long"), _)) => {
                 assert!(true)
             }
+            a => assert!(false, "type: {:?}", a),
+        }
+    }
+
+    #[test]
+    fn test_packet_bogus_ipv4_length() {
+        let mut data: Vec<u8> = vec![0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0];
+
+        /* query */
+        data.extend(vec![0, 0, 28, 0, 1]);
+
+        /* 1st answer */
+        data.extend(vec![0, 0, 28, 0, 1, 0, 0, 0, 0, 0, 4, 1, 2, 3, 4]);
+
+        let dns_sector = DNSSector::new(data).unwrap();
+        let ret = dns_sector.parse();
+        assert!(ret.is_err());
+        match ret.err() {
+            Some(
+                errors::Error(
+                    errors::ErrorKind::InvalidPacket(
+                        "AAAA record doesn\'t include a 4 bytes IP address",
+                    ),
+                    _,
+                ),
+            ) => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
