@@ -6,6 +6,7 @@ use dns_sector::*;
 use errors::*;
 use parsed_packet::*;
 use std::marker;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::ptr;
 
 /// Accessor to the raw packet data.
@@ -188,7 +189,7 @@ pub trait TypedIterable {
             }
             x if x < parsed_packet.offset_answers => Section::Question,
             x if x < parsed_packet.offset_nameservers => Section::Answer,
-            x if x < parsed_packet.offset_additional => Section::NameServers,                
+            x if x < parsed_packet.offset_additional => Section::NameServers,
             _ => Section::Additional,
         };
         Ok(section)
@@ -327,7 +328,7 @@ pub trait TypedIterable {
                 Section::Answer => &mut parsed_packet.offset_answers,
                 Section::NameServers => &mut parsed_packet.offset_nameservers,
                 Section::Additional => &mut parsed_packet.offset_additional,
-                _ => panic!("delete() cannot be used to delete EDNS pseudo-records"),            
+                _ => panic!("delete() cannot be used to delete EDNS pseudo-records"),
             };
             *offset = None;
         }
@@ -350,6 +351,64 @@ pub trait TypedIterable {
         Self: DNSIterable,
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_CLASS_OFFSET..])
+    }
+
+    /// Retrieves the IP address of an `A` or `AAAA` record.
+    fn rr_ip(&self) -> Result<IpAddr>
+    where
+        Self: DNSIterable,
+    {
+        match self.rr_type() {
+            x if x == Type::A.into() => {
+                let rdata = self.rdata_slice();
+                assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 4);
+                let mut ip = [0u8; 4];
+                ip.copy_from_slice(&rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4]);
+                Ok(IpAddr::V4(Ipv4Addr::from(ip)))
+            }
+            x if x == Type::AAAA.into() => {
+                let rdata = self.rdata_slice();
+                assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 16);
+                let mut ip = [0u8; 16];
+                ip.copy_from_slice(&rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]);
+                Ok(IpAddr::V6(Ipv6Addr::from(ip)))
+            }
+            _ => bail!(ErrorKind::PropertyNotFound),
+        }
+    }
+
+    /// Changes the IP address of an `A` or `AAAA` record.
+    fn set_rr_ip(&mut self, ip: &IpAddr) -> Result<()>
+    where
+        Self: DNSIterable,
+    {
+        match self.rr_type() {
+            x if x == Type::A.into() => {
+                match *ip {
+                    IpAddr::V4(ip) => {
+                        let rdata = self.rdata_slice_mut();
+                        assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 4);
+                        rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4]
+                            .copy_from_slice(&ip.octets());
+                        Ok(())
+                    }
+                    _ => bail!(ErrorKind::WrongAddressFamily),
+                }
+            }
+            x if x == Type::AAAA.into() => {
+                match *ip {
+                    IpAddr::V6(ip) => {
+                        let rdata = self.rdata_slice_mut();
+                        assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 16);
+                        rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]
+                            .copy_from_slice(&ip.octets());
+                        Ok(())
+                    }
+                    _ => bail!(ErrorKind::WrongAddressFamily),
+                }
+            }
+            _ => bail!(ErrorKind::PropertyNotFound),
+        }
     }
 }
 
