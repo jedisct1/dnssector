@@ -1,5 +1,5 @@
 use constants::*;
-use libc::{c_int, c_void, sockaddr_storage, sockaddr_in, sockaddr_in6, AF_INET, AF_INET6};
+use libc::{c_int, c_void};
 use parsed_packet::*;
 use edns_iterator::*;
 use errors::*;
