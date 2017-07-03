@@ -58,7 +58,13 @@ impl<'t> DNSIterable for EdnsIterator<'t> {
         }
     }
 
-    fn parsed_packet(&mut self) -> &mut ParsedPacket {
+    #[inline]
+    fn parsed_packet(&self) -> &ParsedPacket {
+        &self.rr_iterator.parsed_packet
+    }
+
+    #[inline]
+    fn parsed_packet_mut(&mut self) -> &mut ParsedPacket {
         &mut self.rr_iterator.parsed_packet
     }
 

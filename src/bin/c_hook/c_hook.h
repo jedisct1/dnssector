@@ -1,6 +1,9 @@
 #ifndef C_HOOK_H
 #define C_HOOK_H
 
+#include <stddef.h>
+#include <stdint.h>
+
 #define ABI_VERSION 0x1
 
 #define DNS_MAX_HOSTNAME_LEN 255
@@ -25,6 +28,8 @@ typedef struct FnTable
     uint16_t (*rr_class)(void *it);
     uint32_t (*rr_ttl)(void *it);
     void (*set_rr_ttl)(void *it, uint32_t ttl);
+    void (*rr_ip)(void *it, uint8_t *addr, size_t *addr_len);
+    void (*set_rr_ip)(void *it, const uint8_t *addr, size_t addr_len);
     void (*set_raw_name)(void *it, const uint8_t *name, size_t len);
     void (*delete)(void *it);
 } FnTable;

@@ -1,12 +1,14 @@
 use constants::*;
-use libc::{c_int, c_void};
+use libc::{c_int, c_void, sockaddr_storage, sockaddr_in, sockaddr_in6, AF_INET, AF_INET6};
 use parsed_packet::*;
 use edns_iterator::*;
+use errors::*;
 use question_iterator::*;
 use response_iterator::*;
 use rr_iterator::*;
 use std::convert::From;
-use std::{ptr, slice};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::{mem, ptr, slice};
 
 const ABI_VERSION: u64 = 0x1;
 
@@ -165,7 +167,7 @@ unsafe extern "C" fn name(
 
 unsafe extern "C" fn rr_ttl(section_iterator: &mut SectionIterator) -> u32 {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
-    match section_iterator.section {       
+    match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
             (&*(section_iterator.it as *mut ResponseIterator)).rr_ttl()
         }
@@ -175,12 +177,72 @@ unsafe extern "C" fn rr_ttl(section_iterator: &mut SectionIterator) -> u32 {
 
 unsafe extern "C" fn set_rr_ttl(section_iterator: &mut SectionIterator, ttl: u32) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
-    match section_iterator.section {       
+    match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
             (&mut *(section_iterator.it as *mut ResponseIterator)).set_rr_ttl(ttl)
         }
         _ => panic!("set_ttl() called on a record with no TTL"),
     }
+}
+
+unsafe extern "C" fn rr_ip(
+    section_iterator: &mut SectionIterator,
+    addr: *mut u8,
+    addr_len: &mut usize,
+) {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    let ip = match section_iterator.section {
+        Section::Answer | Section::NameServers | Section::Additional => {
+            (&mut *(section_iterator.it as *mut ResponseIterator))
+                .rr_ip()
+                .expect("rr_ip() called on a record with no IP")
+        }
+        _ => panic!("rr_ip() called on a record with no IP"),
+    };
+    match ip {
+        IpAddr::V4(ip) => {
+            assert!(*addr_len >= 4);
+            *addr_len = 4;
+            slice::from_raw_parts_mut(addr, *addr_len).copy_from_slice(&ip.octets());
+        }
+        IpAddr::V6(ip) => {
+            assert!(*addr_len >= 16);
+            *addr_len = 16;
+            slice::from_raw_parts_mut(addr, *addr_len).copy_from_slice(&ip.octets());
+        }
+    }
+}
+
+unsafe extern "C" fn set_rr_ip(
+    section_iterator: &mut SectionIterator,
+    addr: *const u8,
+    addr_len: usize,
+) {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    match section_iterator.section {
+        Section::Answer | Section::NameServers | Section::Additional => {
+            (&mut *(section_iterator.it as *mut ResponseIterator))
+                .rr_ip()
+                .expect("set_rr_ip() called on a record with no IP")
+        }
+        _ => panic!("set_rr_ip() called on a record with no IP"),
+    };
+    let ip = match addr_len {
+        4 => {
+            let mut ipo = [0u8; 4];
+            ipo.copy_from_slice(slice::from_raw_parts(addr, addr_len));
+            IpAddr::V4(Ipv4Addr::from(ipo))
+        }
+        16 => {
+            let mut ipo = [0u8; 16];
+            ipo.copy_from_slice(slice::from_raw_parts(addr, addr_len));
+            IpAddr::V6(Ipv6Addr::from(ipo))
+        }
+        _ => panic!("Unsupported address length"),
+    };
+    (&mut *(section_iterator.it as *mut ResponseIterator))
+        .set_rr_ip(&ip)
+        .expect("Wrong IP address family for this record");
 }
 
 unsafe extern "C" fn set_raw_name(
@@ -190,7 +252,7 @@ unsafe extern "C" fn set_raw_name(
 ) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let name = slice::from_raw_parts(name, len);
-    match section_iterator.section {       
+    match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
             let _ = (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(name);
         }
@@ -262,6 +324,16 @@ pub struct FnTable {
     pub rr_class: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u16,
     pub rr_ttl: unsafe extern "C" fn(section_iterator: &mut SectionIterator) -> u32,
     pub set_rr_ttl: unsafe extern "C" fn(section_iterator: &mut SectionIterator, ttl: u32),
+    pub rr_ip: unsafe extern "C" fn(
+        section_iterator: &mut SectionIterator,
+        addr: *mut u8,
+        addr_len: &mut usize,
+    ),
+    pub set_rr_ip: unsafe extern "C" fn(
+        section_iterator: &mut SectionIterator,
+        addr: *const u8,
+        addr_len: usize,
+    ),
     pub set_raw_name:
         unsafe extern "C" fn(section_iterator: &mut SectionIterator, name: *const u8, len: usize),
     pub delete: unsafe extern "C" fn(section_iterator: &mut SectionIterator),
@@ -285,6 +357,8 @@ pub fn fn_table() -> FnTable {
         rr_class,
         rr_ttl,
         set_rr_ttl,
+        rr_ip,
+        set_rr_ip,
         set_raw_name,
         delete,
     }

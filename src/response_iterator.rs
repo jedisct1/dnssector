@@ -68,7 +68,13 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
         }
     }
 
-    fn parsed_packet(&mut self) -> &mut ParsedPacket {
+    #[inline]
+    fn parsed_packet(&self) -> &ParsedPacket {
+        &self.rr_iterator.parsed_packet
+    }
+
+    #[inline]
+    fn parsed_packet_mut(&mut self) -> &mut ParsedPacket {
         &mut self.rr_iterator.parsed_packet
     }
 
@@ -106,7 +112,7 @@ impl<'t> ResponseIterator<'t> {
                             DNSSector::arcount(&parsed_packet.packet),
                             parsed_packet.offset_additional,
                         )
-                    }                    
+                    }
                     _ => unreachable!("Unexpected section"),
                 };
                 if count == 0 {
