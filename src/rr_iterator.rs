@@ -355,17 +355,6 @@ pub trait TypedIterable {
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_CLASS_OFFSET..])
     }
-
-    /// Errors out if the current record doesn't have RDATA (i.e. this is not a question)
-    fn requires_rdata(&self) -> Result<()>
-    where
-        Self: DNSIterable,
-    {
-        match self.current_section()? {
-            Section::Answer | Section::NameServers | Section::Additional => Ok(()),
-            _ => bail!(ErrorKind::PropertyNotFound),
-        }
-    }
 }
 
 pub trait RdataIterable {
@@ -403,14 +392,14 @@ pub trait RdataIterable {
         match self.rr_type() {
             x if x == Type::A.into() => {
                 let rdata = self.rdata_slice();
-                assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 4);
+                assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 4);
                 let mut ip = [0u8; 4];
                 ip.copy_from_slice(&rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4]);
                 Ok(IpAddr::V4(Ipv4Addr::from(ip)))
             }
             x if x == Type::AAAA.into() => {
                 let rdata = self.rdata_slice();
-                assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 16);
+                assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 16);
                 let mut ip = [0u8; 16];
                 ip.copy_from_slice(&rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]);
                 Ok(IpAddr::V6(Ipv6Addr::from(ip)))
