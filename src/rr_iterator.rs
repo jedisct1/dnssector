@@ -418,7 +418,7 @@ pub trait RdataIterable {
                 match *ip {
                     IpAddr::V4(ip) => {
                         let rdata = self.rdata_slice_mut();
-                        assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 4);
+                        assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 4);
                         rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4]
                             .copy_from_slice(&ip.octets());
                         Ok(())
@@ -430,7 +430,7 @@ pub trait RdataIterable {
                 match *ip {
                     IpAddr::V6(ip) => {
                         let rdata = self.rdata_slice_mut();
-                        assert_eq!(rdata.len(), DNS_RR_HEADER_SIZE + 16);
+                        assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 16);
                         rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]
                             .copy_from_slice(&ip.octets());
                         Ok(())
