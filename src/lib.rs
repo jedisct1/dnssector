@@ -1,5 +1,7 @@
 extern crate byteorder;
 #[macro_use]
+extern crate chomp;
+#[macro_use]
 extern crate error_chain;
 extern crate libc;
 
@@ -14,6 +16,8 @@ pub mod question_iterator;
 pub mod response_iterator;
 pub mod rr_iterator;
 
+mod synth;
+
 pub use c_abi::*;
 pub use compress::*;
 pub use constants::*;
@@ -24,3 +28,5 @@ pub use edns_iterator::*;
 pub use question_iterator::*;
 pub use response_iterator::*;
 pub use rr_iterator::*;
+
+use synth::*;
