@@ -15,6 +15,10 @@ error_chain! {
             description("Invalid DNS packet")
             display("Invalid DNS packet: '{}'", t)
         }
+        UnsupportedRRType(t: String) {
+            description("Unsupported record type")
+            display("Unsupported record type: '{}'", t)
+        }
         VoidRecord
         PropertyNotFound
         WrongAddressFamily
