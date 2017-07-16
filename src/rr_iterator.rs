@@ -131,7 +131,7 @@ pub trait DNSIterable {
 }
 
 pub trait TypedIterable {
-    /// Returns the RR name (labels are dot-telimited), as a byte vector. The name is not supposed to be valid UTF-8.
+    /// Returns the RR name (labels are dot-delimited), as a byte vector. The name is not supposed to be valid UTF-8.
     fn name(&self) -> Vec<u8>
     where
         Self: DNSIterable,
@@ -414,30 +414,25 @@ pub trait RdataIterable {
         Self: DNSIterable + TypedIterable,
     {
         match self.rr_type() {
-            x if x == Type::A.into() => {
-                match *ip {
-                    IpAddr::V4(ip) => {
-                        let rdata = self.rdata_slice_mut();
-                        assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 4);
-                        rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4]
-                            .copy_from_slice(&ip.octets());
-                        Ok(())
-                    }
-                    _ => bail!(ErrorKind::WrongAddressFamily),
+            x if x == Type::A.into() => match *ip {
+                IpAddr::V4(ip) => {
+                    let rdata = self.rdata_slice_mut();
+                    assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 4);
+                    rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4].copy_from_slice(&ip.octets());
+                    Ok(())
                 }
-            }
-            x if x == Type::AAAA.into() => {
-                match *ip {
-                    IpAddr::V6(ip) => {
-                        let rdata = self.rdata_slice_mut();
-                        assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 16);
-                        rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]
-                            .copy_from_slice(&ip.octets());
-                        Ok(())
-                    }
-                    _ => bail!(ErrorKind::WrongAddressFamily),
+                _ => bail!(ErrorKind::WrongAddressFamily),
+            },
+            x if x == Type::AAAA.into() => match *ip {
+                IpAddr::V6(ip) => {
+                    let rdata = self.rdata_slice_mut();
+                    assert!(rdata.len() >= DNS_RR_HEADER_SIZE + 16);
+                    rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]
+                        .copy_from_slice(&ip.octets());
+                    Ok(())
                 }
-            }
+                _ => bail!(ErrorKind::WrongAddressFamily),
+            },
             _ => bail!(ErrorKind::PropertyNotFound),
         }
     }

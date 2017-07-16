@@ -54,8 +54,8 @@ impl Compress {
                     if 2 > packet_len - offset {
                         bail!(ErrorKind::InvalidName("Invalid internal offset"));
                     }
-                    let ref_offset = ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as
-                        usize;
+                    let ref_offset =
+                        ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as usize;
                     if ref_offset >= lowest_offset {
                         bail!(ErrorKind::InvalidName("Forward/self reference"));
                     }

@@ -3,7 +3,8 @@ extern crate libloading;
 
 use c_abi::{self, FnTable};
 use dnssector::*;
-use libloading::{Symbol, Library};
+use dnssector::synth::parser::*;
+use libloading::{Library, Symbol};
 
 pub fn main() {
     let packet: Vec<u8> = vec![
@@ -677,8 +678,8 @@ pub fn main() {
         0x00,
     ];
 
-    let dlh = Library::new("src/bin/c_hook/c_hook.dylib")
-        .expect("Cannot load the sample C library");
+    let dlh =
+        Library::new("src/bin/c_hook/c_hook.dylib").expect("Cannot load the sample C library");
 
     let hook: Symbol<unsafe extern "C" fn(*const FnTable, *mut ParsedPacket) -> ()> =
         unsafe { dlh.get(b"hook").unwrap() };

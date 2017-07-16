@@ -15,8 +15,7 @@ pub mod edns_iterator;
 pub mod question_iterator;
 pub mod response_iterator;
 pub mod rr_iterator;
-
-mod synth;
+pub mod synth;
 
 pub use c_abi::*;
 pub use compress::*;
@@ -28,5 +27,4 @@ pub use edns_iterator::*;
 pub use question_iterator::*;
 pub use response_iterator::*;
 pub use rr_iterator::*;
-
-use synth::*;
+pub use synth::*;

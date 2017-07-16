@@ -95,24 +95,18 @@ impl<'t> ResponseIterator<'t> {
             let parsed_packet = &mut rr_iterator.parsed_packet;
             if rr_iterator.offset.is_none() {
                 let (count, offset) = match rr_iterator.section {
-                    Section::Answer => {
-                        (
-                            DNSSector::ancount(&parsed_packet.packet),
-                            parsed_packet.offset_answers,
-                        )
-                    }
-                    Section::NameServers => {
-                        (
-                            DNSSector::nscount(&parsed_packet.packet),
-                            parsed_packet.offset_nameservers,
-                        )
-                    }
-                    Section::Additional => {
-                        (
-                            DNSSector::arcount(&parsed_packet.packet),
-                            parsed_packet.offset_additional,
-                        )
-                    }
+                    Section::Answer => (
+                        DNSSector::ancount(&parsed_packet.packet),
+                        parsed_packet.offset_answers,
+                    ),
+                    Section::NameServers => (
+                        DNSSector::nscount(&parsed_packet.packet),
+                        parsed_packet.offset_nameservers,
+                    ),
+                    Section::Additional => (
+                        DNSSector::arcount(&parsed_packet.packet),
+                        parsed_packet.offset_additional,
+                    ),
                     _ => unreachable!("Unexpected section"),
                 };
                 if count == 0 {
