@@ -18,7 +18,7 @@ fn iter_ops(i: &mut DNSIterable, ops: &[u8]) -> u64
                 }
             },
             1 => { i.offset_next() },
-            2 => { i.set_offset((prev_op * *op) as usize); 1 },
+            2 => { i.set_offset((prev_op as usize * *op as usize) as usize); 1 },
             3 => { i.set_offset_next((prev_op * *op) as usize); 1 },
             4 => { i.invalidate(); 1 },
             5 => { if i.is_tombstone() { 0 } else { 1 } },
