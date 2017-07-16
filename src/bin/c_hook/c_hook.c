@@ -15,6 +15,22 @@ static bool rr_it(void *ctx, void *it)
     fn_table->name(it, name);
     printf("- found RR [%s] with type: %" PRIu16 " and ttl: %" PRIu32 "\n",
            name, fn_table->rr_type(it), fn_table->rr_ttl(it));
+    if (fn_table->rr_type(it) == 1)
+    {
+        uint8_t ip[4];
+        size_t len = sizeof ip;
+        fn_table->rr_ip(it, ip, &len);
+        assert(len == 4);
+        printf("\tip=%u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
+    }
+    else if (fn_table->rr_type(it) == 28)
+    {
+        uint32_t ip[4];
+        size_t len = sizeof ip;
+        fn_table->rr_ip(it, ip, &len);
+        assert(len == 16);
+        printf("\tip6=%u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
+    }
     fn_table->set_rr_ttl(it, 42);
     fn_table->set_raw_name(it, (const uint8_t *)"\x02x2\x03net",
                            sizeof "\x02x2\x03net");
