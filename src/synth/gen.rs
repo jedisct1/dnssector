@@ -1,7 +1,7 @@
 use byteorder::{BigEndian, ByteOrder};
 use constants::*;
 use errors::*;
-use chomp::prelude::U8Input;
+use chomp::prelude::{parse_only, U8Input};
 use std::net::{Ipv4Addr, Ipv6Addr};
 use super::parser::*;
 
@@ -86,6 +86,19 @@ impl RR {
         packet.extend_from_slice(rdata);
         Ok(RR { packet: packet })
     }
+
+    pub fn from_string(s: &str) -> Result<RR> {
+        match parse_only(rr_parser, s.as_bytes()) {
+            Err(_) => bail!(ErrorKind::ParseError),
+            Ok(rr) => match rr {
+                Err(e) => {
+                    panic!("{}", e);
+                    bail!(e)
+                }
+                Ok(rr) => Ok(rr),
+            },
+        }
+    }
 }
 
 pub struct A;
@@ -158,6 +171,33 @@ impl MX {
         rdata.push(0);
         BigEndian::write_u16(&mut rdata[0..2], preference);
         copy_raw_name_from_str(&mut rdata, &mxhost, None)?;
+        RR::new(rr_header, &rdata)
+    }
+}
+
+pub struct SOA;
+
+impl SOA {
+    pub fn build(
+        rr_header: RRHeader,
+        primary_ns: Vec<u8>,
+        contact: Vec<u8>,
+        ts: u32,
+        refresh_ttl: u32,
+        retry_ttl: u32,
+        auth_ttl: u32,
+        neg_ttl: u32,
+    ) -> Result<RR> {
+        let mut rdata = Vec::with_capacity(primary_ns.len() + 1 + contact.len() + 1 + 20);
+        let mut meta = [0u8; 20];
+        copy_raw_name_from_str(&mut rdata, &primary_ns, None)?;
+        copy_raw_name_from_str(&mut rdata, &contact, None)?;
+        BigEndian::write_u32(&mut meta[0..], ts);
+        BigEndian::write_u32(&mut meta[4..], refresh_ttl);
+        BigEndian::write_u32(&mut meta[8..], retry_ttl);
+        BigEndian::write_u32(&mut meta[12..], auth_ttl);
+        BigEndian::write_u32(&mut meta[16..], neg_ttl);
+        rdata.extend_from_slice(&meta);
         RR::new(rr_header, &rdata)
     }
 }

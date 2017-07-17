@@ -315,6 +315,33 @@ fn rr_rdata_mx_parser<I: U8Input>(i: I) -> SimpleResult<I, (u16, Vec<u8>)> {
     }
 }
 
+fn rr_rdata_soa_parser<I: U8Input>(
+    i: I,
+) -> SimpleResult<I, (Vec<u8>, Vec<u8>, u32, u32, u32, u32, u32)> {
+    parse!{i;
+        let primary_ns = hostname_parser();
+        skip_horizontal_whitespaces();
+        let contact = hostname_parser();
+        maybe_skip_horizontal_whitespaces();
+        token(b'(');
+        skip_whitespace();
+        let ts = decimal_u32();
+        skip_whitespace();
+        let refresh_ttl = decimal_u32();
+        skip_whitespace();
+        let retry_ttl = decimal_u32();
+        skip_whitespace();
+        let auth_ttl = decimal_u32();
+        skip_whitespace();
+        let neg_ttl = decimal_u32();
+        skip_whitespace();
+        token(b')');
+        maybe_skip_horizontal_whitespaces();
+        eof();
+        ret (primary_ns, contact, ts, refresh_ttl, retry_ttl, auth_ttl, neg_ttl)
+    }
+}
+
 fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type> {
     match rr_type_str {
         s if s.eq_ignore_ascii_case(b"A") => Ok(Type::A),
@@ -324,6 +351,7 @@ fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type> {
         s if s.eq_ignore_ascii_case(b"PTR") => Ok(Type::PTR),
         s if s.eq_ignore_ascii_case(b"TXT") => Ok(Type::TXT),
         s if s.eq_ignore_ascii_case(b"MX") => Ok(Type::MX),
+        s if s.eq_ignore_ascii_case(b"SOA") => Ok(Type::SOA),
         _ => bail!(ErrorKind::UnsupportedRRType(
             str::from_utf8(rr_type_str)
                 .unwrap_or("<invalid UTF8 sequence>")
@@ -358,6 +386,9 @@ pub fn rr_parser<I: U8Input>(i: I) -> SimpleResult<I, Result<RR>> {
                 },
                 Type::MX => {
                     rr_rdata_mx_parser(i).map(|(preference, mxname)| MX::build(rr_common, preference, mxname))
+                },
+                Type::SOA => {
+                    rr_rdata_soa_parser(i).map(|(primary_ns, contact, ts, refresh_ttl, retry_ttl, auth_ttl, neg_ttl)| SOA::build(rr_common, primary_ns, contact, ts, refresh_ttl, retry_ttl, auth_ttl, neg_ttl))
                 },
                 _ => i.err(parsers::Error::unexpected())
             }

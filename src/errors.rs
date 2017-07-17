@@ -22,5 +22,6 @@ error_chain! {
         VoidRecord
         PropertyNotFound
         WrongAddressFamily
+        ParseError
     }
 }
