@@ -3,7 +3,7 @@ extern crate libloading;
 
 use c_abi::{self, FnTable};
 use dnssector::*;
-use dnssector::synth::parser::*;
+use dnssector::synth::gen::*;
 use libloading::{Library, Symbol};
 
 pub fn main() {
