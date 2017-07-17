@@ -2,8 +2,8 @@ use constants::*;
 use errors::*;
 use chomp::ascii::*;
 use chomp::combinators::*;
-use chomp::prelude::{eof, not_token, parse_only, satisfy, skip_while, token, Buffer, Input,
-                     SimpleResult, U8Input, take_while1};
+use chomp::prelude::{eof, not_token, parse_only, peek, satisfy, skip_while, take_while, token,
+                     Buffer, Input, SimpleResult, U8Input, take_while1};
 use chomp::parsers;
 use chomp::primitives::Primitives;
 use std::ascii::AsciiExt;
@@ -223,9 +223,15 @@ fn label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
                 satisfy(i, |c| { is_alphanumeric(c) || c == b'-' })
             })
         };
-        i -> {
-            either(i, |i| token(i, b'.'), |i| eof(i))
-        };
+        token(b'.');
+        ret ()
+    }
+}
+
+fn last_label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
+    parse!{i;
+        take_while(|c| is_alpha(c) || c == b'_');
+        take_while(|c| is_alphanumeric(c) || c == b'-');
         ret ()
     }
 }
@@ -233,7 +239,11 @@ fn label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
 fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     parse!{i;
         let res = i -> {
-            matched_by(i, |i| bounded::skip_many(i, 1..32, label_parser)).
+            matched_by(i, |i| {
+                bounded::skip_many(i, 1..32, label_parser).bind(|i, _| {
+                    last_label_parser(i)
+                })
+            }).
             map(|(h, _)| {
                 if h.len() > 253 {
                     Err(parsers::Error::unexpected())
