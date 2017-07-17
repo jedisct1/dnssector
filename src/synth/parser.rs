@@ -2,8 +2,8 @@ use constants::*;
 use errors::*;
 use chomp::ascii::*;
 use chomp::combinators::*;
-use chomp::prelude::{eof, not_token, parse_only, peek, satisfy, skip_while, take_while, token,
-                     Buffer, Input, SimpleResult, U8Input, take_while1};
+use chomp::prelude::{eof, not_token, parse_only, peek, satisfy, skip_while, string, take_while,
+                     token, Buffer, Input, SimpleResult, U8Input, take_while1};
 use chomp::parsers;
 use chomp::primitives::Primitives;
 use std::ascii::AsciiExt;
@@ -217,7 +217,7 @@ fn hexstring_parser<I: U8Input>(i: I) -> SimpleResult<I, String> {
 
 fn label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
     parse!{i;
-        satisfy(|c| is_alpha(c) || c == b'_');
+        satisfy(|c| is_alphanumeric(c) || c == b'_');
         i -> {
             bounded::skip_many(i, ..63, |i| {
                 satisfy(i, |c| { is_alphanumeric(c) || c == b'-' })
@@ -230,7 +230,7 @@ fn label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
 
 fn last_label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
     parse!{i;
-        take_while(|c| is_alpha(c) || c == b'_');
+        take_while(|c| is_alphanumeric(c) || c == b'_');
         take_while(|c| is_alphanumeric(c) || c == b'-');
         ret ()
     }
@@ -258,6 +258,19 @@ fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
             })
         };
         ret res
+    }
+}
+
+fn addr_arpa_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
+    parse!{i;
+        let ptr = i -> {
+            matched_by(i, |i| {
+                either(i, |i| ipv4_parser(i), |i| ipv6_parser(i)).bind(|i, _| { string_nocase(i, b".in-addr.arpa.") })
+            }).map(|(ptr, _)| {
+                ptr.into_vec()
+            })
+        };
+        ret ptr
     }
 }
 
