@@ -215,50 +215,47 @@ fn hexstring_parser<I: U8Input>(i: I) -> SimpleResult<I, String> {
     })
 }
 
-fn label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
-    parse!{i;
-        satisfy(|c| is_alphanumeric(c) || c == b'_');
-        i -> {
-            bounded::skip_many(i, ..63, |i| {
-                satisfy(i, |c| { is_alphanumeric(c) || c == b'-' })
-            })
-        };
-        token(b'.');
-        ret ()
-    }
-}
-
-fn last_label_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
-    parse!{i;
-        take_while(|c| is_alphanumeric(c) || c == b'_');
-        take_while(|c| is_alphanumeric(c) || c == b'-');
-        ret ()
-    }
-}
-
 fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
-    parse!{i;
-        let res = i -> {
-            matched_by(i, |i| {
-                bounded::skip_many(i, 1..32, label_parser).bind(|i, _| {
-                    last_label_parser(i)
-                })
-            }).
-            map(|(h, _)| {
-                if h.len() > 253 {
-                    Err(parsers::Error::unexpected())
-                } else {
-                    Ok(h.into_vec())
-                }
-            }).bind(|i, h| {
-                match h {
-                    Ok(h) => i.ret(h),
-                    Err(e) => i.err(e),
-                }
-            })
-        };
-        ret res
-    }
+    let mut label_len = 0;
+    let mut name_len = 0;
+    let mut only_numeric = true;
+    let mut format_err = false;
+    take_while1(i, |c| {
+        name_len += 1;
+        match c {
+            b'.' if label_len == 0 => if name_len != 1 {
+                format_err = true;
+                false
+            } else {
+                only_numeric = false;
+                true
+            },
+            b'.' => {
+                label_len = 0;
+                true
+            }
+            _ if label_len >= 63 - 1 => {
+                format_err = true;
+                false
+            }
+            c if (c == b'_' && label_len == 0) || (c == b'-' && label_len > 0) || is_alpha(c) => {
+                only_numeric = false;
+                label_len += 1;
+                true
+            }
+            c if is_digit(c) => {
+                label_len += 1;
+                true
+            }
+            _ => false,
+        }
+    }).bind(|i, name| {
+        if format_err || (only_numeric && label_len == 0) {
+            i.err(parsers::Error::unexpected())
+        } else {
+            i.ret(name.into_vec())
+        }
+    })
 }
 
 fn addr_arpa_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {

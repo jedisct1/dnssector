@@ -25,7 +25,8 @@ mod tests {
         assert!(RR::from_string("4.3.2.1.in-addr.arpa. 3599 IN PTR host.example.com.").is_ok());
         assert!(RR::from_string("4.3.2.1 3599 IN PTR host.example.com.").is_ok());
         assert!(RR::from_string("4.3.2.1. 3599 IN PTR host.example.com.").is_err());
-        assert!(RR::from_string("4.3.2.1.in-addr.arpa. 3599 IN PTR 1.2.3.4").is_err());
+        assert!(RR::from_string("4.3.2.1.in-addr.arpa. 3599 IN PTR 1.2.3.4").is_ok());
+        assert!(RR::from_string("4.3.2.1.in-addr.arpa. 3599 IN PTR 1.2.3.4.").is_err());
     }
 
     #[test]
