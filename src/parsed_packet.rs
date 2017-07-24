@@ -232,21 +232,30 @@ impl ParsedPacket {
         self.rrcount_inc(section)?;
         match section {
             Section::Question => {
+                self.offset_question = self.offset_question.or(Some(insertion_offset));
+
                 self.offset_answers = self.offset_answers.map(|x| x + rr_len);
                 self.offset_nameservers = self.offset_nameservers.map(|x| x + rr_len);
                 self.offset_additional = self.offset_additional.map(|x| x + rr_len);
                 self.offset_edns = self.offset_edns.map(|x| x + rr_len);
             }
             Section::Answer => {
+                self.offset_answers = self.offset_answers.or(Some(insertion_offset));
+
                 self.offset_nameservers = self.offset_nameservers.map(|x| x + rr_len);
                 self.offset_additional = self.offset_additional.map(|x| x + rr_len);
                 self.offset_edns = self.offset_edns.map(|x| x + rr_len);
             }
             Section::NameServers => {
+                self.offset_nameservers = self.offset_nameservers.or(Some(insertion_offset));
+
                 self.offset_additional = self.offset_additional.map(|x| x + rr_len);
                 self.offset_edns = self.offset_edns.map(|x| x + rr_len);
+            },
+            Section::Additional => {
+                self.offset_additional = self.offset_additional.or(Some(insertion_offset));
             }
-            _ => {}
+            _ => panic!("insertion_offset() is not suitable to adding EDNS pseudorecords"),
         }
         Ok(())
     }
