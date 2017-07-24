@@ -1,4 +1,5 @@
 use byteorder::{BigEndian, ByteOrder};
+use compress::*;
 use constants::*;
 use dns_sector::*;
 use edns_iterator::*;
@@ -6,6 +7,8 @@ use errors::*;
 use response_iterator::*;
 use question_iterator::*;
 use rr_iterator::*;
+use std::ptr;
+use synth::gen;
 
 /// A `ParsedPacket` structure contains information about a successfully parsed
 /// DNS packet, that allows quick access to (extended) flags and to individual sections.
@@ -180,6 +183,69 @@ impl ParsedPacket {
             _ => panic!("EDNS section doesn't have a records count"),
         }
         Ok(rrcount)
+    }
+
+    fn insertion_offset(&self, section: Section) -> Result<usize> {
+        let offset = match section {
+            Section::Question => self.offset_answers
+                .or(self.offset_nameservers)
+                .or(self.offset_additional)
+                .unwrap_or(self.packet.len()),
+            Section::Answer => self.offset_nameservers
+                .or(self.offset_additional)
+                .unwrap_or(self.packet.len()),
+            Section::NameServers => self.offset_additional.unwrap_or(self.packet.len()),
+            Section::Additional => self.packet.len(),
+            _ => panic!("insertion_offset() is not suitable to adding EDNS pseudorecords"),
+        };
+        Ok(offset)
+    }
+
+    pub fn insert(&mut self, section: Section, rr: gen::RR) -> Result<()> {
+        if self.maybe_compressed {
+            let uncompressed = Compress::uncompress(&self.packet)?;
+            self.packet = uncompressed;
+            self.maybe_compressed = false;
+        }
+        let rr_len = rr.packet.len();
+        if DNS_MAX_UNCOMPRESSED_SIZE - self.packet.len() < rr_len {
+            bail!(ErrorKind::PacketTooLarge)
+        }
+        let insertion_offset = self.insertion_offset(section)?;
+        self.packet.reserve(rr_len);
+        if insertion_offset == rr_len {
+            self.packet.extend_from_slice(&rr.packet);
+        } else {
+            unsafe {
+                let packet_ptr = self.packet.as_mut_ptr();
+                ptr::copy(
+                    packet_ptr.offset(insertion_offset as isize),
+                    packet_ptr.offset((insertion_offset + rr_len) as isize),
+                    self.packet.len() - insertion_offset,
+                );
+            }
+            &self.packet[insertion_offset..insertion_offset + rr_len].copy_from_slice(&rr.packet);
+        }
+        self.rrcount_inc(section)?;
+        match section {
+            Section::Question => {
+                self.offset_answers = self.offset_answers.map(|x| x + rr_len);
+                self.offset_nameservers = self.offset_nameservers.map(|x| x + rr_len);
+                self.offset_additional = self.offset_additional.map(|x| x + rr_len);
+                self.offset_edns = self.offset_edns.map(|x| x + rr_len);
+            }
+            Section::Answer => {
+                self.offset_nameservers = self.offset_nameservers.map(|x| x + rr_len);
+                self.offset_additional = self.offset_additional.map(|x| x + rr_len);
+                self.offset_edns = self.offset_edns.map(|x| x + rr_len);
+            }
+            Section::NameServers => {
+                self.offset_additional = self.offset_additional.map(|x| x + rr_len);
+                self.offset_edns = self.offset_edns.map(|x| x + rr_len);
+            }
+            _ => {}
+        }
+        Ok(())
     }
 
     /// Recomputes all section offsets after an in-place decompression of the packet.

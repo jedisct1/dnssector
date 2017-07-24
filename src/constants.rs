@@ -79,6 +79,12 @@ pub const DNS_FLAG_AD: u32 = 1 << 5;
 pub const DNS_FLAG_CD: u32 = 1 << 4;
 pub const DNS_FLAG_DO: u32 = 1 << 31;
 
+/// Maximum size of an uncompressed packet
+pub const DNS_MAX_UNCOMPRESSED_SIZE: usize = 8192;
+
+/// Maximum size of a compressed packet
+pub const DNS_MAX_COMPRESSED_SIZE: usize = 4096;
+
 /// DNS query class
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Class {
