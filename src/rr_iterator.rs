@@ -186,15 +186,21 @@ pub trait TypedIterable {
     {
         let offset = self.offset();
         let parsed_packet = self.parsed_packet();
-        let section = match offset {
-            x if x < parsed_packet.offset_question => {
-                bail!(ErrorKind::InternalError("name before the question section"))
-            }
-            x if x < parsed_packet.offset_answers => Section::Question,
-            x if x < parsed_packet.offset_nameservers => Section::Answer,
-            x if x < parsed_packet.offset_additional => Section::NameServers,
-            _ => Section::Additional,
-        };
+        if offset < parsed_packet.offset_question {
+            bail!(ErrorKind::InternalError("name before the question section"));
+        }
+        let mut section = Section::Question;
+        if parsed_packet.offset_answers.is_some() && offset >= parsed_packet.offset_answers {
+            section = Section::Answer;
+        }
+        if parsed_packet.offset_nameservers.is_some() &&
+            offset >= parsed_packet.offset_nameservers
+        {
+            section = Section::NameServers
+        }
+        if parsed_packet.offset_additional.is_some() && offset >= parsed_packet.offset_additional {
+            section = Section::Additional;
+        }
         Ok(section)
     }
 
@@ -248,19 +254,19 @@ pub trait TypedIterable {
         if section == Section::NameServers || section == Section::Answer ||
             section == Section::Question
         {
-            parsed_packet.offset_additional = Some(
-                (parsed_packet.offset_additional.unwrap() as isize + shift) as usize,
-            )
+            parsed_packet.offset_additional = parsed_packet
+                .offset_additional
+                .map(|x| (x as isize + shift) as usize)
         }
         if section == Section::Answer || section == Section::Question {
-            parsed_packet.offset_nameservers = Some(
-                (parsed_packet.offset_nameservers.unwrap() as isize + shift) as usize,
-            )
+            parsed_packet.offset_nameservers = parsed_packet
+                .offset_nameservers
+                .map(|x| (x as isize + shift) as usize)
         }
         if section == Section::Question {
-            parsed_packet.offset_answers = Some(
-                (parsed_packet.offset_answers.unwrap() as isize + shift) as usize,
-            )
+            parsed_packet.offset_answers = parsed_packet
+                .offset_answers
+                .map(|x| (x as isize + shift) as usize)
         }
         Ok(())
     }

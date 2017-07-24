@@ -172,7 +172,10 @@ impl ParsedPacket {
             _ => panic!("Trying to decrement a the number of records in a pseudosection"),
         };
         if rrcount <= 0 {
-            panic!("Trying to decrement a number of records that was already 0");
+            panic!(
+                "Trying to decrement a number of records that was already 0 in section {:?}",
+                section
+            );
         }
         rrcount -= 1;
         match section {
@@ -182,6 +185,7 @@ impl ParsedPacket {
             Section::Additional => DNSSector::set_arcount(&mut packet, rrcount),
             _ => panic!("EDNS section doesn't have a records count"),
         }
+
         Ok(rrcount)
     }
 
@@ -251,7 +255,7 @@ impl ParsedPacket {
 
                 self.offset_additional = self.offset_additional.map(|x| x + rr_len);
                 self.offset_edns = self.offset_edns.map(|x| x + rr_len);
-            },
+            }
             Section::Additional => {
                 self.offset_additional = self.offset_additional.or(Some(insertion_offset));
             }

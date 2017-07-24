@@ -1,4 +1,3 @@
-use compress::*;
 use constants::*;
 use dns_sector::*;
 use errors::*;
