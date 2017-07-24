@@ -7,8 +7,9 @@ use question_iterator::*;
 use response_iterator::*;
 use rr_iterator::*;
 use std::convert::From;
+use std::ffi::CStr;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::{mem, ptr, slice};
+use std::slice;
 
 const ABI_VERSION: u64 = 0x1;
 
@@ -270,6 +271,52 @@ unsafe extern "C" fn delete(section_iterator: &mut SectionIterator) {
     }
 }
 
+unsafe fn add_to_section(
+    parsed_packet: *mut ParsedPacket,
+    section: Section,
+    rr_str: *const i8,
+) -> Result<()> {
+    let rr_str = match CStr::from_ptr(rr_str).to_str() {
+        Err(_) => bail!(ErrorKind::ParseError),
+        Ok(rr_str) => rr_str,
+    };
+    (*parsed_packet).insert_rr_from_string(section, rr_str)
+}
+
+unsafe extern "C" fn add_to_question(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int {
+    match add_to_section(parsed_packet, Section::Question, rr_str) {
+        Err(_) => -1,
+        Ok(_) => 0,
+    }
+}
+
+unsafe extern "C" fn add_to_answer(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int {
+    match add_to_section(parsed_packet, Section::Answer, rr_str) {
+        Err(_) => -1,
+        Ok(_) => 0,
+    }
+}
+
+unsafe extern "C" fn add_to_nameservers(
+    parsed_packet: *mut ParsedPacket,
+    rr_str: *const i8,
+) -> c_int {
+    match add_to_section(parsed_packet, Section::NameServers, rr_str) {
+        Err(_) => -1,
+        Ok(_) => 0,
+    }
+}
+
+unsafe extern "C" fn add_to_additional(
+    parsed_packet: *mut ParsedPacket,
+    rr_str: *const i8,
+) -> c_int {
+    match add_to_section(parsed_packet, Section::Additional, rr_str) {
+        Err(_) => -1,
+        Ok(_) => 0,
+    }
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -337,6 +384,14 @@ pub struct FnTable {
     pub set_raw_name:
         unsafe extern "C" fn(section_iterator: &mut SectionIterator, name: *const u8, len: usize),
     pub delete: unsafe extern "C" fn(section_iterator: &mut SectionIterator),
+    pub add_to_question:
+        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
+    pub add_to_answer:
+        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
+    pub add_to_nameservers:
+        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
+    pub add_to_additional:
+        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
 }
 
 pub fn fn_table() -> FnTable {
@@ -361,5 +416,9 @@ pub fn fn_table() -> FnTable {
         set_rr_ip,
         set_raw_name,
         delete,
+        add_to_question,
+        add_to_answer,
+        add_to_nameservers,
+        add_to_additional,
     }
 }

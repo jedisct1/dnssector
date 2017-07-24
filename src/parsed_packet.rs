@@ -201,7 +201,7 @@ impl ParsedPacket {
         Ok(offset)
     }
 
-    pub fn insert(&mut self, section: Section, rr: gen::RR) -> Result<()> {
+    pub fn insert_rr(&mut self, section: Section, rr: gen::RR) -> Result<()> {
         if self.maybe_compressed {
             let uncompressed = Compress::uncompress(&self.packet)?;
             self.packet = uncompressed;
@@ -246,6 +246,11 @@ impl ParsedPacket {
             _ => {}
         }
         Ok(())
+    }
+
+    pub fn insert_rr_from_string(&mut self, section: Section, rr_str: &str) -> Result<()> {
+        let rr = gen::RR::from_string(rr_str)?;
+        self.insert_rr(section, rr)
     }
 
     /// Recomputes all section offsets after an in-place decompression of the packet.
