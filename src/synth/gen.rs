@@ -1,7 +1,7 @@
 use byteorder::{BigEndian, ByteOrder};
 use constants::*;
 use errors::*;
-use chomp::prelude::{parse_only, U8Input};
+use chomp::prelude::parse_only;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use super::parser::*;
 
@@ -91,10 +91,7 @@ impl RR {
         match parse_only(rr_parser, s.as_bytes()) {
             Err(_) => bail!(ErrorKind::ParseError),
             Ok(rr) => match rr {
-                Err(e) => {
-                    panic!("{}", e);
-                    bail!(e)
-                }
+                Err(e) => bail!(e),
                 Ok(rr) => Ok(rr),
             },
         }
