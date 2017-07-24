@@ -205,7 +205,8 @@ impl ParsedPacket {
         if self.maybe_compressed {
             let uncompressed = Compress::uncompress(&self.packet)?;
             self.packet = uncompressed;
-            self.maybe_compressed = false;
+            self.recompute()?;
+            debug_assert_eq!(self.maybe_compressed, false);
         }
         let rr_len = rr.packet.len();
         if DNS_MAX_UNCOMPRESSED_SIZE - self.packet.len() < rr_len {
@@ -216,8 +217,10 @@ impl ParsedPacket {
         if insertion_offset == rr_len {
             self.packet.extend_from_slice(&rr.packet);
         } else {
+            let new_len = self.packet.len() + rr_len;
+            let packet_ptr = self.packet.as_mut_ptr();
             unsafe {
-                let packet_ptr = self.packet.as_mut_ptr();
+                self.packet.set_len(new_len);
                 ptr::copy(
                     packet_ptr.offset(insertion_offset as isize),
                     packet_ptr.offset((insertion_offset + rr_len) as isize),

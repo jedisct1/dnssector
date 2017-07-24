@@ -32,6 +32,10 @@ typedef struct FnTable
     void (*set_rr_ip)(void *it, const uint8_t *addr, size_t addr_len);
     void (*set_raw_name)(void *it, const uint8_t *name, size_t len);
     void (*delete)(void *it);
+    void (*add_to_question)(ParsedPacket *parsed_packet, const char *rr_str);
+    void (*add_to_answer)(ParsedPacket *parsed_packet, const char *rr_str);
+    void (*add_to_nameservers)(ParsedPacket *parsed_packet, const char *rr_str);
+    void (*add_to_additional)(ParsedPacket *parsed_packet, const char *rr_str);
 } FnTable;
 
 void hook(const FnTable *fn_table, ParsedPacket *parsed_packet);

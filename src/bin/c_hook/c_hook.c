@@ -36,7 +36,6 @@ static bool rr_it(void *ctx, void *it)
                            sizeof "\x02x2\x03net");
     fn_table->set_raw_name(it, (const uint8_t *)"\x01x\x03org",
                            sizeof "\x01x\x03org");
-    fn_table->delete (it);
 
     return 0;
 }
@@ -62,4 +61,10 @@ void hook(const FnTable *fn_table, ParsedPacket *parsed_packet)
     fn_table->iter_nameservers(parsed_packet, rr_it, fn_table);
     puts("Additional section");
     fn_table->iter_additional(parsed_packet, rr_it, fn_table);
+
+    puts("Adding an extra record to the answer section");
+    fn_table->add_to_answer(parsed_packet, "localhost.example.com. 3599 IN A 127.0.0.1");
+
+    puts("New answer section");
+    fn_table->iter_answer(parsed_packet, rr_it, fn_table);
 }
