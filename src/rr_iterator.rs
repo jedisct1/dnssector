@@ -193,8 +193,7 @@ pub trait TypedIterable {
         if parsed_packet.offset_answers.is_some() && offset >= parsed_packet.offset_answers {
             section = Section::Answer;
         }
-        if parsed_packet.offset_nameservers.is_some() &&
-            offset >= parsed_packet.offset_nameservers
+        if parsed_packet.offset_nameservers.is_some() && offset >= parsed_packet.offset_nameservers
         {
             section = Section::NameServers
         }
