@@ -9,6 +9,7 @@
 #define DNS_MAX_HOSTNAME_LEN 255
 
 typedef struct ParsedPacket ParsedPacket;
+typedef struct CErr CErr;
 
 typedef struct FnTable
 {
@@ -30,12 +31,12 @@ typedef struct FnTable
     void (*set_rr_ttl)(void *it, uint32_t ttl);
     void (*rr_ip)(void *it, uint8_t *addr, size_t *addr_len);
     void (*set_rr_ip)(void *it, const uint8_t *addr, size_t addr_len);
-    void (*set_raw_name)(void *it, const uint8_t *name, size_t len);
-    void (*delete)(void *it);
-    void (*add_to_question)(ParsedPacket *parsed_packet, const char *rr_str);
-    void (*add_to_answer)(ParsedPacket *parsed_packet, const char *rr_str);
-    void (*add_to_nameservers)(ParsedPacket *parsed_packet, const char *rr_str);
-    void (*add_to_additional)(ParsedPacket *parsed_packet, const char *rr_str);
+    int (*set_raw_name)(void *it, const CErr **err, const uint8_t *name, size_t len);
+    int (*delete_rr)(void *it, const CErr **err);
+    int (*add_to_question)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
+    int (*add_to_answer)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
+    int (*add_to_nameservers)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
+    int (*add_to_additional)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
 } FnTable;
 
 void hook(const FnTable *fn_table, ParsedPacket *parsed_packet);

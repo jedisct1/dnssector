@@ -1,17 +1,45 @@
 use constants::*;
-use libc::{c_int, c_void};
+use libc::{c_char, c_int, c_void};
 use parsed_packet::*;
 use edns_iterator::*;
 use errors::*;
 use question_iterator::*;
 use response_iterator::*;
 use rr_iterator::*;
+use std::cell::RefCell;
 use std::convert::From;
-use std::ffi::CStr;
+use std::ffi::{CStr, CString};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::ptr;
 use std::slice;
 
 const ABI_VERSION: u64 = 0x1;
+
+#[repr(C)]
+pub struct CErr {
+    description_cs: CString,
+}
+
+thread_local!(
+    static CERR: RefCell<CErr> = RefCell::new(CErr {
+        description_cs: CString::new("".as_bytes()).unwrap()
+    })
+);
+
+fn throw_err(e: Error, c_err: *mut *const CErr) -> c_int {
+    if !c_err.is_null() {
+        CERR.with(|tc_err| {
+            let mut tc_err = tc_err.borrow_mut();
+            tc_err.description_cs = CString::new(e.description()).unwrap();
+            unsafe { *c_err = &*tc_err };
+        });
+    }
+    -1
+}
+
+unsafe extern "C" fn error_description(c_err: *const CErr) -> *const c_char {
+    (*c_err).description_cs.as_bytes() as *const _ as *const c_char
+}
 
 unsafe extern "C" fn flags(parsed_packet: *const ParsedPacket) -> u32 {
     (*parsed_packet).flags()
@@ -248,24 +276,34 @@ unsafe extern "C" fn set_rr_ip(
 
 unsafe extern "C" fn set_raw_name(
     section_iterator: &mut SectionIterator,
+    c_err: *mut *const CErr,
     name: *const u8,
     len: usize,
-) {
+) -> c_int {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let name = slice::from_raw_parts(name, len);
     match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
-            let _ = (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(name);
+            match (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(name) {
+                Err(e) => throw_err(e, c_err),
+                Ok(()) => 0,
+            }
         }
         _ => panic!("set_raw_name() called on a record with no name"),
     }
 }
 
-unsafe extern "C" fn delete(section_iterator: &mut SectionIterator) {
+unsafe extern "C" fn delete(
+    section_iterator: &mut SectionIterator,
+    c_err: *mut *const CErr,
+) -> c_int {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
         Section::Question | Section::Answer | Section::NameServers | Section::Additional => {
-            let _ = (&mut *(section_iterator.it as *mut ResponseIterator)).delete();
+            match (&mut *(section_iterator.it as *mut ResponseIterator)).delete() {
+                Err(e) => throw_err(e, c_err),
+                Ok(()) => 0,
+            }
         }
         _ => panic!("delete() called in a pseudosection"),
     }
@@ -283,36 +321,46 @@ unsafe fn add_to_section(
     (*parsed_packet).insert_rr_from_string(section, rr_str)
 }
 
-unsafe extern "C" fn add_to_question(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int {
+unsafe extern "C" fn add_to_question(
+    parsed_packet: *mut ParsedPacket,
+    c_err: *mut *const CErr,
+    rr_str: *const i8,
+) -> c_int {
     match add_to_section(parsed_packet, Section::Question, rr_str) {
-        Err(_) => -1,
+        Err(e) => throw_err(e, c_err),
         Ok(_) => 0,
     }
 }
 
-unsafe extern "C" fn add_to_answer(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int {
+unsafe extern "C" fn add_to_answer(
+    parsed_packet: *mut ParsedPacket,
+    c_err: *mut *const CErr,
+    rr_str: *const i8,
+) -> c_int {
     match add_to_section(parsed_packet, Section::Answer, rr_str) {
-        Err(_) => -1,
+        Err(e) => throw_err(e, c_err),
         Ok(_) => 0,
     }
 }
 
 unsafe extern "C" fn add_to_nameservers(
     parsed_packet: *mut ParsedPacket,
+    c_err: *mut *const CErr,
     rr_str: *const i8,
 ) -> c_int {
     match add_to_section(parsed_packet, Section::NameServers, rr_str) {
-        Err(_) => -1,
+        Err(e) => throw_err(e, c_err),
         Ok(_) => 0,
     }
 }
 
 unsafe extern "C" fn add_to_additional(
     parsed_packet: *mut ParsedPacket,
+    c_err: *mut *const CErr,
     rr_str: *const i8,
 ) -> c_int {
     match add_to_section(parsed_packet, Section::Additional, rr_str) {
-        Err(_) => -1,
+        Err(e) => throw_err(e, c_err),
         Ok(_) => 0,
     }
 }
@@ -321,6 +369,8 @@ unsafe extern "C" fn add_to_additional(
 #[repr(C)]
 pub struct FnTable {
     pub abi_version: u64,
+    pub error_description:
+        unsafe extern "C" fn(c_err: *const CErr) -> *const c_char,
     pub flags: unsafe extern "C" fn(parsed_packet: *const ParsedPacket) -> u32,
     pub set_flags: unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, flags: u32),
     pub rcode: unsafe extern "C" fn(parsed_packet: *const ParsedPacket) -> u8,
@@ -381,22 +431,42 @@ pub struct FnTable {
         addr: *const u8,
         addr_len: usize,
     ),
-    pub set_raw_name:
-        unsafe extern "C" fn(section_iterator: &mut SectionIterator, name: *const u8, len: usize),
-    pub delete: unsafe extern "C" fn(section_iterator: &mut SectionIterator),
-    pub add_to_question:
-        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
-    pub add_to_answer:
-        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
-    pub add_to_nameservers:
-        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
-    pub add_to_additional:
-        unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rr_str: *const i8) -> c_int,
+    pub set_raw_name: unsafe extern "C" fn(
+        section_iterator: &mut SectionIterator,
+        c_err: *mut *const CErr,
+        name: *const u8,
+        len: usize,
+    ) -> c_int,
+    pub delete: unsafe extern "C" fn(
+        section_iterator: &mut SectionIterator,
+        c_err: *mut *const CErr,
+    ) -> c_int,
+    pub add_to_question: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        c_err: *mut *const CErr,
+        rr_str: *const i8,
+    ) -> c_int,
+    pub add_to_answer: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        c_err: *mut *const CErr,
+        rr_str: *const i8,
+    ) -> c_int,
+    pub add_to_nameservers: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        c_err: *mut *const CErr,
+        rr_str: *const i8,
+    ) -> c_int,
+    pub add_to_additional: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        c_err: *mut *const CErr,
+        rr_str: *const i8,
+    ) -> c_int,
 }
 
 pub fn fn_table() -> FnTable {
     FnTable {
         abi_version: ABI_VERSION,
+        error_description,
         flags,
         set_flags,
         rcode,

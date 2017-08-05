@@ -27,16 +27,16 @@ static bool rr_it(void *ctx, void *it)
     {
         uint32_t ip[4];
         size_t len = sizeof ip;
-        fn_table->rr_ip(it, ip, &len);
+        fn_table->rr_ip(it, (uint8_t *)ip, &len);
         assert(len == 16);
         printf("\tip6=%u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
     }
     fn_table->set_rr_ttl(it, 42);
-    fn_table->set_raw_name(it, (const uint8_t *)"\x02x2\x03net",
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x02x2\x03net",
                            sizeof "\x02x2\x03net");
-    fn_table->set_raw_name(it, (const uint8_t *)"\x01x\x03org",
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01x\x03org",
                            sizeof "\x01x\x03org");
-    fn_table->delete (it);
+    fn_table->delete_rr(it, NULL);
 
     return 0;
 }
@@ -64,9 +64,9 @@ void hook(const FnTable *fn_table, ParsedPacket *parsed_packet)
     fn_table->iter_additional(parsed_packet, rr_it, fn_table);
 
     puts("Adding an extra record to the answer section");
-    fn_table->add_to_answer(parsed_packet, "localhost.example.com. 3599 IN A 127.0.0.1");
+    fn_table->add_to_answer(parsed_packet, NULL, "localhost.example.com. 3599 IN A 127.0.0.1");
     puts("Adding another extra record to the answer section");
-    fn_table->add_to_answer(parsed_packet, "localhost.example.net. 4201 IN A 127.0.0.2");
+    fn_table->add_to_answer(parsed_packet, NULL, "localhost.example.net. 4201 IN A 127.0.0.2");
 
     puts("New answer section");
     fn_table->iter_answer(parsed_packet, rr_it, fn_table);
