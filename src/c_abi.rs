@@ -10,8 +10,8 @@ use std::cell::RefCell;
 use std::convert::From;
 use std::ffi::{CStr, CString};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::ptr;
 use std::slice;
+use synth::gen;
 
 const ABI_VERSION: u64 = 0x1;
 
@@ -274,22 +274,74 @@ unsafe extern "C" fn set_rr_ip(
         .expect("Wrong IP address family for this record");
 }
 
+unsafe extern "C" fn raw_name_from_str(
+    raw_name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
+    raw_name_len: *mut usize,
+    c_err: *mut *const CErr,
+    name: *const c_char,
+    name_len: usize,
+) -> c_int {
+    let raw_name_ =
+        match gen::raw_name_from_str(slice::from_raw_parts(name as *const u8, name_len), None) {
+            Err(e) => return throw_err(e, c_err),
+            Ok(raw_name_) => raw_name_,
+        };
+    let raw_name_len_ = raw_name_.len();
+    assert!(raw_name_len_ <= DNS_MAX_HOSTNAME_LEN + 1);
+    raw_name[..raw_name_len_].copy_from_slice(&raw_name_);
+    *raw_name_len = raw_name_len_;
+    0
+}
+
 unsafe extern "C" fn set_raw_name(
     section_iterator: &mut SectionIterator,
     c_err: *mut *const CErr,
-    name: *const u8,
-    len: usize,
+    raw_name: *const u8,
+    raw_name_len: usize,
 ) -> c_int {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
-    let name = slice::from_raw_parts(name, len);
+    let raw_name = slice::from_raw_parts(raw_name, raw_name_len);
     match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
-            match (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(name) {
+            match (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(raw_name) {
                 Err(e) => throw_err(e, c_err),
                 Ok(()) => 0,
             }
         }
         _ => panic!("set_raw_name() called on a record with no name"),
+    }
+}
+
+unsafe extern "C" fn set_name(
+    section_iterator: &mut SectionIterator,
+    c_err: *mut *const CErr,
+    name: *const c_char,
+    name_len: usize,
+    default_zone_raw: *const u8,
+    default_zone_raw_len: usize,
+) -> c_int {
+    assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
+    let name = slice::from_raw_parts(name as *const u8, name_len);
+    let default_zone_raw = if default_zone_raw.is_null() || default_zone_raw_len <= 0 {
+        None
+    } else {
+        Some(slice::from_raw_parts(
+            default_zone_raw,
+            default_zone_raw_len,
+        ))
+    };
+    let raw_name = match gen::raw_name_from_str(name, default_zone_raw) {
+        Err(e) => return throw_err(e, c_err),
+        Ok(raw_name) => raw_name,
+    };
+    match section_iterator.section {
+        Section::Answer | Section::NameServers | Section::Additional => {
+            match (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(&raw_name) {
+                Err(e) => throw_err(e, c_err),
+                Ok(()) => 0,
+            }
+        }
+        _ => panic!("set_name() called on a record with no name"),
     }
 }
 
@@ -431,11 +483,26 @@ pub struct FnTable {
         addr: *const u8,
         addr_len: usize,
     ),
+    pub raw_name_from_str: unsafe extern "C" fn(
+        raw_name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
+        raw_name_len: *mut usize,
+        c_err: *mut *const CErr,
+        name: *const c_char,
+        name_len: usize,
+    ) -> c_int,
     pub set_raw_name: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
         c_err: *mut *const CErr,
         name: *const u8,
         len: usize,
+    ) -> c_int,
+    pub set_name: unsafe extern "C" fn(
+        section_iterator: &mut SectionIterator,
+        c_err: *mut *const CErr,
+        name: *const c_char,
+        len: usize,
+        default_zone_raw: *const u8,
+        default_zone_raw_len: usize,
     ) -> c_int,
     pub delete: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
@@ -484,7 +551,9 @@ pub fn fn_table() -> FnTable {
         set_rr_ttl,
         rr_ip,
         set_rr_ip,
+        raw_name_from_str,
         set_raw_name,
+        set_name,
         delete,
         add_to_question,
         add_to_answer,

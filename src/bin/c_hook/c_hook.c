@@ -12,6 +12,8 @@ static bool rr_it(void *ctx, void *it)
 {
     const CErr *err;
     char name[DNS_MAX_HOSTNAME_LEN + 1];
+    uint8_t default_zone[DNS_MAX_HOSTNAME_LEN + 1];
+    size_t default_zone_len;
     int ret;
 
     FnTable *fn_table = ctx;
@@ -39,6 +41,10 @@ static bool rr_it(void *ctx, void *it)
                            sizeof "\x02x2\x03net");
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01x\x03org",
                            sizeof "\x01x\x03org");
+    fn_table->set_name(it, NULL, "example.com.", sizeof "example.com." - 1, NULL, 0);
+    fn_table->set_name(it, NULL, "example.com", sizeof "example.com" - 1, NULL, 0);
+    fn_table->raw_name_from_str(default_zone, &default_zone_len, NULL, "example.com", sizeof "example.com" - 1);
+    fn_table->set_name(it, NULL, "www.prod", sizeof "www.prod" - 1, default_zone, default_zone_len);
     ret = fn_table->delete_rr(it, &err);
     assert(ret == 0);
     ret = fn_table->delete_rr(it, &err);

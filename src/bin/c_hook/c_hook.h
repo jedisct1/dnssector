@@ -32,7 +32,9 @@ typedef struct FnTable
     void (*set_rr_ttl)(void *it, uint32_t ttl);
     void (*rr_ip)(void *it, uint8_t *addr, size_t *addr_len);
     void (*set_rr_ip)(void *it, const uint8_t *addr, size_t addr_len);
-    int (*set_raw_name)(void *it, const CErr **err, const uint8_t *name, size_t len);
+    int (*raw_name_from_str)(uint8_t raw_name[DNS_MAX_HOSTNAME_LEN + 1], size_t *raw_name_len, const CErr **err, const char *name, size_t name_len);
+    int (*set_raw_name)(void *it, const CErr **err, const uint8_t *name, size_t name_len);
+    int (*set_name)(void *it, const CErr **err, const char *name, size_t name_len, const uint8_t *default_zone_raw, size_t default_zone_raw_len);
     int (*delete_rr)(void *it, const CErr **err);
     int (*add_to_question)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
     int (*add_to_answer)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);

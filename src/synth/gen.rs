@@ -13,6 +13,9 @@ pub struct RRHeader {
     pub rr_type: Type,
 }
 
+// Compute a raw (encoded, binary) name from a string, and
+// appends it to the given mutable vector, along with an
+// optional default zone.
 pub fn copy_raw_name_from_str(
     raw_name: &mut Vec<u8>,
     name: &[u8],
@@ -52,12 +55,15 @@ pub fn copy_raw_name_from_str(
             Some(raw_zone) => raw_name.extend_from_slice(raw_zone),
         }
     }
+    debug_assert!(DNS_MAX_HOSTNAME_LEN >= 253);
     if raw_name.len() > 253 {
         bail!(ErrorKind::InvalidName("Name too long"))
     }
     Ok(())
 }
 
+/// Get the raw (binary, encoded) name for a name given as a string, and
+/// an optional default zone.
 pub fn raw_name_from_str(name: &[u8], raw_zone: Option<&[u8]>) -> Result<Vec<u8>> {
     let mut raw_name = Vec::with_capacity(name.len() + raw_zone.map_or(1, |x| x.len()));
     copy_raw_name_from_str(&mut raw_name, name, raw_zone)?;
