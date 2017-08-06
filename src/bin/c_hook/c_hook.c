@@ -2,6 +2,7 @@
 #include <dlfcn.h>
 #include <inttypes.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -9,7 +10,9 @@
 
 static bool rr_it(void *ctx, void *it)
 {
+    const CErr *err;
     char name[DNS_MAX_HOSTNAME_LEN + 1];
+    int ret;
 
     FnTable *fn_table = ctx;
     fn_table->name(it, name);
@@ -36,7 +39,11 @@ static bool rr_it(void *ctx, void *it)
                            sizeof "\x02x2\x03net");
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01x\x03org",
                            sizeof "\x01x\x03org");
-    fn_table->delete_rr(it, NULL);
+    ret = fn_table->delete_rr(it, &err);
+    assert(ret == 0);
+    ret = fn_table->delete_rr(it, &err);
+    assert(ret == -1);
+    assert(strcmp(fn_table->error_description(err), "VoidRecord") == 0);
 
     return 0;
 }
