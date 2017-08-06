@@ -307,10 +307,11 @@ pub trait TypedIterable {
     where
         Self: DNSIterable,
     {
+        self.offset().ok_or(ErrorKind::VoidRecord)?;
         let section = self.current_section()?;
         if self.parsed_packet().maybe_compressed {
             let (uncompressed, new_offset) = {
-                let ref_offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
+                let ref_offset = self.offset().expect("delete() called on a tombstone");
                 let compressed = self.raw_mut().packet;
                 Compress::uncompress_with_previous_offset(compressed, ref_offset)?
             };
