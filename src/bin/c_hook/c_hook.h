@@ -14,6 +14,7 @@ typedef struct CErr CErr;
 typedef struct FnTable
 {
     uint64_t abi_version;
+    const char *(*error_description)(const CErr *err);
     uint32_t (*flags)(const ParsedPacket *parsed_packet);
     void (*set_flags)(ParsedPacket *parsed_packet, uint32_t flags);
     uint8_t (*rcode)(const ParsedPacket *parsed_packet);
