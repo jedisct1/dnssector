@@ -321,7 +321,6 @@ unsafe extern "C" fn set_name(
     default_zone_raw_len: usize,
 ) -> c_int {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
-    let name = slice::from_raw_parts(name as *const u8, name_len);
     let default_zone_raw = if default_zone_raw.is_null() || default_zone_raw_len <= 0 {
         None
     } else {
@@ -330,7 +329,10 @@ unsafe extern "C" fn set_name(
             default_zone_raw_len,
         ))
     };
-    let raw_name = match gen::raw_name_from_str(name, default_zone_raw) {
+    let raw_name = match gen::raw_name_from_str(
+        slice::from_raw_parts(name as *const u8, name_len),
+        default_zone_raw,
+    ) {
         Err(e) => return throw_err(e, c_err),
         Ok(raw_name) => raw_name,
     };

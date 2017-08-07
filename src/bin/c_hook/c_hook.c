@@ -41,6 +41,8 @@ static bool rr_it(void *ctx, void *it)
                            sizeof "\x02x2\x03net");
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01x\x03org",
                            sizeof "\x01x\x03org");
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07example\x03com",
+                           sizeof "\x07example\x03com");
     fn_table->set_name(it, NULL, "example.com.", sizeof "example.com." - 1, NULL, 0);
     fn_table->set_name(it, NULL, "example.com", sizeof "example.com" - 1, NULL, 0);
     fn_table->raw_name_from_str(default_zone, &default_zone_len, NULL, "example.com", sizeof "example.com" - 1);
