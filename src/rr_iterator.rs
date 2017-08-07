@@ -136,6 +136,7 @@ pub trait TypedIterable {
     where
         Self: DNSIterable,
     {
+        let mut indirections = 0;
         let raw = self.raw();
         let mut offset = raw.offset;
         let mut res: Vec<u8> = Vec::with_capacity(64);
@@ -148,6 +149,10 @@ pub trait TypedIterable {
                 0 => break,
                 len if len & 0xc0 == 0xc0 => {
                     let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
+                    if new_offset == offset || indirections > DNS_MAX_HOSTNAME_INDIRECTIONS {
+                        return res;
+                    }
+                    indirections += 1;
                     offset = new_offset;
                     continue;
                 }
