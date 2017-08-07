@@ -42,6 +42,13 @@ typedef struct FnTable
     int (*add_to_additional)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
 } FnTable;
 
-void hook(const FnTable *fn_table, ParsedPacket *parsed_packet);
+typedef enum Action
+{
+    ACTION_PASS = 1,
+    ACTION_LOOKUP,
+    ACTION_DROP
+} Action;
+
+Action hook(const FnTable *fn_table, ParsedPacket *parsed_packet);
 
 #endif

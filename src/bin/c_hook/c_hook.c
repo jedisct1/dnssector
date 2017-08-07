@@ -59,7 +59,7 @@ static bool rr_it(void *ctx, void *it)
     return 0;
 }
 
-void hook(const FnTable *fn_table, ParsedPacket *parsed_packet)
+Action hook(const FnTable *fn_table, ParsedPacket *parsed_packet)
 {
     uint32_t flags;
 
@@ -88,4 +88,6 @@ void hook(const FnTable *fn_table, ParsedPacket *parsed_packet)
 
     puts("New answer section");
     fn_table->iter_answer(parsed_packet, rr_it, fn_table);
+
+    return ACTION_PASS;
 }
