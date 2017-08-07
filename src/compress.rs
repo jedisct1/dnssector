@@ -56,7 +56,7 @@ impl Compress {
                     }
                     let ref_offset =
                         ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as usize;
-                    if ref_offset >= lowest_offset {
+                    if ref_offset == offset || ref_offset >= lowest_offset {
                         bail!(ErrorKind::InvalidName("Forward/self reference"));
                     }
                     final_offset = final_offset.or(Some(offset + 2));
