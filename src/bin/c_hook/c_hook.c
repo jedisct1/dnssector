@@ -43,10 +43,15 @@ static bool rr_it(void *ctx, void *it)
                            sizeof "\x01x\x03org");
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07example\x03com",
                            sizeof "\x07example\x03com");
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07example\x03com",
+                           sizeof "\x07example\x03com");
+#if 0
     fn_table->set_name(it, NULL, "example.com.", sizeof "example.com." - 1, NULL, 0);
     fn_table->set_name(it, NULL, "example.com", sizeof "example.com" - 1, NULL, 0);
+    fn_table->set_name(it, NULL, "a.pretty.long.example.com", sizeof "a.pretty.long.example.com" - 1, NULL, 0);
     fn_table->raw_name_from_str(default_zone, &default_zone_len, NULL, "example.com", sizeof "example.com" - 1);
     fn_table->set_name(it, NULL, "www.prod", sizeof "www.prod" - 1, default_zone, default_zone_len);
+#endif
     ret = fn_table->delete_rr(it, &err);
     assert(ret == 0);
     ret = fn_table->delete_rr(it, &err);
