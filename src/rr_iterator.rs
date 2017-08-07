@@ -148,7 +148,6 @@ pub trait TypedIterable {
                 0 => break,
                 len if len & 0xc0 == 0xc0 => {
                     let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
-                    assert!(new_offset < offset);
                     offset = new_offset;
                     continue;
                 }
