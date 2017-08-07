@@ -49,6 +49,7 @@ typedef enum Action
     ACTION_DROP
 } Action;
 
-Action hook(const FnTable *fn_table, ParsedPacket *parsed_packet);
+Action hook_recv(const FnTable *fn_table, ParsedPacket *parsed_packet);
+Action hook_deliver(const FnTable *fn_table, ParsedPacket *parsed_packet);
 
 #endif
