@@ -1,0 +1,1 @@
+example.com. 86399 IN TXT "Sample escaped \000\008\128\255 text"

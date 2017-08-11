@@ -23,3 +23,6 @@ path = "fuzzers/fuzzer_script_1.rs"
 [[bin]]
 name = "fuzzer_script_op"
 path = "fuzzers/fuzzer_script_op.rs"
+[[bin]]
+name = "fuzzer_script_synth"
+path = "fuzzers/fuzzer_script_synth.rs"
