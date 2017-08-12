@@ -1,6 +1,6 @@
 extern crate dnssector;
-extern crate libloading;
 extern crate libc;
+extern crate libloading;
 
 use libc::c_int;
 use c_abi::{self, FnTable};
