@@ -218,7 +218,7 @@ pub trait TypedIterable {
                 return Ok(());
             }
             let offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
-            let mut packet = &mut self.parsed_packet_mut().packet;
+            let packet = &mut self.parsed_packet_mut().packet;
             let packet_len = packet.len();
             let packet_ptr = packet.as_mut_ptr();
             if shift > 0 {
@@ -298,7 +298,7 @@ pub trait TypedIterable {
         let shift = new_name_len as isize - current_name_len as isize;
         self.resize_rr(shift)?;
         {
-            let mut packet = &mut self.parsed_packet_mut().packet;
+            let packet = &mut self.parsed_packet_mut().packet;
             &mut packet[offset..offset + new_name_len].copy_from_slice(name);
         }
         self.recompute_rr();
