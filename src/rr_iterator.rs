@@ -220,7 +220,6 @@ pub trait TypedIterable {
             let offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
             let packet = &mut self.parsed_packet_mut().packet;
             let packet_len = packet.len();
-            let packet_ptr = packet.as_mut_ptr();
             if shift > 0 {
                 let new_packet_len = packet_len + shift as usize;
                 if new_packet_len > 0xffff {
@@ -231,6 +230,7 @@ pub trait TypedIterable {
                     new_packet_len,
                     (offset as isize + shift) as usize + (packet_len - offset) as usize
                 );
+                let packet_ptr = packet.as_mut_ptr();
                 unsafe {
                     ptr::copy(
                         packet_ptr.offset(offset as isize),
@@ -240,6 +240,7 @@ pub trait TypedIterable {
                 }
             } else if shift < 0 {
                 assert!(packet_len >= (-shift) as usize);
+                let packet_ptr = packet.as_mut_ptr();
                 unsafe {
                     ptr::copy(
                         packet_ptr.offset((offset as isize - shift) as isize),

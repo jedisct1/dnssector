@@ -66,13 +66,14 @@ static bool rr_it(void *ctx, void *it)
     }
     fn_table->set_rr_ttl(it, 42);
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x02x2\x03net",
-                           sizeof "\x02x2\x03net");
+                           sizeof "\x02x2\x03net");   
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01x\x03org",
                            sizeof "\x01x\x03org");
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07example\x03com",
                            sizeof "\x07example\x03com");
     fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07example\x03com",
                            sizeof "\x07example\x03com");
+
     fn_table->set_name(it, NULL, "example.com.", sizeof "example.com." - 1, NULL, 0);
     fn_table->set_name(it, NULL, "example.com", sizeof "example.com" - 1, NULL, 0);
     fn_table->set_name(it, NULL, "a.pretty.long.example.com", sizeof "a.pretty.long.example.com" - 1, NULL, 0);
@@ -86,6 +87,27 @@ static bool rr_it(void *ctx, void *it)
 
     return 0;
 }
+
+static ParsedPacket *pp;
+
+static bool rr_it2(void *ctx, void *it)
+{
+    const CErr *err;
+    char name[DNS_MAX_HOSTNAME_LEN + 1];
+    uint8_t default_zone[DNS_MAX_HOSTNAME_LEN + 1];
+    size_t default_zone_len;
+    int ret;
+
+    FnTable *fn_table = ctx;
+    fn_table->name(it, name);
+    printf("- [rr_it2] found RR [%s] with type: %" PRIu16 " and ttl: %" PRIu32 "\n",
+           name, fn_table->rr_type(it), fn_table->rr_ttl(it));
+   dump(fn_table, pp);   
+    fn_table->set_name(it, NULL, "a.pretty.long.example.com", sizeof "a.pretty.long.example.com" - 1, NULL, 0);
+   dump(fn_table, pp);
+    return 0;
+}
+
 
 Action hook_recv(const FnTable *fn_table, ParsedPacket *parsed_packet)
 {
@@ -119,8 +141,10 @@ Action hook_deliver(const FnTable *fn_table, ParsedPacket *parsed_packet)
     puts("Adding another extra record to the answer section");
     fn_table->add_to_answer(parsed_packet, NULL, "localhost.example.net. 4201 IN A 127.0.0.2");
 
+   dump(fn_table, parsed_packet);
+pp = parsed_packet;   
     puts("New answer section");
-    fn_table->iter_answer(parsed_packet, rr_it, fn_table);
+    fn_table->iter_answer(parsed_packet, rr_it2, fn_table);
 
     return ACTION_PASS;
 }
