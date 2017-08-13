@@ -222,9 +222,9 @@ impl ParsedPacket {
         if insertion_offset == new_len {
             self.packet.extend_from_slice(&rr.packet);
         } else {
-            let packet_ptr = self.packet.as_mut_ptr();
             unsafe {
                 self.packet.set_len(new_len);
+                let packet_ptr = self.packet.as_mut_ptr();
                 ptr::copy(
                     packet_ptr.offset(insertion_offset as isize),
                     packet_ptr.offset((insertion_offset + rr_len) as isize),

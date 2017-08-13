@@ -230,8 +230,8 @@ pub trait TypedIterable {
                     new_packet_len,
                     (offset as isize + shift) as usize + (packet_len - offset) as usize
                 );
-                let packet_ptr = packet.as_mut_ptr();
                 unsafe {
+                    let packet_ptr = packet.as_mut_ptr();
                     ptr::copy(
                         packet_ptr.offset(offset as isize),
                         packet_ptr.offset((offset as isize + shift) as isize),
@@ -240,8 +240,8 @@ pub trait TypedIterable {
                 }
             } else if shift < 0 {
                 assert!(packet_len >= (-shift) as usize);
-                let packet_ptr = packet.as_mut_ptr();
                 unsafe {
+                    let packet_ptr = packet.as_mut_ptr();
                     ptr::copy(
                         packet_ptr.offset((offset as isize - shift) as isize),
                         packet_ptr.offset(offset as isize),
