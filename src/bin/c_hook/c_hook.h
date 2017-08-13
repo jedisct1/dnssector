@@ -1,12 +1,14 @@
 #ifndef C_HOOK_H
 #define C_HOOK_H
 
+#include <ctype.h>
 #include <stddef.h>
 #include <stdint.h>
 
 #define ABI_VERSION 0x1
 
 #define DNS_MAX_HOSTNAME_LEN 255
+#define DNS_MAX_PACKET_SIZE 8192
 
 typedef struct ParsedPacket ParsedPacket;
 typedef struct CErr CErr;
@@ -40,10 +42,10 @@ typedef struct FnTable
     int (*add_to_answer)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
     int (*add_to_nameservers)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
     int (*add_to_additional)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
+    int (*raw_packet)(const ParsedPacket *parsed_packet, uint8_t raw_packet[DNS_MAX_PACKET_SIZE], size_t *raw_packet_len, size_t max_len);
 } FnTable;
 
-typedef enum Action
-{
+typedef enum Action {
     ACTION_PASS = 1,
     ACTION_LOOKUP,
     ACTION_DROP

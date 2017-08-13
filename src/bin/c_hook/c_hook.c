@@ -8,6 +8,34 @@
 
 #include "c_hook.h"
 
+static void dump(const FnTable *fn_table, const ParsedPacket *parsed_packet)
+{
+    uint8_t raw_packet[DNS_MAX_PACKET_SIZE];
+    size_t raw_packet_len;
+    size_t i;
+    int c;
+
+    if (fn_table->raw_packet(parsed_packet, raw_packet, &raw_packet_len, sizeof raw_packet) != 0)
+    {
+        fprintf(stderr, "Unable to access the raw packet\n");
+        return;
+    }
+    printf("\n\nRaw packet (len=%zu):\n", raw_packet_len);
+    for (i = 0; i < raw_packet_len; i++)
+    {
+        c = (int)raw_packet[i];
+        if (isalnum(c))
+        {
+            printf("'%c', ", c);
+        }
+        else
+        {
+            printf("%d, ", c);
+        }
+    }
+    printf("\n\n");
+}
+
 static bool rr_it(void *ctx, void *it)
 {
     const CErr *err;

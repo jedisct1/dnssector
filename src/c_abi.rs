@@ -419,6 +419,22 @@ unsafe extern "C" fn add_to_additional(
     }
 }
 
+unsafe extern "C" fn raw_packet(
+    parsed_packet: *const ParsedPacket,
+    raw_packet_: &mut [u8; DNS_MAX_UNCOMPRESSED_SIZE],
+    raw_packet_len: *mut size_t,
+    raw_packet_max_len: size_t,
+) -> c_int {
+    let packet = &(*parsed_packet).packet;
+    let packet_len = packet.len();
+    if (packet_len > raw_packet_max_len) {
+        return -1;
+    }
+    raw_packet_[..packet_len].copy_from_slice(packet);
+    *raw_packet_len = packet_len;
+    0
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -530,6 +546,12 @@ pub struct FnTable {
         c_err: *mut *const CErr,
         rr_str: *const i8,
     ) -> c_int,
+    pub raw_packet: unsafe extern "C" fn(
+        parsed_packet: *const ParsedPacket,
+        raw_packet_: &mut [u8; DNS_MAX_UNCOMPRESSED_SIZE],
+        raw_packet_len: *mut size_t,
+        raw_packet_max_len: size_t,
+    ) -> c_int,
 }
 
 pub fn fn_table() -> FnTable {
@@ -561,5 +583,6 @@ pub fn fn_table() -> FnTable {
         add_to_answer,
         add_to_nameservers,
         add_to_additional,
+        raw_packet,
     }
 }
