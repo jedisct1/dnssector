@@ -217,11 +217,11 @@ impl ParsedPacket {
             bail!(ErrorKind::PacketTooLarge)
         }
         let insertion_offset = self.insertion_offset(section)?;
+        let new_len = self.packet.len() + rr_len;
         self.packet.reserve(rr_len);
-        if insertion_offset == rr_len {
+        if insertion_offset == new_len {
             self.packet.extend_from_slice(&rr.packet);
         } else {
-            let new_len = self.packet.len() + rr_len;
             let packet_ptr = self.packet.as_mut_ptr();
             unsafe {
                 self.packet.set_len(new_len);
