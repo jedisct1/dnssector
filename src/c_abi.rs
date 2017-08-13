@@ -438,7 +438,6 @@ unsafe extern "C" fn raw_packet(
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
-    pub abi_version: u64,
     pub error_description:
         unsafe extern "C" fn(c_err: *const CErr) -> *const c_char,
     pub flags: unsafe extern "C" fn(parsed_packet: *const ParsedPacket) -> u32,
@@ -552,11 +551,11 @@ pub struct FnTable {
         raw_packet_len: *mut size_t,
         raw_packet_max_len: size_t,
     ) -> c_int,
+    pub abi_version: u64,
 }
 
 pub fn fn_table() -> FnTable {
     FnTable {
-        abi_version: ABI_VERSION,
         error_description,
         flags,
         set_flags,
@@ -584,5 +583,6 @@ pub fn fn_table() -> FnTable {
         add_to_nameservers,
         add_to_additional,
         raw_packet,
+        abi_version: ABI_VERSION,
     }
 }

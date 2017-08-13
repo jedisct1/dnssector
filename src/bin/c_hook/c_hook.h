@@ -15,7 +15,6 @@ typedef struct CErr CErr;
 
 typedef struct FnTable
 {
-    uint64_t abi_version;
     const char *(*error_description)(const CErr *err);
     uint32_t (*flags)(const ParsedPacket *parsed_packet);
     void (*set_flags)(ParsedPacket *parsed_packet, uint32_t flags);
@@ -43,6 +42,7 @@ typedef struct FnTable
     int (*add_to_nameservers)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
     int (*add_to_additional)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
     int (*raw_packet)(const ParsedPacket *parsed_packet, uint8_t raw_packet[DNS_MAX_PACKET_SIZE], size_t *raw_packet_len, size_t max_len);
+    uint64_t abi_version;
 } FnTable;
 
 typedef enum Action {
