@@ -1,5 +1,5 @@
 use constants::*;
-use libc::{c_char, c_int, c_void};
+use libc::{c_char, c_int, c_void, size_t};
 use parsed_packet::*;
 use edns_iterator::*;
 use errors::*;
@@ -217,7 +217,7 @@ unsafe extern "C" fn set_rr_ttl(section_iterator: &mut SectionIterator, ttl: u32
 unsafe extern "C" fn rr_ip(
     section_iterator: &mut SectionIterator,
     addr: *mut u8,
-    addr_len: &mut usize,
+    addr_len: &mut size_t,
 ) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let ip = match section_iterator.section {
@@ -245,7 +245,7 @@ unsafe extern "C" fn rr_ip(
 unsafe extern "C" fn set_rr_ip(
     section_iterator: &mut SectionIterator,
     addr: *const u8,
-    addr_len: usize,
+    addr_len: size_t,
 ) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
@@ -276,10 +276,10 @@ unsafe extern "C" fn set_rr_ip(
 
 unsafe extern "C" fn raw_name_from_str(
     raw_name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
-    raw_name_len: *mut usize,
+    raw_name_len: *mut size_t,
     c_err: *mut *const CErr,
     name: *const c_char,
-    name_len: usize,
+    name_len: size_t,
 ) -> c_int {
     let raw_name_ =
         match gen::raw_name_from_str(slice::from_raw_parts(name as *const u8, name_len), None) {
@@ -297,7 +297,7 @@ unsafe extern "C" fn set_raw_name(
     section_iterator: &mut SectionIterator,
     c_err: *mut *const CErr,
     raw_name: *const u8,
-    raw_name_len: usize,
+    raw_name_len: size_t,
 ) -> c_int {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let raw_name = slice::from_raw_parts(raw_name, raw_name_len);
@@ -316,9 +316,9 @@ unsafe extern "C" fn set_name(
     section_iterator: &mut SectionIterator,
     c_err: *mut *const CErr,
     name: *const c_char,
-    name_len: usize,
+    name_len: size_t,
     default_zone_raw: *const u8,
-    default_zone_raw_len: usize,
+    default_zone_raw_len: size_t,
 ) -> c_int {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let default_zone_raw = if default_zone_raw.is_null() || default_zone_raw_len <= 0 {
@@ -494,33 +494,33 @@ pub struct FnTable {
     pub rr_ip: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
         addr: *mut u8,
-        addr_len: &mut usize,
+        addr_len: &mut size_t,
     ),
     pub set_rr_ip: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
         addr: *const u8,
-        addr_len: usize,
+        addr_len: size_t,
     ),
     pub raw_name_from_str: unsafe extern "C" fn(
         raw_name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
-        raw_name_len: *mut usize,
+        raw_name_len: *mut size_t,
         c_err: *mut *const CErr,
         name: *const c_char,
-        name_len: usize,
+        name_len: size_t,
     ) -> c_int,
     pub set_raw_name: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
         c_err: *mut *const CErr,
         name: *const u8,
-        len: usize,
+        len: size_t,
     ) -> c_int,
     pub set_name: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
         c_err: *mut *const CErr,
         name: *const c_char,
-        len: usize,
+        len: size_t,
         default_zone_raw: *const u8,
-        default_zone_raw_len: usize,
+        default_zone_raw_len: size_t,
     ) -> c_int,
     pub delete: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
