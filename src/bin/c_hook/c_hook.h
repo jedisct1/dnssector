@@ -42,6 +42,7 @@ typedef struct FnTable
     int (*add_to_nameservers)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
     int (*add_to_additional)(ParsedPacket *parsed_packet, const CErr **err, const char *rr_str);
     int (*raw_packet)(const ParsedPacket *parsed_packet, uint8_t raw_packet[DNS_MAX_PACKET_SIZE], size_t *raw_packet_len, size_t max_len);
+    int (*question)(const ParsedPacket *parsed_packet, char name[DNS_MAX_HOSTNAME_LEN + 1], uint16_t *rr_type);
     uint64_t abi_version;
 } FnTable;
 

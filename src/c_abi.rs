@@ -435,6 +435,31 @@ unsafe extern "C" fn raw_packet(
     0
 }
 
+unsafe extern "C" fn question(
+    parsed_packet: *const ParsedPacket,
+    name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
+    rr_type: *mut u16,
+) -> c_int {
+    match (*parsed_packet).question() {
+        None => {
+            name[0] = 0;
+            *rr_type = 0;
+            -1
+        }
+        Some((name_str, rr_type_)) => {
+            *rr_type = rr_type_;
+            let name_str_len = name_str.len();
+            if name_str_len > DNS_MAX_HOSTNAME_LEN {
+                name[0] = 0;
+                return -1;
+            }
+            name[..name_str_len].copy_from_slice(&name_str);
+            name[name_str_len] = 0;
+            0
+        }
+    }
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -551,6 +576,11 @@ pub struct FnTable {
         raw_packet_len: *mut size_t,
         raw_packet_max_len: size_t,
     ) -> c_int,
+    pub question: unsafe extern "C" fn(
+        parsed_packet: *const ParsedPacket,
+        name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
+        rr_type: *mut u16,
+    ) -> c_int,
     pub abi_version: u64,
 }
 
@@ -583,6 +613,7 @@ pub fn fn_table() -> FnTable {
         add_to_nameservers,
         add_to_additional,
         raw_packet,
+        question,
         abi_version: ABI_VERSION,
     }
 }
