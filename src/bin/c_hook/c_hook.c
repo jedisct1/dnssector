@@ -101,23 +101,17 @@ static bool rr_it2(void *ctx, void *it)
     return 0;
 }
 
-static bool rr_question_it(void *ctx, void *it)
-{
-    char name[DNS_MAX_HOSTNAME_LEN + 1];
-
-    FnTable *fn_table = ctx;
-    fn_table->name(it, name);
-    printf("- [rr_question] found RR [%s] with type: %" PRIu16 " and ttl: %" PRIu32 "\n",
-           name, fn_table->rr_type(it), fn_table->rr_ttl(it));
-
-    return 0;
-}
-
 Action hook_recv(const FnTable *fn_table, ParsedPacket *parsed_packet)
 {
+    char name[DNS_MAX_HOSTNAME_LEN + 1];
+    uint16_t rr_type;
+
     assert(fn_table->abi_version == ABI_VERSION);
     puts("Recv hook - Question received");
-    fn_table->iter_answer(parsed_packet, rr_question_it, fn_table);
+    if (fn_table->question(parsed_packet, name, &rr_type) == 0)
+    {
+        printf("Question received: [%s] with type: %" PRIu16 "\n", name, rr_type);
+    }
     return ACTION_PASS;
 }
 
