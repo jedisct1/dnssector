@@ -291,4 +291,14 @@ impl ParsedPacket {
         self.maybe_compressed = false;
         Ok(())
     }
+
+    pub fn question(&self) -> Option<()> {
+        let offset = match self.offset_question {
+            None => return None,
+            Some(offset) => offset,
+        };
+        let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
+        let res = Compress::copy_uncompressed_name(&mut name, &self.packet, offset);
+        Some(())
+    }
 }
