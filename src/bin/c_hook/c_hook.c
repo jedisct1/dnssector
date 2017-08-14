@@ -117,7 +117,7 @@ Action hook_recv(const FnTable *fn_table, ParsedPacket *parsed_packet)
 {
     assert(fn_table->abi_version == ABI_VERSION);
     puts("Recv hook - Question received");
-    fn_table->iter_questions(parsed_packet, rr_question_it, fn_table);
+    fn_table->iter_answer(parsed_packet, rr_question_it, fn_table);
     return ACTION_PASS;
 }
 

@@ -292,13 +292,15 @@ impl ParsedPacket {
         Ok(())
     }
 
-    pub fn question(&self) -> Option<()> {
+    pub fn question(&self) -> Option<((Vec<u8>, u16))> {
         let offset = match self.offset_question {
             None => return None,
             Some(offset) => offset,
         };
-        let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
-        let res = Compress::copy_uncompressed_name(&mut name, &self.packet, offset);
-        Some(())
+        let name_str = Compress::raw_name_to_str(&self.packet, offset);
+        let offset = offset + Compress::raw_name_len(&self.packet[offset..]);
+        let rdata = &self.packet[offset..];
+        let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
+        Some((name_str, rr_type))
     }
 }

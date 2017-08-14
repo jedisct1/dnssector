@@ -445,6 +445,36 @@ impl Compress {
         i + 1
     }
 
+    /// Comvert a trusted raw name to a string
+    pub fn raw_name_to_str(packet: &[u8], mut offset: usize) -> Vec<u8> {
+        let mut indirections = 0;
+        let mut res: Vec<u8> = Vec::with_capacity(64);
+        loop {
+            let label_len = match packet[offset] {
+                0 => break,
+                len if len & 0xc0 == 0xc0 => {
+                    let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
+                    if new_offset == offset || indirections > DNS_MAX_HOSTNAME_INDIRECTIONS {
+                        return res;
+                    }
+                    indirections += 1;
+                    offset = new_offset;
+                    continue;
+                }
+                len => len,
+            } as usize;
+            offset += 1;
+            let label = &packet[offset..offset + label_len];
+            offset += label_len;
+            if !res.is_empty() {
+                res.push(b'.');
+            }
+            res.extend(label);
+        }
+        res.make_ascii_lowercase();
+        res
+    }
+
     /// Compress a name starting at `offset` using the suffix dictionary `dict`
     /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
     /// Returns the length of the name as well as the location right after the uncompressed name.
