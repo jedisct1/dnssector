@@ -427,7 +427,7 @@ unsafe extern "C" fn raw_packet(
 ) -> c_int {
     let packet = &(*parsed_packet).packet;
     let packet_len = packet.len();
-    if (packet_len > raw_packet_max_len) {
+    if packet_len > raw_packet_max_len {
         return -1;
     }
     raw_packet_[..packet_len].copy_from_slice(packet);
