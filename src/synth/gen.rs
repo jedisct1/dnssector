@@ -1,4 +1,3 @@
-
 use super::parser::*;
 use byteorder::{BigEndian, ByteOrder};
 use chomp::prelude::parse_only;

@@ -1,4 +1,3 @@
-
 use byteorder::{BigEndian, ByteOrder};
 use compress::*;
 use constants::*;
