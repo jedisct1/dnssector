@@ -65,15 +65,14 @@ static bool rr_it(void *ctx, void *it)
         printf("\tip6=%u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
     }
     fn_table->set_rr_ttl(it, 42);
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x02x2\x03net",
-                           sizeof "\x02x2\x03net");
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01x\x03org",
-                           sizeof "\x01x\x03org");
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07example\x03com",
-                           sizeof "\x07example\x03com");
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07example\x03com",
-                           sizeof "\x07example\x03com");
-
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x02" "x2" "\x03" "net",
+                           sizeof "\x02" "x2" "\x03" "net");
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01" "x" "\x03" "org",
+                           sizeof "\x01" "x" "\x03" "org");
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07" "example" "\x03" "com",
+                           sizeof "\x07" "example" "\x03" "com");
+    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07" "example" "\x03" "com",
+                           sizeof "\x07" "example" "\x03" "com");
     fn_table->set_name(it, NULL, "example.com.", sizeof "example.com." - 1, NULL, 0);
     fn_table->set_name(it, NULL, "example.com", sizeof "example.com" - 1, NULL, 0);
     fn_table->set_name(it, NULL, "a.pretty.long.example.com", sizeof "a.pretty.long.example.com" - 1, NULL, 0);
