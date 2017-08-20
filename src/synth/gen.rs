@@ -1,9 +1,10 @@
+
+use super::parser::*;
 use byteorder::{BigEndian, ByteOrder};
+use chomp::prelude::parse_only;
 use constants::*;
 use errors::*;
-use chomp::prelude::parse_only;
 use std::net::{Ipv4Addr, Ipv6Addr};
-use super::parser::*;
 
 #[derive(Clone, Debug)]
 pub struct RRHeader {

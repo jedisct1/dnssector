@@ -1,8 +1,8 @@
 use constants::*;
-use libc::{c_char, c_int, c_void, size_t};
-use parsed_packet::*;
 use edns_iterator::*;
 use errors::*;
+use libc::{c_char, c_int, c_void, size_t};
+use parsed_packet::*;
 use question_iterator::*;
 use response_iterator::*;
 use rr_iterator::*;

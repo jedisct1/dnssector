@@ -1,16 +1,17 @@
-use constants::*;
-use errors::*;
+
+use super::gen::*;
 use chomp::ascii::*;
 use chomp::combinators::*;
+use chomp::parsers;
 use chomp::prelude::{eof, not_token, parse_only, peek, satisfy, skip_while, string, take_while,
                      token, Buffer, Input, SimpleResult, U8Input, take_while1};
-use chomp::parsers;
 use chomp::primitives::Primitives;
+use constants::*;
+use errors::*;
 use std::ascii::AsciiExt;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::{self, FromStr};
 use std::u32;
-use super::gen::*;
 
 #[inline]
 pub fn string_nocase<I: Input<Token = u8>>(mut i: I, s: &[u8]) -> SimpleResult<I, I::Buffer> {
