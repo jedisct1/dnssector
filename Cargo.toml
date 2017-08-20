@@ -8,6 +8,11 @@ clippy = {version = "~0", optional = true}
 byteorder = "*"
 chomp = "*"
 debug_stub_derive = "*"
-error-chain = "*"
 libc = "*"
 libloading = "*"
+error-chain = {version = "*", default-features = false}
+
+[profile.release]
+lto = true
+panic = "abort"
+opt-level = 3
