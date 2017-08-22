@@ -536,6 +536,22 @@
 <span id="491">491</span>
 <span id="492">492</span>
 <span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
 </pre><pre class="rust ">
 <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ByteOrder</span>};
 <span class="kw">use</span> <span class="ident">compress</span>::<span class="kw-2">*</span>;
@@ -867,7 +883,23 @@
                     ))
                 }
                 <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
-            }            
+            }
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">A</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">rr_rdlen</span> <span class="op">!=</span> <span class="number">4</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                        <span class="string">&quot;A record doesn&#39;t include a 4 bytes IP address&quot;</span>
+                    ))
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
+            }
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">AAAA</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">if</span> <span class="ident">rr_rdlen</span> <span class="op">!=</span> <span class="number">16</span> {
+                    <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InvalidPacket</span>(
+                        <span class="string">&quot;AAAA record doesn&#39;t include a 16 bytes IP address&quot;</span>
+                    ))
+                }
+                <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
+            }
             _ <span class="op">=&gt;</span> {
                 <span class="self">self</span>.<span class="ident">increment_offset</span>(<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="ident">rr_rdlen</span>)<span class="question-mark">?</span>;
             }
@@ -1088,7 +1120,6 @@
         window.rootPath = "../../";
         window.currentCrate = "dnssector";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

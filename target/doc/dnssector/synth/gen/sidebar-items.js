@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["copy_raw_name_from_str",""],["raw_name_from_str","Get the raw (binary, encoded) name for a name given as a string, and an optional default zone."]],"struct":[["A",""],["AAAA",""],["CNAME",""],["MX",""],["NS",""],["PTR",""],["RR",""],["RRHeader",""],["SOA",""],["TXT",""]]});

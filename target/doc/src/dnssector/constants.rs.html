@@ -310,6 +310,12 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
 </pre><pre class="rust ">
 <span class="attribute">#<span class="op">!</span>[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 
@@ -392,6 +398,12 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_CD</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">4</span>;
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_FLAG_DO</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;&lt;</span> <span class="number">31</span>;
 
+<span class="doccomment">/// Maximum size of an uncompressed packet</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_MAX_UNCOMPRESSED_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span>;
+
+<span class="doccomment">/// Maximum size of a compressed packet</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DNS_MAX_COMPRESSED_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span>;
+
 <span class="doccomment">/// DNS query class</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Class</span> {
@@ -455,45 +467,45 @@
     <span class="ident">OPT</span> <span class="op">=</span> <span class="number">41</span>,
     <span class="ident">APL</span> <span class="op">=</span> <span class="number">42</span>,
     <span class="ident">DS</span> <span class="op">=</span> <span class="number">43</span>,
-    <span class="ident">SSHFP</span> <span class="op">=</span> <span class="number">44</span>, <span class="comment">/* RFC 4255 */</span>
-    <span class="ident">IPSECKEY</span> <span class="op">=</span> <span class="number">45</span>, <span class="comment">/* RFC 4025 */</span>
-    <span class="ident">RRSIG</span> <span class="op">=</span> <span class="number">46</span>, <span class="comment">/* RFC 4034 */</span>
-    <span class="ident">NSEC</span> <span class="op">=</span> <span class="number">47</span>, <span class="comment">/* RFC 4034 */</span>
-    <span class="ident">DNSKEY</span> <span class="op">=</span> <span class="number">48</span>, <span class="comment">/* RFC 4034 */</span>
-    <span class="ident">DHCID</span> <span class="op">=</span> <span class="number">49</span>, <span class="comment">/* RFC 4701 */</span>
-    <span class="ident">NSEC3</span> <span class="op">=</span> <span class="number">50</span>, <span class="comment">/* RFC 5155 */</span>
-    <span class="ident">NSEC3PARAM</span> <span class="op">=</span> <span class="number">51</span>, <span class="comment">/* RFC 5155 */</span>
-    <span class="ident">TLSA</span> <span class="op">=</span> <span class="number">52</span>, <span class="comment">/* RFC 6698 */</span>
-    <span class="ident">SMIMEA</span> <span class="op">=</span> <span class="number">53</span>, <span class="comment">/* draft-ietf-dane-smime */</span>
-    <span class="ident">HIP</span> <span class="op">=</span> <span class="number">55</span>, <span class="comment">/* RFC 5205 */</span>
+    <span class="ident">SSHFP</span> <span class="op">=</span> <span class="number">44</span>,      <span class="comment">// RFC 4255</span>
+    <span class="ident">IPSECKEY</span> <span class="op">=</span> <span class="number">45</span>,   <span class="comment">// RFC 4025</span>
+    <span class="ident">RRSIG</span> <span class="op">=</span> <span class="number">46</span>,      <span class="comment">// RFC 4034</span>
+    <span class="ident">NSEC</span> <span class="op">=</span> <span class="number">47</span>,       <span class="comment">// RFC 4034</span>
+    <span class="ident">DNSKEY</span> <span class="op">=</span> <span class="number">48</span>,     <span class="comment">// RFC 4034</span>
+    <span class="ident">DHCID</span> <span class="op">=</span> <span class="number">49</span>,      <span class="comment">// RFC 4701</span>
+    <span class="ident">NSEC3</span> <span class="op">=</span> <span class="number">50</span>,      <span class="comment">// RFC 5155</span>
+    <span class="ident">NSEC3PARAM</span> <span class="op">=</span> <span class="number">51</span>, <span class="comment">// RFC 5155</span>
+    <span class="ident">TLSA</span> <span class="op">=</span> <span class="number">52</span>,       <span class="comment">// RFC 6698</span>
+    <span class="ident">SMIMEA</span> <span class="op">=</span> <span class="number">53</span>,     <span class="comment">// draft-ietf-dane-smime</span>
+    <span class="ident">HIP</span> <span class="op">=</span> <span class="number">55</span>,        <span class="comment">// RFC 5205</span>
     <span class="ident">NINFO</span> <span class="op">=</span> <span class="number">56</span>,
     <span class="ident">RKEY</span> <span class="op">=</span> <span class="number">57</span>,
     <span class="ident">TALINK</span> <span class="op">=</span> <span class="number">58</span>,
-    <span class="ident">CDS</span> <span class="op">=</span> <span class="number">59</span>, <span class="comment">/* RFC 7344 */</span>
-    <span class="ident">CDNSKEY</span> <span class="op">=</span> <span class="number">60</span>, <span class="comment">/* RFC 7344 */</span>
-    <span class="ident">OPENPGPKEY</span> <span class="op">=</span> <span class="number">61</span>, <span class="comment">/* RFC 7929 */</span>
-    <span class="ident">CSYNC</span> <span class="op">=</span> <span class="number">62</span>, <span class="comment">/* RFC 7477 */</span>
-    <span class="ident">SPF</span> <span class="op">=</span> <span class="number">99</span>, <span class="comment">/* RFC 4408 */</span>
+    <span class="ident">CDS</span> <span class="op">=</span> <span class="number">59</span>,        <span class="comment">// RFC 7344</span>
+    <span class="ident">CDNSKEY</span> <span class="op">=</span> <span class="number">60</span>,    <span class="comment">// RFC 7344</span>
+    <span class="ident">OPENPGPKEY</span> <span class="op">=</span> <span class="number">61</span>, <span class="comment">// RFC 7929</span>
+    <span class="ident">CSYNC</span> <span class="op">=</span> <span class="number">62</span>,      <span class="comment">// RFC 7477</span>
+    <span class="ident">SPF</span> <span class="op">=</span> <span class="number">99</span>,        <span class="comment">// RFC 4408</span>
     <span class="ident">UINFO</span> <span class="op">=</span> <span class="number">100</span>,
     <span class="ident">UID</span> <span class="op">=</span> <span class="number">101</span>,
     <span class="ident">GID</span> <span class="op">=</span> <span class="number">102</span>,
     <span class="ident">UNSPEC</span> <span class="op">=</span> <span class="number">103</span>,
-    <span class="ident">NID</span> <span class="op">=</span> <span class="number">104</span>, <span class="comment">/* RFC 6742 */</span>
-    <span class="ident">L32</span> <span class="op">=</span> <span class="number">105</span>, <span class="comment">/* RFC 6742 */</span>
-    <span class="ident">L64</span> <span class="op">=</span> <span class="number">106</span>, <span class="comment">/* RFC 6742 */</span>
-    <span class="ident">LP</span> <span class="op">=</span> <span class="number">107</span>, <span class="comment">/* RFC 6742 */</span>
-    <span class="ident">EUI48</span> <span class="op">=</span> <span class="number">108</span>, <span class="comment">/* RFC 7043 */</span>
-    <span class="ident">EUI64</span> <span class="op">=</span> <span class="number">109</span>, <span class="comment">/* RFC 7043 */</span>
-    <span class="ident">TKEY</span> <span class="op">=</span> <span class="number">249</span>, <span class="comment">/* RFC 2930 */</span>
+    <span class="ident">NID</span> <span class="op">=</span> <span class="number">104</span>,   <span class="comment">// RFC 6742</span>
+    <span class="ident">L32</span> <span class="op">=</span> <span class="number">105</span>,   <span class="comment">// RFC 6742</span>
+    <span class="ident">L64</span> <span class="op">=</span> <span class="number">106</span>,   <span class="comment">// RFC 6742</span>
+    <span class="ident">LP</span> <span class="op">=</span> <span class="number">107</span>,    <span class="comment">// RFC 6742</span>
+    <span class="ident">EUI48</span> <span class="op">=</span> <span class="number">108</span>, <span class="comment">// RFC 7043</span>
+    <span class="ident">EUI64</span> <span class="op">=</span> <span class="number">109</span>, <span class="comment">// RFC 7043</span>
+    <span class="ident">TKEY</span> <span class="op">=</span> <span class="number">249</span>,  <span class="comment">// RFC 2930</span>
     <span class="ident">TSIG</span> <span class="op">=</span> <span class="number">250</span>,
     <span class="ident">IXFR</span> <span class="op">=</span> <span class="number">251</span>,
     <span class="ident">AXFR</span> <span class="op">=</span> <span class="number">252</span>,
     <span class="ident">MAILB</span> <span class="op">=</span> <span class="number">253</span>,
     <span class="ident">MAILA</span> <span class="op">=</span> <span class="number">254</span>,
     <span class="ident">ANY</span> <span class="op">=</span> <span class="number">255</span>,
-    <span class="ident">URI</span> <span class="op">=</span> <span class="number">256</span>, <span class="comment">/* RFC 7553 */</span>
-    <span class="ident">CAA</span> <span class="op">=</span> <span class="number">257</span>, <span class="comment">/* RFC 6844 */</span>
-    <span class="ident">AVC</span> <span class="op">=</span> <span class="number">258</span>, <span class="comment">/* Cisco&#39;s DNS-AS RR, see www.dns-as.org */</span>
+    <span class="ident">URI</span> <span class="op">=</span> <span class="number">256</span>, <span class="comment">// RFC 7553</span>
+    <span class="ident">CAA</span> <span class="op">=</span> <span class="number">257</span>, <span class="comment">// RFC 6844</span>
+    <span class="ident">AVC</span> <span class="op">=</span> <span class="number">258</span>, <span class="comment">// Cisco&#39;s DNS-AS RR, see www.dns-as.org</span>
     <span class="ident">TA</span> <span class="op">=</span> <span class="number">32768</span>,
     <span class="ident">DLV</span> <span class="op">=</span> <span class="number">32769</span>,
 }
@@ -636,7 +648,6 @@
         window.rootPath = "../../";
         window.currentCrate = "dnssector";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

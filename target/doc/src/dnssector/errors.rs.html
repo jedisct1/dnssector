@@ -62,6 +62,14 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
 </pre><pre class="rust ">
 <span class="macro">error_chain</span><span class="macro">!</span> {
     <span class="ident">errors</span> {
@@ -70,16 +78,24 @@
         <span class="ident">UnsupportedClass</span>
         <span class="ident">InternalError</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
             <span class="ident">description</span>(<span class="string">&quot;Internal error&quot;</span>)
-            <span class="ident">display</span>(<span class="string">&quot;Internal error: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)            
+            <span class="ident">display</span>(<span class="string">&quot;Internal error: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)
         }
         <span class="ident">InvalidName</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
             <span class="ident">description</span>(<span class="string">&quot;Invalid name in a DNS record&quot;</span>)
-            <span class="ident">display</span>(<span class="string">&quot;Invalid name in a DNS record: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)            
+            <span class="ident">display</span>(<span class="string">&quot;Invalid name in a DNS record: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)
         }
         <span class="ident">InvalidPacket</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
             <span class="ident">description</span>(<span class="string">&quot;Invalid DNS packet&quot;</span>)
             <span class="ident">display</span>(<span class="string">&quot;Invalid DNS packet: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)
         }
+        <span class="ident">UnsupportedRRType</span>(<span class="ident">t</span>: <span class="ident">String</span>) {
+            <span class="ident">description</span>(<span class="string">&quot;Unsupported record type&quot;</span>)
+            <span class="ident">display</span>(<span class="string">&quot;Unsupported record type: &#39;{}&#39;&quot;</span>, <span class="ident">t</span>)
+        }
+        <span class="ident">VoidRecord</span>
+        <span class="ident">PropertyNotFound</span>
+        <span class="ident">WrongAddressFamily</span>
+        <span class="ident">ParseError</span>
     }
 }
 </pre>
@@ -140,7 +156,6 @@
         window.rootPath = "../../";
         window.currentCrate = "dnssector";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>

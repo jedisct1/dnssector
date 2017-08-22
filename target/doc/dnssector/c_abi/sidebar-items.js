@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["fn_table",""]],"struct":[["FnTable","C wrappers to the internal API"],["SectionIterator",""]]});
+initSidebarItems({"fn":[["fn_table",""]],"struct":[["CErr",""],["FnTable","C wrappers to the internal API"],["SectionIterator",""]]});

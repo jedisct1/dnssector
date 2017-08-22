@@ -462,15 +462,109 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
 </pre><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ascii</span>::<span class="ident">AsciiExt</span>;
 <span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ByteOrder</span>};
 <span class="kw">use</span> <span class="ident">compress</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">dns_sector</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">errors</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">parsed_packet</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ascii</span>::<span class="ident">AsciiExt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>;
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ptr</span>;
 
 <span class="doccomment">/// Accessor to the raw packet data.</span>
@@ -498,17 +592,30 @@
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">marker</span>::<span class="ident">Sized</span>;
 
-    <span class="doccomment">/// Returns the offset of the current RR, or `None` if we haven&#39;t started iterating yet.</span>
+    <span class="doccomment">/// Returns the offset of the current RR, or `None` if we haven&#39;t started iterating yet</span>
+    <span class="doccomment">/// or if the current record has been deleted.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// In order to check for the later, please use `is_tombstone()` instead for clarity.</span>
     <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// Returns the offset right after the current RR</span>
+    <span class="doccomment">/// Returns the offset right after the current RR.</span>
     <span class="kw">fn</span> <span class="ident">offset_next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">usize</span>;
 
-    <span class="doccomment">/// Sets the offset of the current RR</span>
+    <span class="doccomment">/// Sets the offset of the current RR.</span>
     <span class="kw">fn</span> <span class="ident">set_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>);
 
-    <span class="doccomment">/// Sets the offset of the next RR</span>
+    <span class="doccomment">/// Sets the offset of the next RR.</span>
     <span class="kw">fn</span> <span class="ident">set_offset_next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">usize</span>);
+
+    <span class="doccomment">/// Prevents access to the current record.</span>
+    <span class="doccomment">/// This is useful after a delete operation: from a user perspective, the current</span>
+    <span class="doccomment">/// iterator doesn&#39;t point to a valid RR any more.</span>
+    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+
+    <span class="doccomment">/// Returns `true` if the record has been invalidated by a previous call to `delete()`</span>
+    <span class="kw">fn</span> <span class="ident">is_tombstone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">is_none</span>()
+    }
 
     <span class="doccomment">/// Updates the precomputed RR information</span>
     <span class="kw">fn</span> <span class="ident">recompute_rr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
@@ -523,7 +630,10 @@
     <span class="kw">fn</span> <span class="ident">raw_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">RRRawMut</span>;
 
     <span class="doccomment">/// Accesses the parsed packet structure.</span>
-    <span class="kw">fn</span> <span class="ident">parsed_packet</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParsedPacket</span>;
+    <span class="kw">fn</span> <span class="ident">parsed_packet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="ident">ParsedPacket</span>;
+
+    <span class="doccomment">/// Accesses the parsed packet structure.</span>
+    <span class="kw">fn</span> <span class="ident">parsed_packet_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParsedPacket</span>;
 
     <span class="doccomment">/// Raw packet data.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -570,7 +680,7 @@
             <span class="kw">let</span> <span class="ident">compressed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_mut</span>().<span class="ident">packet</span>;
             <span class="ident">Compress</span>::<span class="ident">uncompress_with_previous_offset</span>(<span class="ident">compressed</span>, <span class="ident">ref_offset_next</span>)<span class="question-mark">?</span>
         };
-        <span class="self">self</span>.<span class="ident">parsed_packet</span>().<span class="ident">packet</span> <span class="op">=</span> <span class="ident">uncompressed</span>;
+        <span class="self">self</span>.<span class="ident">parsed_packet_mut</span>().<span class="ident">packet</span> <span class="op">=</span> <span class="ident">uncompressed</span>;
         <span class="self">self</span>.<span class="ident">set_offset_next</span>(<span class="ident">new_offset_next</span>);
         <span class="self">self</span>.<span class="ident">recompute_sections</span>();
         <span class="self">self</span>.<span class="ident">recompute_rr</span>();
@@ -579,39 +689,18 @@
 }
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TypedIterable</span> {
-    <span class="doccomment">/// Returns the RR name (labels are dot-telimited), as a byte vector. The name is not supposed to be valid UTF-8.</span>
+    <span class="doccomment">/// Returns the RR name (labels are dot-delimited), as a byte vector. The name is not supposed to be valid UTF-8.</span>
     <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">DNSIterable</span>,
     {
         <span class="kw">let</span> <span class="ident">raw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">offset</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="number">64</span>);
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">offset</span>;
         <span class="kw">if</span> <span class="ident">raw</span>.<span class="ident">name_end</span> <span class="op">&lt;=</span> <span class="ident">offset</span> {
-            <span class="kw">return</span> <span class="ident">res</span>;
+            <span class="kw">return</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         }
         <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">raw</span>.<span class="ident">packet</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">label_len</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">packet</span>[<span class="ident">offset</span>] {
-                <span class="number">0</span> <span class="op">=&gt;</span> <span class="kw">break</span>,
-                <span class="ident">len</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&amp;</span> <span class="number">0xc0</span> <span class="op">==</span> <span class="number">0xc0</span> <span class="op">=&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">new_offset</span> <span class="op">=</span> (<span class="ident">BigEndian</span>::<span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="ident">packet</span>[<span class="ident">offset</span>..]) <span class="op">&amp;</span> <span class="number">0x3fff</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">new_offset</span> <span class="op">&lt;</span> <span class="ident">offset</span>);
-                    <span class="ident">offset</span> <span class="op">=</span> <span class="ident">new_offset</span>;
-                    <span class="kw">continue</span>;
-                }
-                <span class="ident">len</span> <span class="op">=&gt;</span> <span class="ident">len</span>,
-            } <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="ident">offset</span> <span class="op">+=</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="ident">label</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">packet</span>[<span class="ident">offset</span>..<span class="ident">offset</span> <span class="op">+</span> <span class="ident">label_len</span>];
-            <span class="ident">offset</span> <span class="op">+=</span> <span class="ident">label_len</span>;
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">res</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">res</span>.<span class="ident">push</span>(<span class="string">b&#39;.&#39;</span>);
-            }
-            <span class="ident">res</span>.<span class="ident">extend</span>(<span class="ident">label</span>);
-        }
-        <span class="ident">res</span>.<span class="ident">make_ascii_lowercase</span>();
-        <span class="ident">res</span>
+        <span class="ident">Compress</span>::<span class="ident">raw_name_to_str</span>(<span class="kw-2">&amp;</span><span class="ident">packet</span>, <span class="ident">offset</span>)
     }
 
     <span class="doccomment">/// Appends the uncompressed RR name (raw format, with labels prefixed by their length) to the given vector.</span>
@@ -628,21 +717,26 @@
     }
 
     <span class="doccomment">/// Returns the section the current record belongs to.</span>
-    <span class="kw">fn</span> <span class="ident">current_section</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Section</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">current_section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Section</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">DNSIterable</span>,
     {
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>();
         <span class="kw">let</span> <span class="ident">parsed_packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parsed_packet</span>();
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">offset</span> {
-            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_question</span> <span class="op">=&gt;</span> {
-                <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InternalError</span>(<span class="string">&quot;name before the question section&quot;</span>))
-            }
-            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_answers</span> <span class="op">=&gt;</span> <span class="ident">Section</span>::<span class="ident">Question</span>,
-            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_nameservers</span> <span class="op">=&gt;</span> <span class="ident">Section</span>::<span class="ident">Answer</span>,
-            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_additional</span> <span class="op">=&gt;</span> <span class="ident">Section</span>::<span class="ident">NameServers</span>,                
-            _ <span class="op">=&gt;</span> <span class="ident">Section</span>::<span class="ident">Additional</span>,
-        };
+        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_question</span> {
+            <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">InternalError</span>(<span class="string">&quot;name before the question section&quot;</span>));
+        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section</span>::<span class="ident">Question</span>;
+        <span class="kw">if</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_answers</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_answers</span> {
+            <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section</span>::<span class="ident">Answer</span>;
+        }
+        <span class="kw">if</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_nameservers</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_nameservers</span>
+        {
+            <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section</span>::<span class="ident">NameServers</span>
+        }
+        <span class="kw">if</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_additional</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">offset</span> <span class="op">&gt;=</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_additional</span> {
+            <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section</span>::<span class="ident">Additional</span>;
+        }
         <span class="prelude-val">Ok</span>(<span class="ident">section</span>)
     }
 
@@ -656,11 +750,9 @@
             <span class="kw">if</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
             }
-            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Setting raw name with no known offset&quot;</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">parsed_packet</span>().<span class="ident">packet</span>;
+            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">ok_or</span>(<span class="ident">ErrorKind</span>::<span class="ident">VoidRecord</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">parsed_packet_mut</span>().<span class="ident">packet</span>;
             <span class="kw">let</span> <span class="ident">packet_len</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">len</span>();
-            <span class="kw">let</span> <span class="ident">packet_ptr</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">as_mut_ptr</span>();
             <span class="kw">if</span> <span class="ident">shift</span> <span class="op">&gt;</span> <span class="number">0</span> {
                 <span class="kw">let</span> <span class="ident">new_packet_len</span> <span class="op">=</span> <span class="ident">packet_len</span> <span class="op">+</span> <span class="ident">shift</span> <span class="kw">as</span> <span class="ident">usize</span>;
                 <span class="kw">if</span> <span class="ident">new_packet_len</span> <span class="op">&gt;</span> <span class="number">0xffff</span> {
@@ -672,6 +764,7 @@
                     (<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> (<span class="ident">packet_len</span> <span class="op">-</span> <span class="ident">offset</span>) <span class="kw">as</span> <span class="ident">usize</span>
                 );
                 <span class="kw">unsafe</span> {
+                    <span class="kw">let</span> <span class="ident">packet_ptr</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">as_mut_ptr</span>();
                     <span class="ident">ptr</span>::<span class="ident">copy</span>(
                         <span class="ident">packet_ptr</span>.<span class="ident">offset</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">isize</span>),
                         <span class="ident">packet_ptr</span>.<span class="ident">offset</span>((<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">isize</span>),
@@ -681,6 +774,7 @@
             } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">shift</span> <span class="op">&lt;</span> <span class="number">0</span> {
                 <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">packet_len</span> <span class="op">&gt;=</span> (<span class="op">-</span><span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>);
                 <span class="kw">unsafe</span> {
+                    <span class="kw">let</span> <span class="ident">packet_ptr</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">as_mut_ptr</span>();
                     <span class="ident">ptr</span>::<span class="ident">copy</span>(
                         <span class="ident">packet_ptr</span>.<span class="ident">offset</span>((<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">isize</span>),
                         <span class="ident">packet_ptr</span>.<span class="ident">offset</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">isize</span>),
@@ -693,23 +787,23 @@
         <span class="kw">let</span> <span class="ident">new_offset_next</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">offset_next</span>() <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="self">self</span>.<span class="ident">set_offset_next</span>(<span class="ident">new_offset_next</span>);
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_section</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">parsed_packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parsed_packet</span>();
+        <span class="kw">let</span> <span class="ident">parsed_packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parsed_packet_mut</span>();
         <span class="kw">if</span> <span class="ident">section</span> <span class="op">==</span> <span class="ident">Section</span>::<span class="ident">NameServers</span> <span class="op">||</span> <span class="ident">section</span> <span class="op">==</span> <span class="ident">Section</span>::<span class="ident">Answer</span> <span class="op">||</span>
             <span class="ident">section</span> <span class="op">==</span> <span class="ident">Section</span>::<span class="ident">Question</span>
         {
-            <span class="ident">parsed_packet</span>.<span class="ident">offset_additional</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
-                (<span class="ident">parsed_packet</span>.<span class="ident">offset_additional</span>.<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-            )
+            <span class="ident">parsed_packet</span>.<span class="ident">offset_additional</span> <span class="op">=</span> <span class="ident">parsed_packet</span>
+                .<span class="ident">offset_additional</span>
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>)
         }
         <span class="kw">if</span> <span class="ident">section</span> <span class="op">==</span> <span class="ident">Section</span>::<span class="ident">Answer</span> <span class="op">||</span> <span class="ident">section</span> <span class="op">==</span> <span class="ident">Section</span>::<span class="ident">Question</span> {
-            <span class="ident">parsed_packet</span>.<span class="ident">offset_nameservers</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
-                (<span class="ident">parsed_packet</span>.<span class="ident">offset_nameservers</span>.<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-            )
+            <span class="ident">parsed_packet</span>.<span class="ident">offset_nameservers</span> <span class="op">=</span> <span class="ident">parsed_packet</span>
+                .<span class="ident">offset_nameservers</span>
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>)
         }
         <span class="kw">if</span> <span class="ident">section</span> <span class="op">==</span> <span class="ident">Section</span>::<span class="ident">Question</span> {
-            <span class="ident">parsed_packet</span>.<span class="ident">offset_answers</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
-                (<span class="ident">parsed_packet</span>.<span class="ident">offset_answers</span>.<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-            )
+            <span class="ident">parsed_packet</span>.<span class="ident">offset_answers</span> <span class="op">=</span> <span class="ident">parsed_packet</span>
+                .<span class="ident">offset_answers</span>
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">+</span> <span class="ident">shift</span>) <span class="kw">as</span> <span class="ident">usize</span>)
         }
         <span class="prelude-val">Ok</span>(())
     }
@@ -723,29 +817,68 @@
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">name</span>[..<span class="ident">new_name_len</span>];
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">parsed_packet</span>().<span class="ident">maybe_compressed</span> {
             <span class="kw">let</span> (<span class="ident">uncompressed</span>, <span class="ident">new_offset</span>) <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">ref_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>()
-                    .<span class="ident">expect</span>(<span class="string">&quot;Setting raw name with no known offset&quot;</span>);
+                <span class="kw">let</span> <span class="ident">ref_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">ok_or</span>(<span class="ident">ErrorKind</span>::<span class="ident">VoidRecord</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">compressed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_mut</span>().<span class="ident">packet</span>;
                 <span class="ident">Compress</span>::<span class="ident">uncompress_with_previous_offset</span>(<span class="ident">compressed</span>, <span class="ident">ref_offset</span>)<span class="question-mark">?</span>
             };
-            <span class="self">self</span>.<span class="ident">parsed_packet</span>().<span class="ident">packet</span> <span class="op">=</span> <span class="ident">uncompressed</span>;
+            <span class="self">self</span>.<span class="ident">parsed_packet_mut</span>().<span class="ident">packet</span> <span class="op">=</span> <span class="ident">uncompressed</span>;
             <span class="self">self</span>.<span class="ident">set_offset</span>(<span class="ident">new_offset</span>);
             <span class="self">self</span>.<span class="ident">recompute_rr</span>(); <span class="comment">// XXX - Just for sanity, but not strictly required here</span>
             <span class="self">self</span>.<span class="ident">recompute_sections</span>();
         }
-
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Setting raw name with no known offset&quot;</span>);
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">ok_or</span>(<span class="ident">ErrorKind</span>::<span class="ident">VoidRecord</span>)<span class="question-mark">?</span>;
         <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">parsed_packet</span>().<span class="ident">maybe_compressed</span>, <span class="bool-val">false</span>);
         <span class="kw">let</span> <span class="ident">current_name_len</span> <span class="op">=</span> <span class="ident">Compress</span>::<span class="ident">raw_name_len</span>(<span class="self">self</span>.<span class="ident">name_slice</span>());
         <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">new_name_len</span> <span class="kw">as</span> <span class="ident">isize</span> <span class="op">-</span> <span class="ident">current_name_len</span> <span class="kw">as</span> <span class="ident">isize</span>;
         <span class="self">self</span>.<span class="ident">resize_rr</span>(<span class="ident">shift</span>)<span class="question-mark">?</span>;
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">parsed_packet</span>().<span class="ident">packet</span>;
+            <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">parsed_packet_mut</span>().<span class="ident">packet</span>;
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">packet</span>[<span class="ident">offset</span>..<span class="ident">offset</span> <span class="op">+</span> <span class="ident">new_name_len</span>].<span class="ident">copy_from_slice</span>(<span class="ident">name</span>);
         }
         <span class="self">self</span>.<span class="ident">recompute_rr</span>();
 
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Deletes the record</span>
+    <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span>,
+    {
+        <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">ok_or</span>(<span class="ident">ErrorKind</span>::<span class="ident">VoidRecord</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_section</span>()<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">parsed_packet</span>().<span class="ident">maybe_compressed</span> {
+            <span class="kw">let</span> (<span class="ident">uncompressed</span>, <span class="ident">new_offset</span>) <span class="op">=</span> {
+                <span class="kw">let</span> <span class="ident">ref_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">expect</span>(<span class="string">&quot;delete() called on a tombstone&quot;</span>);
+                <span class="kw">let</span> <span class="ident">compressed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_mut</span>().<span class="ident">packet</span>;
+                <span class="ident">Compress</span>::<span class="ident">uncompress_with_previous_offset</span>(<span class="ident">compressed</span>, <span class="ident">ref_offset</span>)<span class="question-mark">?</span>
+            };
+            <span class="self">self</span>.<span class="ident">parsed_packet_mut</span>().<span class="ident">packet</span> <span class="op">=</span> <span class="ident">uncompressed</span>;
+            <span class="self">self</span>.<span class="ident">set_offset</span>(<span class="ident">new_offset</span>);
+            <span class="self">self</span>.<span class="ident">recompute_rr</span>(); <span class="comment">// XXX - Just for sanity, but not strictly required here</span>
+            <span class="self">self</span>.<span class="ident">recompute_sections</span>();
+        }
+        <span class="kw">let</span> <span class="ident">rr_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset_next</span>() <span class="op">-</span>
+            <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">expect</span>(
+                <span class="string">&quot;Deleting record with no known offset after optional decompression&quot;</span>,
+            );
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">rr_len</span> <span class="op">&gt;</span> <span class="number">0</span>);
+        <span class="self">self</span>.<span class="ident">resize_rr</span>(<span class="op">-</span>(<span class="ident">rr_len</span> <span class="kw">as</span> <span class="ident">isize</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>().<span class="ident">unwrap</span>();
+        <span class="self">self</span>.<span class="ident">set_offset_next</span>(<span class="ident">offset</span>);
+        <span class="self">self</span>.<span class="ident">invalidate</span>();
+        <span class="kw">let</span> <span class="ident">parsed_packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parsed_packet_mut</span>();
+        <span class="kw">let</span> <span class="ident">rrcount</span> <span class="op">=</span> <span class="ident">parsed_packet</span>.<span class="ident">rrcount_dec</span>(<span class="ident">section</span>)<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="ident">rrcount</span> <span class="op">&lt;=</span> <span class="number">0</span> {
+            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">section</span> {
+                <span class="ident">Section</span>::<span class="ident">Question</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_question</span>,
+                <span class="ident">Section</span>::<span class="ident">Answer</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_answers</span>,
+                <span class="ident">Section</span>::<span class="ident">NameServers</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_nameservers</span>,
+                <span class="ident">Section</span>::<span class="ident">Additional</span> <span class="op">=&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">parsed_packet</span>.<span class="ident">offset_additional</span>,
+                _ <span class="op">=&gt;</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;delete() cannot be used to delete EDNS pseudo-records&quot;</span>),
+            };
+            <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        }
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -793,6 +926,59 @@
         <span class="self">Self</span>: <span class="ident">DNSIterable</span> <span class="op">+</span> <span class="ident">TypedIterable</span>,
     {
         <span class="ident">BigEndian</span>::<span class="ident">read_u16</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rdata_slice</span>()[<span class="ident">DNS_RR_RDLEN_OFFSET</span>..]) <span class="kw">as</span> <span class="ident">usize</span>
+    }
+
+    <span class="doccomment">/// Retrieves the IP address of an `A` or `AAAA` record.</span>
+    <span class="kw">fn</span> <span class="ident">rr_ip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span> <span class="op">+</span> <span class="ident">TypedIterable</span>,
+    {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rr_type</span>() {
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">A</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rdata_slice</span>();
+                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">rdata</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">4</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ip</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
+                <span class="ident">ip</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">rdata</span>[<span class="ident">DNS_RR_HEADER_SIZE</span>..<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">4</span>]);
+                <span class="prelude-val">Ok</span>(<span class="ident">IpAddr</span>::<span class="ident">V4</span>(<span class="ident">Ipv4Addr</span>::<span class="ident">from</span>(<span class="ident">ip</span>)))
+            }
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">AAAA</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> {
+                <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rdata_slice</span>();
+                <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">rdata</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">16</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ip</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
+                <span class="ident">ip</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">rdata</span>[<span class="ident">DNS_RR_HEADER_SIZE</span>..<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">16</span>]);
+                <span class="prelude-val">Ok</span>(<span class="ident">IpAddr</span>::<span class="ident">V6</span>(<span class="ident">Ipv6Addr</span>::<span class="ident">from</span>(<span class="ident">ip</span>)))
+            }
+            _ <span class="op">=&gt;</span> <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">PropertyNotFound</span>),
+        }
+    }
+
+    <span class="doccomment">/// Changes the IP address of an `A` or `AAAA` record.</span>
+    <span class="kw">fn</span> <span class="ident">set_rr_ip</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ip</span>: <span class="kw-2">&amp;</span><span class="ident">IpAddr</span>) <span class="op">-&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="self">Self</span>: <span class="ident">DNSIterable</span> <span class="op">+</span> <span class="ident">TypedIterable</span>,
+    {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rr_type</span>() {
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">A</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">ip</span> {
+                <span class="ident">IpAddr</span>::<span class="ident">V4</span>(<span class="ident">ip</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rdata_slice_mut</span>();
+                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">rdata</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">4</span>);
+                    <span class="ident">rdata</span>[<span class="ident">DNS_RR_HEADER_SIZE</span>..<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">4</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">ip</span>.<span class="ident">octets</span>());
+                    <span class="prelude-val">Ok</span>(())
+                }
+                _ <span class="op">=&gt;</span> <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">WrongAddressFamily</span>),
+            },
+            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">Type</span>::<span class="ident">AAAA</span>.<span class="ident">into</span>() <span class="op">=&gt;</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">ip</span> {
+                <span class="ident">IpAddr</span>::<span class="ident">V6</span>(<span class="ident">ip</span>) <span class="op">=&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rdata_slice_mut</span>();
+                    <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">rdata</span>.<span class="ident">len</span>() <span class="op">&gt;=</span> <span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">16</span>);
+                    <span class="ident">rdata</span>[<span class="ident">DNS_RR_HEADER_SIZE</span>..<span class="ident">DNS_RR_HEADER_SIZE</span> <span class="op">+</span> <span class="number">16</span>]
+                        .<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">ip</span>.<span class="ident">octets</span>());
+                    <span class="prelude-val">Ok</span>(())
+                }
+                _ <span class="op">=&gt;</span> <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">WrongAddressFamily</span>),
+            },
+            _ <span class="op">=&gt;</span> <span class="macro">bail</span><span class="macro">!</span>(<span class="ident">ErrorKind</span>::<span class="ident">PropertyNotFound</span>),
+        }
     }
 }
 
@@ -940,7 +1126,6 @@
         window.rootPath = "../../";
         window.currentCrate = "dnssector";
     </script>
-    <script src="../../jquery.js"></script>
     <script src="../../main.js"></script>
     <script defer src="../../search-index.js"></script>
 </body>
