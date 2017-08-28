@@ -139,6 +139,8 @@ Action hook_recv(const EdgeDNSFnTable *edgedns_fn_table, SessionState *session_s
     {
         printf("Question received: [%s] with type: %" PRIu16 "\n", name, rr_type);
     }
+    edgedns_fn_table->set_session_id(session_state, NULL, "42", 2);
+
     return ACTION_PASS;
 }
 
