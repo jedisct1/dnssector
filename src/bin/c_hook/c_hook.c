@@ -65,14 +65,42 @@ static bool rr_it(void *ctx, void *it)
         printf("\tip6=%u.%u.%u.%u\n", ip[0], ip[1], ip[2], ip[3]);
     }
     fn_table->set_rr_ttl(it, 42);
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x02" "x2" "\x03" "net",
-                           sizeof "\x02" "x2" "\x03" "net");
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x01" "x" "\x03" "org",
-                           sizeof "\x01" "x" "\x03" "org");
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07" "example" "\x03" "com",
-                           sizeof "\x07" "example" "\x03" "com");
-    fn_table->set_raw_name(it, NULL, (const uint8_t *)"\x07" "example" "\x03" "com",
-                           sizeof "\x07" "example" "\x03" "com");
+    fn_table->set_raw_name(it, NULL,
+                           (const uint8_t *)"\x02"
+                                            "x2"
+                                            "\x03"
+                                            "net",
+                           sizeof "\x02"
+                                  "x2"
+                                  "\x03"
+                                  "net");
+    fn_table->set_raw_name(it, NULL,
+                           (const uint8_t *)"\x01"
+                                            "x"
+                                            "\x03"
+                                            "org",
+                           sizeof "\x01"
+                                  "x"
+                                  "\x03"
+                                  "org");
+    fn_table->set_raw_name(it, NULL,
+                           (const uint8_t *)"\x07"
+                                            "example"
+                                            "\x03"
+                                            "com",
+                           sizeof "\x07"
+                                  "example"
+                                  "\x03"
+                                  "com");
+    fn_table->set_raw_name(it, NULL,
+                           (const uint8_t *)"\x07"
+                                            "example"
+                                            "\x03"
+                                            "com",
+                           sizeof "\x07"
+                                  "example"
+                                  "\x03"
+                                  "com");
     fn_table->set_name(it, NULL, "example.com.", sizeof "example.com." - 1, NULL, 0);
     fn_table->set_name(it, NULL, "example.com", sizeof "example.com" - 1, NULL, 0);
     fn_table->set_name(it, NULL, "a.pretty.long.example.com", sizeof "a.pretty.long.example.com" - 1, NULL, 0);
@@ -100,7 +128,7 @@ static bool rr_it2(void *ctx, void *it)
     return 0;
 }
 
-Action hook_recv(const FnTable *fn_table, ParsedPacket *parsed_packet)
+Action hook_recv(const EdgeDNSFnTable *edgedns_fn_table, SessionState *session_state, const FnTable *fn_table, ParsedPacket *parsed_packet)
 {
     char name[DNS_MAX_HOSTNAME_LEN + 1];
     uint16_t rr_type;
@@ -114,7 +142,7 @@ Action hook_recv(const FnTable *fn_table, ParsedPacket *parsed_packet)
     return ACTION_PASS;
 }
 
-Action hook_deliver(const FnTable *fn_table, ParsedPacket *parsed_packet)
+Action hook_deliver(const EdgeDNSFnTable *edgedns_fn_table, SessionState *session_state, const FnTable *fn_table, ParsedPacket *parsed_packet)
 {
     uint32_t flags;
 

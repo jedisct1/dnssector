@@ -11,7 +11,21 @@
 #define DNS_MAX_PACKET_SIZE 8192
 
 typedef struct ParsedPacket ParsedPacket;
+typedef struct SessionState SessionState;
 typedef struct CErr CErr;
+
+typedef struct EdgeDNSFnTable
+{
+    const char *(*error_description)(const CErr *err);
+    int (*env_insert_str)(SessionState *session_state, const CErr **err,
+                          const char *key, const char *val);
+    int (*env_insert_i64)(SessionState *session_state, const CErr **err,
+                          const char *key, int64_t i64);
+    int (*env_get_str)(const SessionState *session_state, const CErr **err,
+                       const char *key, char *val_p, size_t *val_len_p, size_t val_max_len);
+    int (*env_get_i64)(const SessionState *session_state, const CErr **err,
+                       const char *key, int64_t *i64);
+} EdgeDNSFnTable;
 
 typedef struct FnTable
 {
@@ -52,7 +66,7 @@ typedef enum Action {
     ACTION_DROP
 } Action;
 
-Action hook_recv(const FnTable *fn_table, ParsedPacket *parsed_packet);
-Action hook_deliver(const FnTable *fn_table, ParsedPacket *parsed_packet);
+Action hook_recv(const EdgeDNSFnTable *edgedns_fn_table, SessionState *session_state, const FnTable *fn_table, ParsedPacket *parsed_packet);
+Action hook_deliver(const EdgeDNSFnTable *edgedns_fn_table, SessionState *session_state, const FnTable *fn_table, ParsedPacket *parsed_packet);
 
 #endif
