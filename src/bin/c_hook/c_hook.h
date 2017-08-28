@@ -18,13 +18,13 @@ typedef struct EdgeDNSFnTable
 {
     const char *(*error_description)(const CErr *err);
     int (*env_insert_str)(SessionState *session_state, const CErr **err,
-                          const char *key, const char *val);
+                          const char *key, size_t key_len, const char *val, size_t val_len);
     int (*env_insert_i64)(SessionState *session_state, const CErr **err,
-                          const char *key, int64_t i64);
+                          const char *key, size_t key_len, int64_t i64);
     int (*env_get_str)(const SessionState *session_state, const CErr **err,
-                       const char *key, char *val_p, size_t *val_len_p, size_t val_max_len);
+                       const char *key, size_t key_len, char *val_p, size_t *val_len_p, size_t val_max_len);
     int (*env_get_i64)(const SessionState *session_state, const CErr **err,
-                       const char *key, int64_t *i64);
+                       const char *key, size_t key_len, int64_t *i64);
 } EdgeDNSFnTable;
 
 typedef struct FnTable
