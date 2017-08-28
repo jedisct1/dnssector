@@ -17,6 +17,7 @@ typedef struct CErr CErr;
 typedef struct EdgeDNSFnTable
 {
     const char *(*error_description)(const CErr *err);
+    int (*set_session_id)(SessionState *session_state, const CErr **err, const char *session_id, size_t session_id_len);
     int (*env_insert_str)(SessionState *session_state, const CErr **err,
                           const char *key, size_t key_len, const char *val, size_t val_len);
     int (*env_insert_i64)(SessionState *session_state, const CErr **err,
