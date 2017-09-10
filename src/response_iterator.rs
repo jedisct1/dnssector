@@ -1,6 +1,5 @@
 use constants::*;
 use dns_sector::*;
-use errors::*;
 use parsed_packet::*;
 use rr_iterator::*;
 

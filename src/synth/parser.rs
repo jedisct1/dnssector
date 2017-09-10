@@ -2,8 +2,8 @@ use super::gen::*;
 use chomp::ascii::*;
 use chomp::combinators::*;
 use chomp::parsers;
-use chomp::prelude::{eof, not_token, parse_only, peek, satisfy, skip_while, string, take_while,
-                     token, Buffer, Input, SimpleResult, U8Input, take_while1};
+use chomp::prelude::{eof, not_token, satisfy, skip_while, token, Buffer, Input, SimpleResult,
+                     U8Input, take_while1};
 use chomp::primitives::Primitives;
 use constants::*;
 use errors::*;

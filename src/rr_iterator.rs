@@ -4,7 +4,6 @@ use constants::*;
 use dns_sector::*;
 use errors::*;
 use parsed_packet::*;
-use std::ascii::AsciiExt;
 use std::marker;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::ptr;
