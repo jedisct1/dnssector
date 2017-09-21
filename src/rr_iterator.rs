@@ -229,8 +229,8 @@ pub trait TypedIterable {
         self.set_offset_next(new_offset_next);
         let section = self.current_section()?;
         let parsed_packet = self.parsed_packet_mut();
-        if section == Section::NameServers || section == Section::Answer ||
-            section == Section::Question
+        if section == Section::NameServers || section == Section::Answer
+            || section == Section::Question
         {
             parsed_packet.offset_additional = parsed_packet
                 .offset_additional
@@ -299,10 +299,9 @@ pub trait TypedIterable {
             self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
             self.recompute_sections();
         }
-        let rr_len = self.offset_next() -
-            self.offset().expect(
-                "Deleting record with no known offset after optional decompression",
-            );
+        let rr_len = self.offset_next()
+            - self.offset()
+                .expect("Deleting record with no known offset after optional decompression");
         assert!(rr_len > 0);
         self.resize_rr(-(rr_len as isize))?;
         let offset = self.offset().unwrap();

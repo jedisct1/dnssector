@@ -151,8 +151,8 @@ impl Compress {
             Some(x) if x == Type::MX.into() => {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
-                let new_rdlen = 2 +
-                    Compress::copy_uncompressed_name(
+                let new_rdlen = 2
+                    + Compress::copy_uncompressed_name(
                         &mut uncompressed,
                         packet,
                         offset_rdata + DNS_RR_HEADER_SIZE + 2,
@@ -218,8 +218,8 @@ impl Compress {
             Some(x) if x == Type::MX.into() => {
                 let offset = compressed.len();
                 compressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
-                let new_rdlen = 2 +
-                    Compress::copy_compressed_name(
+                let new_rdlen = 2
+                    + Compress::copy_compressed_name(
                         &mut dict,
                         &mut compressed,
                         packet,
@@ -554,8 +554,8 @@ impl SuffixDict {
         }
         for i in 0..self.count {
             let candidate = &self.suffixes[i];
-            if candidate.len <= suffix_len &&
-                Self::raw_names_eq_ignore_case(suffix, &candidate.suffix[..candidate.len])
+            if candidate.len <= suffix_len
+                && Self::raw_names_eq_ignore_case(suffix, &candidate.suffix[..candidate.len])
             {
                 return Some(candidate.offset);
             }
