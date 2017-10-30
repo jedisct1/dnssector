@@ -121,6 +121,7 @@ impl DNSSector {
         Ok((BigEndian::read_u16(&self.packet[offset..])))
     }
 
+    #[allow(dead_code)]
     #[inline]
     fn be32_load(&self, rr_offset: usize) -> Result<u32> {
         self.ensure_remaining_len(rr_offset + 4)?;
@@ -155,6 +156,7 @@ impl DNSSector {
     }
 
     /// Returns the TTL of the record currently being parsed.
+    #[allow(dead_code)]
     #[inline]
     fn rr_ttl(&self) -> Result<u32> {
         self.be32_load(DNS_RR_TTL_OFFSET)
@@ -385,6 +387,7 @@ impl DNSSector {
         Ok((self.packet[offset] as u16) << 8 | self.packet[offset + 1] as u16)
     }
 
+    #[allow(dead_code)]
     #[inline]
     fn edns_be32_load(&self, rr_offset: usize) -> Result<u32> {
         self.edns_ensure_remaining_len(rr_offset + 4)?;
@@ -397,6 +400,7 @@ impl DNSSector {
     }
 
     /// Returns the extended code of a record within the edns pseudo-section.
+    #[allow(dead_code)]
     #[inline]
     fn edns_rr_code(&self) -> Result<u16> {
         self.edns_be16_load(DNS_EDNS_RR_CODE_OFFSET)
@@ -417,6 +421,7 @@ impl DNSSector {
     }
 
     /// Returns the maximum payload size for UDP packets, from an optional `OPT` record.
+    #[allow(dead_code)]
     #[inline]
     fn opt_rr_max_payload(&self) -> Result<usize> {
         self.be16_load(DNS_OPT_RR_MAX_PAYLOAD_OFFSET)

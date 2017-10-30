@@ -33,6 +33,7 @@ fn is_horizontal_whitespace(c: u8) -> bool {
     c == b' ' || c == b'\t'
 }
 
+#[allow(dead_code)]
 fn is_not_horizontal_whitespace(c: u8) -> bool {
     !is_horizontal_whitespace(c)
 }
@@ -103,6 +104,7 @@ fn is_hexdigit(c: u8) -> bool {
     }
 }
 
+#[allow(dead_code)]
 fn from_hexdigit(c: u8) -> u8 {
     match c {
         b'0'...b'9' => c - b'0',
@@ -112,6 +114,7 @@ fn from_hexdigit(c: u8) -> u8 {
     }
 }
 
+#[allow(dead_code)]
 fn hex_u16<I: Input<Token = u8>>(i: I) -> SimpleResult<I, u16> {
     take_while1(i, is_hexdigit).bind(|i, it| {
         let v = it.fold(Some(0u16), |x, c| {
@@ -148,6 +151,7 @@ fn maybe_escaped_char<I: U8Input>(i: I) -> SimpleResult<I, u8> {
     }
 }
 
+#[allow(dead_code)]
 fn escaped_string_until_whitespace<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     parse!{i;
         let all = i -> {
@@ -209,10 +213,10 @@ fn ipv6_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv6Addr> {
     })
 }
 
+#[allow(dead_code)]
 fn hexstring_parser<I: U8Input>(i: I) -> SimpleResult<I, String> {
-    take_while1(i, |c| is_hexdigit(c)).bind(|i, hex_str| {
-        i.ret(str::from_utf8(&hex_str.into_vec()).unwrap().to_owned())
-    })
+    take_while1(i, |c| is_hexdigit(c))
+        .bind(|i, hex_str| i.ret(str::from_utf8(&hex_str.into_vec()).unwrap().to_owned()))
 }
 
 fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
@@ -258,6 +262,7 @@ fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     )
 }
 
+#[allow(dead_code)]
 fn addr_arpa_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     parse!{i;
         let ptr = i -> {

@@ -461,50 +461,45 @@ unsafe extern "C" fn question(
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
-    pub error_description:
-        unsafe extern "C" fn(c_err: *const CErr) -> *const c_char,
+    pub error_description: unsafe extern "C" fn(c_err: *const CErr) -> *const c_char,
     pub flags: unsafe extern "C" fn(parsed_packet: *const ParsedPacket) -> u32,
     pub set_flags: unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, flags: u32),
     pub rcode: unsafe extern "C" fn(parsed_packet: *const ParsedPacket) -> u8,
     pub set_rcode: unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rcode: u8),
     pub opcode: unsafe extern "C" fn(parsed_packet: *const ParsedPacket) -> u8,
     pub set_opcode: unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, opcode: u8),
-    pub iter_answer:
-        unsafe extern "C" fn(
-            parsed_packet: *mut ParsedPacket,
-            cb: unsafe extern "C" fn(
-                ctx: *mut c_void,
-                section_iterator: *const SectionIterator,
-            ) -> bool,
-            *mut c_void,
-        ),
-    pub iter_nameservers:
-        unsafe extern "C" fn(
-            parsed_packet: *mut ParsedPacket,
-            cb: unsafe extern "C" fn(
-                ctx: *mut c_void,
-                section_iterator: *const SectionIterator,
-            ) -> bool,
-            *mut c_void,
-        ),
-    pub iter_additional:
-        unsafe extern "C" fn(
-            parsed_packet: *mut ParsedPacket,
-            cb: unsafe extern "C" fn(
-                ctx: *mut c_void,
-                section_iterator: *const SectionIterator,
-            ) -> bool,
-            *mut c_void,
-        ),
-    pub iter_edns:
-        unsafe extern "C" fn(
-            parsed_packet: *mut ParsedPacket,
-            cb: unsafe extern "C" fn(
-                ctx: *mut c_void,
-                section_iterator: *const EdnsIterator,
-            ) -> bool,
-            *mut c_void,
-        ),
+    pub iter_answer: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        cb: unsafe extern "C" fn(
+            ctx: *mut c_void,
+            section_iterator: *const SectionIterator,
+        ) -> bool,
+        *mut c_void,
+    ),
+    pub iter_nameservers: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        cb: unsafe extern "C" fn(
+            ctx: *mut c_void,
+            section_iterator: *const SectionIterator,
+        ) -> bool,
+        *mut c_void,
+    ),
+    pub iter_additional: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        cb: unsafe extern "C" fn(
+            ctx: *mut c_void,
+            section_iterator: *const SectionIterator,
+        ) -> bool,
+        *mut c_void,
+    ),
+    pub iter_edns: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        cb: unsafe extern "C" fn(
+            ctx: *mut c_void,
+            section_iterator: *const EdnsIterator,
+        ) -> bool,
+        *mut c_void,
+    ),
     pub name: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
         name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
@@ -518,11 +513,12 @@ pub struct FnTable {
         addr: *mut u8,
         addr_len: &mut size_t,
     ),
-    pub set_rr_ip: unsafe extern "C" fn(
-        section_iterator: &mut SectionIterator,
-        addr: *const u8,
-        addr_len: size_t,
-    ),
+    pub set_rr_ip:
+        unsafe extern "C" fn(
+            section_iterator: &mut SectionIterator,
+            addr: *const u8,
+            addr_len: size_t,
+        ),
     pub raw_name_from_str: unsafe extern "C" fn(
         raw_name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
         raw_name_len: *mut size_t,
@@ -544,10 +540,9 @@ pub struct FnTable {
         default_zone_raw: *const u8,
         default_zone_raw_len: size_t,
     ) -> c_int,
-    pub delete: unsafe extern "C" fn(
-        section_iterator: &mut SectionIterator,
-        c_err: *mut *const CErr,
-    ) -> c_int,
+    pub delete:
+        unsafe extern "C" fn(section_iterator: &mut SectionIterator, c_err: *mut *const CErr)
+            -> c_int,
     pub add_to_question: unsafe extern "C" fn(
         parsed_packet: *mut ParsedPacket,
         c_err: *mut *const CErr,
