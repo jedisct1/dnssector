@@ -184,14 +184,12 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(
-                errors::Error(
-                    errors::ErrorKind::InvalidPacket(
-                        "AAAA record doesn\'t include a 16 bytes IP address",
-                    ),
-                    _,
+            Some(errors::Error(
+                errors::ErrorKind::InvalidPacket(
+                    "AAAA record doesn\'t include a 16 bytes IP address",
                 ),
-            ) => assert!(true),
+                _,
+            )) => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }

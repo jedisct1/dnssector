@@ -16,11 +16,13 @@ use std::u32;
 pub fn string_nocase<I: Input<Token = u8>>(mut i: I, s: &[u8]) -> SimpleResult<I, I::Buffer> {
     let mut n = 0;
     let len = s.len();
-    let b = i.consume_while(|c| if n >= len || !c.eq_ignore_ascii_case(&s[n]) {
-        false
-    } else {
-        n += 1;
-        true
+    let b = i.consume_while(|c| {
+        if n >= len || !c.eq_ignore_ascii_case(&s[n]) {
+            false
+        } else {
+            n += 1;
+            true
+        }
     });
     if n >= len {
         i.ret(b)
@@ -253,13 +255,13 @@ fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
             }
             _ => false,
         }
-    }).bind(
-        |i, name| if format_err || (only_numeric && label_len == 0) {
+    }).bind(|i, name| {
+        if format_err || (only_numeric && label_len == 0) {
             i.err(parsers::Error::unexpected())
         } else {
             i.ret(name.into_vec())
-        },
-    )
+        }
+    })
 }
 
 #[allow(dead_code)]
