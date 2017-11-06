@@ -68,6 +68,39 @@ impl Renamer {
         Ok(Some(res))
     }
 
+    fn copy_with_replaced_name(
+        mut renamed_packet: &mut Vec<u8>,
+        packet: &[u8],
+        offset: usize,
+        mut suffix_dict: &mut SuffixDict,
+        target_name: &[u8],
+        source_name: &[u8],
+        match_suffix: bool,
+    ) -> Result<()> {
+        let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
+        let _compressed_name_len = Compress::copy_uncompressed_name(&mut name, packet, offset);
+        let replaced_name = Self::replace_raw(&name, target_name, source_name, match_suffix)?;
+        match replaced_name {
+            None => {
+                Compress::copy_compressed_name(
+                    &mut suffix_dict,
+                    &mut renamed_packet,
+                    packet,
+                    offset,
+                );
+            }
+            Some(replaced_name) => {
+                Compress::copy_compressed_name(
+                    &mut suffix_dict,
+                    &mut renamed_packet,
+                    &replaced_name,
+                    0,
+                );
+            }
+        };
+        Ok(())
+    }
+
     fn rename_question_section(
         mut renamed_packet: &mut Vec<u8>,
         parsed_packet: &mut ParsedPacket,
@@ -75,34 +108,20 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<Vec<u8>> {
+    ) -> Result<()> {
         let mut it = parsed_packet.into_iter_question();
         while let Some(item) = it {
             {
                 let raw = item.raw();
-                let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
-                let _compressed_name_len =
-                    Compress::copy_uncompressed_name(&mut name, raw.packet, raw.offset);
-                let replaced_name =
-                    Self::replace_raw(&name, target_name, source_name, match_suffix)?;
-                match replaced_name {
-                    None => {
-                        Compress::copy_compressed_name(
-                            &mut suffix_dict,
-                            &mut renamed_packet,
-                            raw.packet,
-                            raw.offset,
-                        );
-                    }
-                    Some(replaced_name) => {
-                        Compress::copy_compressed_name(
-                            &mut suffix_dict,
-                            &mut renamed_packet,
-                            &replaced_name,
-                            0,
-                        );
-                    }
-                }
+                Self::copy_with_replaced_name(
+                    &mut renamed_packet,
+                    &raw.packet,
+                    raw.offset,
+                    &mut suffix_dict,
+                    &target_name,
+                    &source_name,
+                    match_suffix,
+                )?;
                 if raw.packet.len() < raw.name_end + DNS_RR_QUESTION_HEADER_SIZE {
                     bail!("Short question RR");
                 }
@@ -111,7 +130,50 @@ impl Renamer {
             }
             it = item.next();
         }
-        Ok(Vec::new())
+        Ok(())
+    }
+
+    fn rename_answer_section(
+        mut renamed_packet: &mut Vec<u8>,
+        parsed_packet: &mut ParsedPacket,
+        mut suffix_dict: &mut SuffixDict,
+        target_name: &[u8],
+        source_name: &[u8],
+        match_suffix: bool,
+    ) -> Result<()> {
+        let mut it = parsed_packet.into_iter_answer();
+        while let Some(item) = it {
+            {
+                let raw = item.raw();
+                Self::copy_with_replaced_name(
+                    &mut renamed_packet,
+                    &raw.packet,
+                    raw.offset,
+                    &mut suffix_dict,
+                    &target_name,
+                    &source_name,
+                    match_suffix,
+                )?;
+                if raw.packet.len() < raw.name_end + DNS_RR_HEADER_SIZE {
+                    bail!("Short response RR");
+                }
+                let rr_type = item.rr_type();
+                match rr_type {
+                    x if x == Type::NS.into() || x == Type::CNAME.into()
+                        || x == Type::PTR.into() =>
+                    {
+                        let rd_len = item.rr_rdlen();
+                        let packet = &raw.packet;
+                        let offset_rdata = raw.name_end;
+                        let rdata = &packet[offset_rdata..];
+                    }
+                    _ => {}
+                };
+                renamed_packet.extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_HEADER_SIZE]);
+            }
+            it = item.next();
+        }
+        Ok(())
     }
 
     pub fn rename_with_raw_names(
@@ -128,7 +190,7 @@ impl Renamer {
         }
         let mut renamed_packet = Vec::with_capacity(parsed_packet.packet.len());
         let mut suffix_dict = SuffixDict::new();
-        let packet = Self::rename_question_section(
+        Self::rename_question_section(
             &mut renamed_packet,
             &mut parsed_packet,
             &mut suffix_dict,
@@ -136,7 +198,14 @@ impl Renamer {
             source_name,
             match_suffix,
         )?;
-
-        Ok(packet)
+        Self::rename_answer_section(
+            &mut renamed_packet,
+            &mut parsed_packet,
+            &mut suffix_dict,
+            target_name,
+            source_name,
+            match_suffix,
+        )?;
+        Ok(renamed_packet)
     }
 }
