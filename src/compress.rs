@@ -3,6 +3,7 @@ use constants::*;
 use dns_sector::*;
 use errors::*;
 use rr_iterator::*;
+#[allow(unused_imports)]
 use std::ascii::AsciiExt;
 use std::cmp;
 

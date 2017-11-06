@@ -7,6 +7,7 @@ use chomp::prelude::{eof, not_token, satisfy, skip_while, token, Buffer, Input, 
 use chomp::primitives::Primitives;
 use constants::*;
 use errors::*;
+#[allow(unused_imports)]
 use std::ascii::AsciiExt;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::{self, FromStr};

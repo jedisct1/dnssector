@@ -3,6 +3,7 @@ use constants::*;
 use errors::*;
 use parsed_packet::*;
 use rr_iterator::*;
+#[allow(unused_imports)]
 use std::ascii::AsciiExt;
 
 pub struct Renamer;
