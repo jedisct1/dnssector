@@ -68,21 +68,14 @@ impl Renamer {
         Ok(Some(res))
     }
 
-    pub fn rename_with_raw_names(
+    fn rename_question_section(
+        mut renamed_packet: &mut Vec<u8>,
         parsed_packet: &mut ParsedPacket,
+        mut suffix_dict: &mut SuffixDict,
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
     ) -> Result<Vec<u8>> {
-        if target_name.len() <= 0 || source_name.len() <= 0 {
-            bail!("Empty name");
-        }
-        if target_name.len() > DNS_MAX_HOSTNAME_LEN || source_name.len() > DNS_MAX_HOSTNAME_LEN {
-            bail!("Name too long");
-        }
-        let mut renamed_packet = Vec::with_capacity(parsed_packet.packet.len());
-        let mut suffix_dict = SuffixDict::new();
-
         let mut it = parsed_packet.into_iter_question();
         while let Some(item) = it {
             {
@@ -119,5 +112,31 @@ impl Renamer {
             it = item.next();
         }
         Ok(Vec::new())
+    }
+
+    pub fn rename_with_raw_names(
+        mut parsed_packet: &mut ParsedPacket,
+        target_name: &[u8],
+        source_name: &[u8],
+        match_suffix: bool,
+    ) -> Result<Vec<u8>> {
+        if target_name.len() <= 0 || source_name.len() <= 0 {
+            bail!("Empty name");
+        }
+        if target_name.len() > DNS_MAX_HOSTNAME_LEN || source_name.len() > DNS_MAX_HOSTNAME_LEN {
+            bail!("Name too long");
+        }
+        let mut renamed_packet = Vec::with_capacity(parsed_packet.packet.len());
+        let mut suffix_dict = SuffixDict::new();
+        let packet = Self::rename_question_section(
+            &mut renamed_packet,
+            &mut parsed_packet,
+            &mut suffix_dict,
+            target_name,
+            source_name,
+            match_suffix,
+        )?;
+
+        Ok(packet)
     }
 }
