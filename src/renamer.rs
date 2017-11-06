@@ -38,11 +38,13 @@ impl Renamer {
             }
             i += name[i] as usize + 1;
         }
-        if i >= name_len {
+        if i >= name_len || (name[i] == 0 && name_len > 0) {
             return Ok(None);
         }
+        if i != offset {
+            bail!("Inconsistent encoding");
+        }
         assert_eq!(i, offset);
-
         while name[i] != 0 {
             let label_len = name[i] as usize;
             let source_label_len = source_name[i - offset] as usize;
