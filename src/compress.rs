@@ -453,11 +453,10 @@ impl Compress {
 
     /// Returns the total length of a raw name, possibly after decompression, including the final `0` label length.
     pub fn raw_name_len_after_decompression(packet: &[u8], mut offset: usize) -> usize {
-        let mut final_offset = None;
+        let mut name_len = 0;
         loop {
             let label_len = match packet[offset] {
                 len if len & 0xc0 == 0xc0 => {
-                    final_offset = final_offset.or(Some(offset + 2));
                     let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
                     assert!(new_offset < offset);
                     offset = new_offset;
@@ -466,13 +465,13 @@ impl Compress {
                 len => len,
             } as usize;
             let prefixed_label_len = 1 + label_len;
+            name_len += prefixed_label_len;
             offset += prefixed_label_len;
             if label_len == 0 {
                 break;
             }
         }
-        let final_offset = final_offset.unwrap_or(offset);
-        final_offset - offset
+        name_len
     }
 
     /// Convert a trusted raw name to a string
