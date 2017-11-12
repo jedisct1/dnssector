@@ -437,16 +437,45 @@ impl Compress {
         Ok(compressed)
     }
 
-    /// Returns the total length of an uncompressed raw name, including the final `0` label length.
+    /// Returns the total length of a raw name *without decompressing it*, including the final `0` label length.
     pub fn raw_name_len(name: &[u8]) -> usize {
         let mut i = 0;
         while name[i] != 0 {
-            i += name[i] as usize + 1
+            let len = name[i] as usize;
+            if len & 0xc0 == 0xc0 {
+                i += 1;
+                break;
+            }
+            i += len + 1
         }
         i + 1
     }
 
-    /// Comvert a trusted raw name to a string
+    /// Returns the total length of a raw name, possibly after decompression, including the final `0` label length.
+    pub fn raw_name_len_after_decompression(packet: &[u8], mut offset: usize) -> usize {
+        let mut final_offset = None;
+        loop {
+            let label_len = match packet[offset] {
+                len if len & 0xc0 == 0xc0 => {
+                    final_offset = final_offset.or(Some(offset + 2));
+                    let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
+                    assert!(new_offset < offset);
+                    offset = new_offset;
+                    continue;
+                }
+                len => len,
+            } as usize;
+            let prefixed_label_len = 1 + label_len;
+            offset += prefixed_label_len;
+            if label_len == 0 {
+                break;
+            }
+        }
+        let final_offset = final_offset.unwrap_or(offset);
+        final_offset - offset
+    }
+
+    /// Convert a trusted raw name to a string
     pub fn raw_name_to_str(packet: &[u8], mut offset: usize) -> Vec<u8> {
         let mut indirections = 0;
         let mut res: Vec<u8> = Vec::with_capacity(64);
@@ -486,7 +515,7 @@ impl Compress {
         packet: &[u8],
         mut offset: usize,
     ) -> CompressedNameResult {
-        let uncompressed_name_len = Compress::raw_name_len(&packet[offset..]);
+        let uncompressed_name_len = Compress::raw_name_len_after_decompression(packet, offset);
         let initial_compressed_len = compressed.len();
         let final_offset = offset + uncompressed_name_len;
         loop {
