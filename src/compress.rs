@@ -518,13 +518,16 @@ impl Compress {
         let initial_compressed_len = compressed.len();
         let final_offset = offset + uncompressed_name_len;
         loop {
+            let label_len = packet[offset] as usize;
+            if label_len & 0xc0 == 0xc0 {
+                panic!("copy_compressed_name() called on an already compressed name");
+            }
             if let Some(ref_offset) = dict.insert(&packet[offset..final_offset], offset) {
                 assert!(offset < 65536 >> 2); // Checked in dict.insert()
                 compressed.push((ref_offset >> 8) as u8 | 0xc0);
                 compressed.push((ref_offset & 0xff) as u8);
                 break;
             }
-            let label_len = packet[offset] as usize;
             let offset_next = offset + 1 + label_len;
             compressed.extend_from_slice(&packet[offset..offset_next]);
             offset = offset_next;
