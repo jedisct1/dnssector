@@ -170,7 +170,7 @@ impl Renamer {
                         Self::copy_with_replaced_name(
                             &mut renamed_packet,
                             &raw.packet,
-                            offset_rdata,
+                            offset_rdata + DNS_RR_HEADER_SIZE,
                             &mut suffix_dict,
                             &target_name,
                             &source_name,
@@ -183,7 +183,8 @@ impl Renamer {
                         let rd_len = item.rr_rdlen();
                         let packet = &raw.packet;
                         let offset_rdata = raw.name_end;
-                        let rdata = &packet[offset_rdata..offset_rdata + rd_len];
+                        let rdata = &packet[offset_rdata + DNS_RR_HEADER_SIZE
+                                                ..offset_rdata + DNS_RR_HEADER_SIZE + rd_len];
                         renamed_packet.extend(rdata);
                     }
                 };
