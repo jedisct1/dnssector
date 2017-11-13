@@ -186,8 +186,8 @@ impl Compress {
         }
     }
 
-    /// Compresses trusted record's data and puts the result into `name`.
-    fn compress_rdata(
+    /// Compresses trusted record's data and puts the result into `compressed`.
+    pub fn compress_rdata(
         mut dict: &mut SuffixDict,
         mut compressed: &mut Vec<u8>,
         raw: RRRaw,
@@ -505,14 +505,16 @@ impl Compress {
     }
 
     /// Compress a name starting at `offset` using the suffix dictionary `dict`
+    /// `base_offset` is an additional offset added to the location stored in the dictionary.
     /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
     /// Returns the length of the name as well as the location right after the uncompressed name.
     //  XXX - TODO: `compressed` could be a slice, since compression will never increase the required capacity.
-    pub fn copy_compressed_name(
+    pub fn copy_compressed_name_with_base_offset(
         dict: &mut SuffixDict,
         compressed: &mut Vec<u8>,
         packet: &[u8],
         mut offset: usize,
+        base_offset: usize,
     ) -> CompressedNameResult {
         let uncompressed_name_len = Compress::raw_name_len_after_decompression(packet, offset);
         let initial_compressed_len = compressed.len();
@@ -522,7 +524,9 @@ impl Compress {
             if label_len & 0xc0 == 0xc0 {
                 panic!("copy_compressed_name() called on an already compressed name");
             }
-            if let Some(ref_offset) = dict.insert(&packet[offset..final_offset], offset) {
+            if let Some(ref_offset) =
+                dict.insert(&packet[offset..final_offset], base_offset + offset)
+            {
                 assert!(offset < 65536 >> 2); // Checked in dict.insert()
                 compressed.push((ref_offset >> 8) as u8 | 0xc0);
                 compressed.push((ref_offset & 0xff) as u8);
@@ -539,6 +543,19 @@ impl Compress {
             name_len: compressed.len() - initial_compressed_len,
             final_offset,
         }
+    }
+
+    /// Compress a name starting at `offset` using the suffix dictionary `dict`
+    /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
+    /// Returns the length of the name as well as the location right after the uncompressed name.
+    //  XXX - TODO: `compressed` could be a slice, since compression will never increase the required capacity.
+    pub fn copy_compressed_name(
+        dict: &mut SuffixDict,
+        compressed: &mut Vec<u8>,
+        packet: &[u8],
+        offset: usize,
+    ) -> CompressedNameResult {
+        Self::copy_compressed_name_with_base_offset(dict, compressed, packet, offset, 0)
     }
 }
 

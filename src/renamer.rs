@@ -80,16 +80,24 @@ impl Renamer {
         let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
         let _compressed_name_len = Compress::copy_uncompressed_name(&mut name, packet, offset);
         let replaced_name = Self::replace_raw(&name, target_name, source_name, match_suffix)?;
+        let renamed_packet_len = renamed_packet.len();
         match replaced_name {
             None => {
-                Compress::copy_compressed_name(&mut suffix_dict, &mut renamed_packet, &name, 0);
+                Compress::copy_compressed_name_with_base_offset(
+                    &mut suffix_dict,
+                    &mut renamed_packet,
+                    &name,
+                    0,
+                    renamed_packet_len,
+                );
             }
             Some(replaced_name) => {
-                Compress::copy_compressed_name(
+                Compress::copy_compressed_name_with_base_offset(
                     &mut suffix_dict,
                     &mut renamed_packet,
                     &replaced_name,
                     0,
+                    renamed_packet_len,
                 );
             }
         };
@@ -158,10 +166,16 @@ impl Renamer {
                     x if x == Type::NS.into() || x == Type::CNAME.into()
                         || x == Type::PTR.into() =>
                     {
-                        let rd_len = item.rr_rdlen();
-                        let packet = &raw.packet;
                         let offset_rdata = raw.name_end;
-                        let rdata = &packet[offset_rdata..];
+                        Self::copy_with_replaced_name(
+                            &mut renamed_packet,
+                            &raw.packet,
+                            offset_rdata,
+                            &mut suffix_dict,
+                            &target_name,
+                            &source_name,
+                            match_suffix,
+                        )?;
                     }
                     x if x == Type::MX.into() => {}
                     x if x == Type::SOA.into() => {}
