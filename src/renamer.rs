@@ -82,12 +82,7 @@ impl Renamer {
         let replaced_name = Self::replace_raw(&name, target_name, source_name, match_suffix)?;
         match replaced_name {
             None => {
-                Compress::copy_compressed_name(
-                    &mut suffix_dict,
-                    &mut renamed_packet,
-                    packet,
-                    offset,
-                );
+                Compress::copy_compressed_name(&mut suffix_dict, &mut renamed_packet, &name, 0);
             }
             Some(replaced_name) => {
                 Compress::copy_compressed_name(
