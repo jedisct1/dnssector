@@ -259,124 +259,60 @@ impl Renamer {
     }
 
     fn rename_answer_section(
-        mut renamed_packet: &mut Vec<u8>,
+        renamed_packet: &mut Vec<u8>,
         parsed_packet: &mut ParsedPacket,
-        mut suffix_dict: &mut SuffixDict,
+        suffix_dict: &mut SuffixDict,
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
     ) -> Result<()> {
-        let mut it = parsed_packet.into_iter_answer() as Option<ResponseIterator>;
-        while let Some(item) = it {
-            {
-                let raw = item.raw();
-                Self::copy_with_replaced_name(
-                    &mut renamed_packet,
-                    &raw.packet,
-                    raw.offset,
-                    &mut suffix_dict,
-                    &target_name,
-                    &source_name,
-                    match_suffix,
-                )?;
-                if raw.packet.len() < raw.name_end + DNS_RR_HEADER_SIZE {
-                    bail!("Short response RR");
-                }
-                let renamed_packet_offset_data = renamed_packet.len();
-                renamed_packet.extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_HEADER_SIZE]);
-                let rr_type = item.rr_type();
-                match rr_type {
-                    x if x == Type::NS.into() || x == Type::CNAME.into()
-                        || x == Type::PTR.into() =>
-                    {
-                        let offset_rdata = raw.name_end;
-                        Self::copy_with_replaced_name(
-                            &mut renamed_packet,
-                            &raw.packet,
-                            offset_rdata + DNS_RR_HEADER_SIZE,
-                            &mut suffix_dict,
-                            &target_name,
-                            &source_name,
-                            match_suffix,
-                        )?;
-                        let new_rdlen =
-                            DNS_RR_HEADER_SIZE + renamed_packet.len() - renamed_packet_offset_data;
-                        BigEndian::write_u16(
-                            &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
-                            new_rdlen as u16,
-                        );
-                    }
-                    x if x == Type::MX.into() => {
-                        let offset_rdata = raw.name_end;
-                        renamed_packet.extend(
-                            &raw.packet[offset_rdata + DNS_RR_HEADER_SIZE
-                                            ..offset_rdata + DNS_RR_HEADER_SIZE + 2],
-                        );
-                        let renamed_packet_name_offset = renamed_packet.len();
-                        Self::copy_with_replaced_name(
-                            &mut renamed_packet,
-                            &raw.packet,
-                            offset_rdata + DNS_RR_HEADER_SIZE + 2,
-                            &mut suffix_dict,
-                            &target_name,
-                            &source_name,
-                            match_suffix,
-                        )?;
-                        let new_rdlen = DNS_RR_HEADER_SIZE + 2 + renamed_packet.len()
-                            - renamed_packet_name_offset;
-                        BigEndian::write_u16(
-                            &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
-                            new_rdlen as u16,
-                        );
-                    }
-                    x if x == Type::SOA.into() => {
-                        let offset_rdata = raw.name_end;
-                        let renamed_packet_name1_offset = renamed_packet.len();
-                        let name1_offset = offset_rdata + DNS_RR_HEADER_SIZE;
-                        let name1_len = Compress::raw_name_len(&raw.packet[name1_offset..]);
-                        Self::copy_with_replaced_name(
-                            &mut renamed_packet,
-                            &raw.packet,
-                            name1_offset,
-                            &mut suffix_dict,
-                            &target_name,
-                            &source_name,
-                            match_suffix,
-                        )?;
-                        let name2_offset = name1_offset + name1_len;
-                        let name2_len = Compress::raw_name_len(&raw.packet[name2_offset..]);
-                        Self::copy_with_replaced_name(
-                            &mut renamed_packet,
-                            &raw.packet,
-                            name2_offset,
-                            &mut suffix_dict,
-                            &target_name,
-                            &source_name,
-                            match_suffix,
-                        )?;
-                        let soa_metadata_offset = name2_offset + name2_len;
-                        renamed_packet
-                            .extend(&raw.packet[soa_metadata_offset..soa_metadata_offset + 20]);
-                        let new_rdlen =
-                            DNS_RR_HEADER_SIZE + renamed_packet.len() - renamed_packet_name1_offset;
-                        BigEndian::write_u16(
-                            &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
-                            new_rdlen as u16,
-                        );
-                    }
-                    _ => {
-                        let rd_len = item.rr_rdlen();
-                        let packet = &raw.packet;
-                        let offset_rdata = raw.name_end;
-                        let rdata =
-                            &packet[offset_rdata..offset_rdata + DNS_RR_HEADER_SIZE + rd_len];
-                        renamed_packet.extend(&rdata[DNS_RR_HEADER_SIZE..]);
-                    }
-                };
-            }
-            it = item.next();
-        }
-        Ok(())
+        let it = parsed_packet.into_iter_answer() as Option<ResponseIterator>;
+        Self::rename_response_section(
+            it,
+            renamed_packet,
+            suffix_dict,
+            target_name,
+            source_name,
+            match_suffix,
+        )
+    }
+
+    fn rename_nameservers_section(
+        renamed_packet: &mut Vec<u8>,
+        parsed_packet: &mut ParsedPacket,
+        suffix_dict: &mut SuffixDict,
+        target_name: &[u8],
+        source_name: &[u8],
+        match_suffix: bool,
+    ) -> Result<()> {
+        let it = parsed_packet.into_iter_nameservers() as Option<ResponseIterator>;
+        Self::rename_response_section(
+            it,
+            renamed_packet,
+            suffix_dict,
+            target_name,
+            source_name,
+            match_suffix,
+        )
+    }
+
+    fn rename_additional_section(
+        renamed_packet: &mut Vec<u8>,
+        parsed_packet: &mut ParsedPacket,
+        suffix_dict: &mut SuffixDict,
+        target_name: &[u8],
+        source_name: &[u8],
+        match_suffix: bool,
+    ) -> Result<()> {
+        let it = parsed_packet.into_iter_additional() as Option<ResponseIterator>;
+        Self::rename_response_section(
+            it,
+            renamed_packet,
+            suffix_dict,
+            target_name,
+            source_name,
+            match_suffix,
+        )
     }
 
     pub fn rename_with_raw_names(
@@ -403,6 +339,22 @@ impl Renamer {
             match_suffix,
         )?;
         Self::rename_answer_section(
+            &mut renamed_packet,
+            &mut parsed_packet,
+            &mut suffix_dict,
+            target_name,
+            source_name,
+            match_suffix,
+        )?;
+        Self::rename_nameservers_section(
+            &mut renamed_packet,
+            &mut parsed_packet,
+            &mut suffix_dict,
+            target_name,
+            source_name,
+            match_suffix,
+        )?;
+        Self::rename_additional_section(
             &mut renamed_packet,
             &mut parsed_packet,
             &mut suffix_dict,
