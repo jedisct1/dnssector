@@ -157,6 +157,7 @@ impl Renamer {
                 if raw.packet.len() < raw.name_end + DNS_RR_HEADER_SIZE {
                     bail!("Short response RR");
                 }
+                renamed_packet.extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_HEADER_SIZE]);
                 let rr_type = item.rr_type();
                 match rr_type {
                     x if x == Type::NS.into() || x == Type::CNAME.into()
@@ -167,9 +168,16 @@ impl Renamer {
                         let offset_rdata = raw.name_end;
                         let rdata = &packet[offset_rdata..];
                     }
-                    _ => {}
+                    x if x == Type::MX.into() => {}
+                    x if x == Type::SOA.into() => {}
+                    _ => {
+                        let rd_len = item.rr_rdlen();
+                        let packet = &raw.packet;
+                        let offset_rdata = raw.name_end;
+                        let rdata = &packet[offset_rdata..offset_rdata + rd_len];
+                        renamed_packet.extend(rdata);
+                    }
                 };
-                renamed_packet.extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_HEADER_SIZE]);
             }
             it = item.next();
         }
@@ -189,6 +197,7 @@ impl Renamer {
             bail!("Name too long");
         }
         let mut renamed_packet = Vec::with_capacity(parsed_packet.packet.len());
+        parsed_packet.copy_header(&mut renamed_packet);
         let mut suffix_dict = SuffixDict::new();
         Self::rename_question_section(
             &mut renamed_packet,

@@ -63,6 +63,11 @@ impl ParsedPacket {
         EdnsIterator::new(RRIterator::new(self, Section::Edns)).next()
     }
 
+    /// Copy the packet header
+    pub fn copy_header(&self, header: &mut Vec<u8>) {
+        header.extend(&self.packet[..DNS_HEADER_SIZE]);
+    }
+
     /// Returns the transaction ID.
     #[inline]
     pub fn tid(&self) -> u16 {
