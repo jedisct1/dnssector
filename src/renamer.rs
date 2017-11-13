@@ -195,7 +195,7 @@ impl Renamer {
                         Self::copy_with_replaced_name(
                             &mut renamed_packet,
                             &raw.packet,
-                            renamed_packet_name_offset,
+                            offset_rdata + DNS_RR_HEADER_SIZE + 2,
                             &mut suffix_dict,
                             &target_name,
                             &source_name,
@@ -208,7 +208,41 @@ impl Renamer {
                             new_rdlen as u16,
                         );
                     }
-                    x if x == Type::SOA.into() => {}
+                    x if x == Type::SOA.into() => {
+                        let offset_rdata = raw.name_end;
+                        let renamed_packet_name1_offset = renamed_packet.len();
+                        let name1_offset = offset_rdata + DNS_RR_HEADER_SIZE;
+                        let name1_len = Compress::raw_name_len(&raw.packet[name1_offset..]);
+                        Self::copy_with_replaced_name(
+                            &mut renamed_packet,
+                            &raw.packet,
+                            name1_offset,
+                            &mut suffix_dict,
+                            &target_name,
+                            &source_name,
+                            match_suffix,
+                        )?;
+                        let name2_offset = name1_offset + name1_len;
+                        let name2_len = Compress::raw_name_len(&raw.packet[name2_offset..]);
+                        Self::copy_with_replaced_name(
+                            &mut renamed_packet,
+                            &raw.packet,
+                            name2_offset,
+                            &mut suffix_dict,
+                            &target_name,
+                            &source_name,
+                            match_suffix,
+                        )?;
+                        let soa_metadata_offset = name2_offset + name2_len;
+                        renamed_packet
+                            .extend(&raw.packet[soa_metadata_offset..soa_metadata_offset + 20]);
+                        let new_rdlen =
+                            DNS_RR_HEADER_SIZE + renamed_packet.len() - renamed_packet_name1_offset;
+                        BigEndian::write_u16(
+                            &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
+                            new_rdlen as u16,
+                        );
+                    }
                     _ => {
                         let rd_len = item.rr_rdlen();
                         let packet = &raw.packet;
