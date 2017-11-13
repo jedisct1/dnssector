@@ -1,3 +1,4 @@
+use byteorder::{BigEndian, ByteOrder};
 use compress::*;
 use constants::*;
 use errors::*;
@@ -160,6 +161,7 @@ impl Renamer {
                 if raw.packet.len() < raw.name_end + DNS_RR_HEADER_SIZE {
                     bail!("Short response RR");
                 }
+                let renamed_packet_offset_data = renamed_packet.len();
                 renamed_packet.extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_HEADER_SIZE]);
                 let rr_type = item.rr_type();
                 match rr_type {
@@ -176,6 +178,11 @@ impl Renamer {
                             &source_name,
                             match_suffix,
                         )?;
+                        let new_rdlen = renamed_packet.len() - renamed_packet_offset_data;
+                        BigEndian::write_u16(
+                            &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
+                            new_rdlen as u16,
+                        );
                     }
                     x if x == Type::MX.into() => {}
                     x if x == Type::SOA.into() => {}
@@ -183,9 +190,9 @@ impl Renamer {
                         let rd_len = item.rr_rdlen();
                         let packet = &raw.packet;
                         let offset_rdata = raw.name_end;
-                        let rdata = &packet[offset_rdata + DNS_RR_HEADER_SIZE
-                                                ..offset_rdata + DNS_RR_HEADER_SIZE + rd_len];
-                        renamed_packet.extend(rdata);
+                        let rdata =
+                            &packet[offset_rdata..offset_rdata + DNS_RR_HEADER_SIZE + rd_len];
+                        renamed_packet.extend(&rdata[DNS_RR_HEADER_SIZE..]);
                     }
                 };
             }
