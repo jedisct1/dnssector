@@ -184,7 +184,28 @@ impl Renamer {
                             new_rdlen as u16,
                         );
                     }
-                    x if x == Type::MX.into() => {}
+                    x if x == Type::MX.into() => {
+                        let offset_rdata = raw.name_end;
+                        renamed_packet.extend(
+                            &raw.packet[offset_rdata + DNS_RR_HEADER_SIZE
+                                            ..offset_rdata + DNS_RR_HEADER_SIZE + 2],
+                        );
+                        let renamed_packet_name_offset = renamed_packet.len();
+                        Self::copy_with_replaced_name(
+                            &mut renamed_packet,
+                            &raw.packet,
+                            renamed_packet_name_offset,
+                            &mut suffix_dict,
+                            &target_name,
+                            &source_name,
+                            match_suffix,
+                        )?;
+                        let new_rdlen = renamed_packet.len() - renamed_packet_name_offset;
+                        BigEndian::write_u16(
+                            &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
+                            new_rdlen as u16,
+                        );
+                    }
                     x if x == Type::SOA.into() => {}
                     _ => {
                         let rd_len = item.rr_rdlen();
