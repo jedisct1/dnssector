@@ -179,7 +179,7 @@ impl Renamer {
                             match_suffix,
                         )?;
                         let new_rdlen =
-                            DNS_RR_HEADER_SIZE + renamed_packet.len() - renamed_packet_offset_data;
+                            renamed_packet.len() - renamed_packet_offset_data - DNS_RR_HEADER_SIZE;
                         BigEndian::write_u16(
                             &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
                             new_rdlen as u16,
@@ -201,8 +201,8 @@ impl Renamer {
                             &source_name,
                             match_suffix,
                         )?;
-                        let new_rdlen = DNS_RR_HEADER_SIZE + 2 + renamed_packet.len()
-                            - renamed_packet_name_offset;
+                        let new_rdlen = 2 + renamed_packet.len() - renamed_packet_name_offset
+                            - DNS_RR_HEADER_SIZE;
                         BigEndian::write_u16(
                             &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
                             new_rdlen as u16,
@@ -237,7 +237,7 @@ impl Renamer {
                         renamed_packet
                             .extend(&raw.packet[soa_metadata_offset..soa_metadata_offset + 20]);
                         let new_rdlen =
-                            DNS_RR_HEADER_SIZE + renamed_packet.len() - renamed_packet_name1_offset;
+                            renamed_packet.len() - renamed_packet_name1_offset - DNS_RR_HEADER_SIZE;
                         BigEndian::write_u16(
                             &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
                             new_rdlen as u16,
@@ -362,6 +362,7 @@ impl Renamer {
             source_name,
             match_suffix,
         )?;
+        parsed_packet.copy_raw_edns_section(&mut renamed_packet);
         Ok(renamed_packet)
     }
 }

@@ -68,6 +68,23 @@ impl ParsedPacket {
         header.extend(&self.packet[..DNS_HEADER_SIZE]);
     }
 
+    /// Copy the EDNS section
+    pub fn copy_raw_edns_section(&self, raw_edns: &mut Vec<u8>) -> usize {
+        let offset_edns = match self.offset_edns {
+            None => return 0,
+            Some(offset_edns) => offset_edns,
+        };
+        debug_assert!(offset_edns >= 1 + DNS_RR_HEADER_SIZE);
+        if offset_edns < 1 + DNS_RR_HEADER_SIZE {
+            return 0;
+        }
+        let offset_edns_header = offset_edns - (1 + DNS_RR_HEADER_SIZE);
+        debug_assert_eq!(self.packet[offset_edns_header], 0);
+        let edns_len = self.packet.len() - offset_edns_header;
+        raw_edns.extend_from_slice(&self.packet[offset_edns_header..]);
+        edns_len
+    }
+
     /// Returns the transaction ID.
     #[inline]
     pub fn tid(&self) -> u16 {
@@ -297,6 +314,7 @@ impl ParsedPacket {
         Ok(())
     }
 
+    /// Returns the question as a stirng, as well as the query type
     pub fn question(&self) -> Option<((Vec<u8>, u16))> {
         let offset = match self.offset_question {
             None => return None,
