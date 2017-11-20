@@ -60,6 +60,12 @@ impl Compress {
                     if ref_offset == offset || ref_offset >= lowest_offset {
                         bail!(ErrorKind::InvalidName("Forward/self reference"));
                     }
+                    if packet[ref_offset] & 0xc0 == 0xc0 {
+                        bail!(ErrorKind::InvalidName("Double reference"));
+                    }
+                    if packet[ref_offset] < 2 {
+                        bail!(ErrorKind::InvalidName("Reference to a name that cannot be compressed"));
+                    }
                     final_offset = final_offset.or(Some(offset + 2));
                     offset = ref_offset;
                     barrier_offset = lowest_offset;
