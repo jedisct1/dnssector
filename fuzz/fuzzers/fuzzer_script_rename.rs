@@ -5,6 +5,7 @@ extern crate libfuzzer_sys;
 
 use dnssector::*;
 
+/// Parse a packet, rename *.net, reparse the resulting packet
 fuzz_target!(|packet: &[u8]| {
     let dns_sector = DNSSector::new(packet.to_vec()).unwrap();
     let mut parsed = match dns_sector.parse() {
