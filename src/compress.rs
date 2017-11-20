@@ -64,7 +64,9 @@ impl Compress {
                         bail!(ErrorKind::InvalidName("Double reference"));
                     }
                     if packet[ref_offset] < 2 {
-                        bail!(ErrorKind::InvalidName("Reference to a name that cannot be compressed"));
+                        bail!(ErrorKind::InvalidName(
+                            "Reference to a name that cannot be compressed"
+                        ));
                     }
                     final_offset = final_offset.or(Some(offset + 2));
                     offset = ref_offset;
