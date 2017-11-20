@@ -201,6 +201,11 @@ impl DNSSector {
             bail!(ErrorKind::PacketTooSmall)
         }
         let qdcount = Self::qdcount(&self.packet);
+        if qdcount == 0 {
+            bail!(ErrorKind::InvalidPacket(
+                "A DNS packet shoudl contain a question",
+            ));
+        }
         if qdcount > 1 {
             bail!(ErrorKind::InvalidPacket(
                 "A DNS packet cannot contain more than one question",
