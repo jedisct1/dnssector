@@ -26,5 +26,9 @@ fuzz_target!(|packet: &[u8]| {
         .parse()
         .expect("Valid packet couldn't be parsed");
     let packet2 = reparsed_packet.into_packet();
-    assert_eq!(packet, packet2.as_slice());
+    let uncompressed =
+        Compress::uncompress(&packet).expect("Unable to uncompress the original packet");
+    let uncompressed2 =
+        Compress::uncompress(&packet2).expect("Unable to uncompress the recreated packet");
+    assert_eq!(uncompressed, uncompressed2);
 });
