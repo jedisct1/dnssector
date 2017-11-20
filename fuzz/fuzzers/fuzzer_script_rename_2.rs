@@ -7,7 +7,10 @@ use dnssector::*;
 
 /// Parse a packet, do not change anything, check that the resulting packet is identical to the original one
 fuzz_target!(|packet: &[u8]| {
-    let dns_sector = DNSSector::new(packet.to_vec()).unwrap();
+    let dns_sector = match DNSSector::new(packet.to_vec()) {
+        Err(_) => return,
+        Ok(dns_sector) => dns_sector,
+    };
     let mut parsed = match dns_sector.parse() {
         Err(_) => return,
         Ok(parsed) => parsed,
