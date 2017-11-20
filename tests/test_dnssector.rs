@@ -159,10 +159,9 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err() {
-            Some(errors::Error(
-                errors::ErrorKind::InvalidName("Reference to a name that cannot be compressed"),
-                _,
-            )) => assert!(true),
+            Some(errors::Error(errors::ErrorKind::InvalidName("Label length too long"), _)) => {
+                assert!(true)
+            }
             a => assert!(false, "type: {:?}", a),
         }
     }
