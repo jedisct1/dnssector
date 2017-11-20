@@ -76,8 +76,7 @@ pub struct SectionIterator {
 
 unsafe extern "C" fn iter_answer(
     parsed_packet: *mut ParsedPacket,
-    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const SectionIterator)
-        -> bool,
+    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const SectionIterator) -> bool,
     ctx: *mut c_void,
 ) {
     let mut it = (*parsed_packet).into_iter_answer();
@@ -96,8 +95,7 @@ unsafe extern "C" fn iter_answer(
 
 unsafe extern "C" fn iter_nameservers(
     parsed_packet: *mut ParsedPacket,
-    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const SectionIterator)
-        -> bool,
+    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const SectionIterator) -> bool,
     ctx: *mut c_void,
 ) {
     let mut it = (*parsed_packet).into_iter_nameservers();
@@ -116,8 +114,7 @@ unsafe extern "C" fn iter_nameservers(
 
 unsafe extern "C" fn iter_additional(
     parsed_packet: *mut ParsedPacket,
-    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const SectionIterator)
-        -> bool,
+    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const SectionIterator) -> bool,
     ctx: *mut c_void,
 ) {
     let mut it = (*parsed_packet).into_iter_additional();
@@ -136,8 +133,7 @@ unsafe extern "C" fn iter_additional(
 
 unsafe extern "C" fn iter_edns(
     parsed_packet: *mut ParsedPacket,
-    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const EdnsIterator)
-        -> bool,
+    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const EdnsIterator) -> bool,
     ctx: *mut c_void,
 ) {
     let mut it = (*parsed_packet).into_iter_edns();
@@ -468,38 +464,42 @@ pub struct FnTable {
     pub set_rcode: unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, rcode: u8),
     pub opcode: unsafe extern "C" fn(parsed_packet: *const ParsedPacket) -> u8,
     pub set_opcode: unsafe extern "C" fn(parsed_packet: *mut ParsedPacket, opcode: u8),
-    pub iter_answer: unsafe extern "C" fn(
-        parsed_packet: *mut ParsedPacket,
-        cb: unsafe extern "C" fn(
-            ctx: *mut c_void,
-            section_iterator: *const SectionIterator,
-        ) -> bool,
-        *mut c_void,
-    ),
-    pub iter_nameservers: unsafe extern "C" fn(
-        parsed_packet: *mut ParsedPacket,
-        cb: unsafe extern "C" fn(
-            ctx: *mut c_void,
-            section_iterator: *const SectionIterator,
-        ) -> bool,
-        *mut c_void,
-    ),
-    pub iter_additional: unsafe extern "C" fn(
-        parsed_packet: *mut ParsedPacket,
-        cb: unsafe extern "C" fn(
-            ctx: *mut c_void,
-            section_iterator: *const SectionIterator,
-        ) -> bool,
-        *mut c_void,
-    ),
-    pub iter_edns: unsafe extern "C" fn(
-        parsed_packet: *mut ParsedPacket,
-        cb: unsafe extern "C" fn(
-            ctx: *mut c_void,
-            section_iterator: *const EdnsIterator,
-        ) -> bool,
-        *mut c_void,
-    ),
+    pub iter_answer:
+        unsafe extern "C" fn(
+            parsed_packet: *mut ParsedPacket,
+            cb: unsafe extern "C" fn(
+                ctx: *mut c_void,
+                section_iterator: *const SectionIterator,
+            ) -> bool,
+            *mut c_void,
+        ),
+    pub iter_nameservers:
+        unsafe extern "C" fn(
+            parsed_packet: *mut ParsedPacket,
+            cb: unsafe extern "C" fn(
+                ctx: *mut c_void,
+                section_iterator: *const SectionIterator,
+            ) -> bool,
+            *mut c_void,
+        ),
+    pub iter_additional:
+        unsafe extern "C" fn(
+            parsed_packet: *mut ParsedPacket,
+            cb: unsafe extern "C" fn(
+                ctx: *mut c_void,
+                section_iterator: *const SectionIterator,
+            ) -> bool,
+            *mut c_void,
+        ),
+    pub iter_edns:
+        unsafe extern "C" fn(
+            parsed_packet: *mut ParsedPacket,
+            cb: unsafe extern "C" fn(
+                ctx: *mut c_void,
+                section_iterator: *const EdnsIterator,
+            ) -> bool,
+            *mut c_void,
+        ),
     pub name: unsafe extern "C" fn(
         section_iterator: &mut SectionIterator,
         name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
@@ -513,12 +513,11 @@ pub struct FnTable {
         addr: *mut u8,
         addr_len: &mut size_t,
     ),
-    pub set_rr_ip:
-        unsafe extern "C" fn(
-            section_iterator: &mut SectionIterator,
-            addr: *const u8,
-            addr_len: size_t,
-        ),
+    pub set_rr_ip: unsafe extern "C" fn(
+        section_iterator: &mut SectionIterator,
+        addr: *const u8,
+        addr_len: size_t,
+    ),
     pub raw_name_from_str: unsafe extern "C" fn(
         raw_name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
         raw_name_len: *mut size_t,
