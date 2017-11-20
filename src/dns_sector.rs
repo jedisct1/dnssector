@@ -203,7 +203,7 @@ impl DNSSector {
         let qdcount = Self::qdcount(&self.packet);
         if qdcount == 0 {
             bail!(ErrorKind::InvalidPacket(
-                "A DNS packet shoudl contain a question",
+                "A DNS packet should contain a question",
             ));
         }
         if qdcount > 1 {
