@@ -26,3 +26,6 @@ path = "fuzzers/fuzzer_script_op.rs"
 [[bin]]
 name = "fuzzer_script_synth"
 path = "fuzzers/fuzzer_script_synth.rs"
+[[bin]]
+name = "fuzzer_script_rename"
+path = "fuzzers/fuzzer_script_rename.rs"
