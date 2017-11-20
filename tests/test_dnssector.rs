@@ -364,4 +364,20 @@ mod tests {
         assert_eq!(flags & DNS_FLAG_RD, DNS_FLAG_RD);
         assert_eq!(flags, 0x80000100);
     }
+
+    #[test]
+    fn test_packet_with_no_question() {
+        let data = vec![
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4, 4, 4, 4, 4, 4, 4, 63, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 59, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4,
+            4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 41, 0, 0, 0, 0, 0, 10, 0, 0,
+        ];
+        let dns_sector = DNSSector::new(data).unwrap();
+        let ret = dns_sector.parse();
+        assert!(ret.is_err());
+        match ret.err() {
+            Some(errors::Error(errors::ErrorKind::InvalidPacket(_), _)) => assert!(true),
+            _ => assert!(false),
+        }
+    }
 }
