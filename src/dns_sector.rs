@@ -271,6 +271,7 @@ impl DNSSector {
 
     /// Parses a RR from the answer, nameservers or additional sections.
     fn parse_rr(&mut self, section: Section) -> Result<()> {
+        let rr_start_offset = self.offset;
         self.skip_name()?;
         let rr_type = self.rr_type()?;
         let rr_rdlen = self.rr_rdlen()?;
@@ -278,7 +279,12 @@ impl DNSSector {
             x if x == Type::OPT.into() => {
                 if section != Section::Additional {
                     bail!(ErrorKind::InvalidPacket(
-                        "OPT RRs must be in the additional section",
+                        "OPT RRs must be in the additional section"
+                    ));
+                }
+                if self.offset - rr_start_offset != 1 {
+                    bail!(ErrorKind::InvalidPacket(
+                        "OPT RRs must have the root domain as the domain name"
                     ));
                 }
                 return self.parse_opt();
