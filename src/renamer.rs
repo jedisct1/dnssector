@@ -315,6 +315,9 @@ impl Renamer {
         )
     }
 
+    /// Replaces `source_name` with `target_name` in all names, in all records.
+    /// If `match_suffix` is `true`, do suffix matching instead of exact matching
+    /// This allows renaming `*.example.com` into `*.example.net`.
     pub fn rename_with_raw_names(
         mut parsed_packet: &mut ParsedPacket,
         target_name: &[u8],

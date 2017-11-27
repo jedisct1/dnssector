@@ -5,6 +5,7 @@ use dns_sector::*;
 use edns_iterator::*;
 use errors::*;
 use question_iterator::*;
+use renamer::*;
 use response_iterator::*;
 use rr_iterator::*;
 use std::ptr;
@@ -325,5 +326,30 @@ impl ParsedPacket {
         let rdata = &self.packet[offset..];
         let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
         Some((name_str, rr_type))
+    }
+
+    /// Replaces `source_name` with `target_name` in all names, in all records.
+    /// If `match_suffix` is `true`, do suffix matching instead of exact matching
+    /// This allows renaming `*.example.com` into `*.example.net`.
+    pub fn rename_with_raw_names(
+        &mut self,
+        target_name: &[u8],
+        source_name: &[u8],
+        match_suffix: bool,
+    ) -> Result<()> {
+        let packet = Renamer::rename_with_raw_names(self, target_name, source_name, match_suffix)?;
+        let dns_sector = DNSSector::new(packet)?;
+        let parsed_packet = dns_sector.parse()?;
+        self.offset_question = parsed_packet.offset_question;
+        self.offset_answers = parsed_packet.offset_answers;
+        self.offset_nameservers = parsed_packet.offset_nameservers;
+        self.offset_additional = parsed_packet.offset_additional;
+        self.offset_edns = parsed_packet.offset_edns;
+        assert_eq!(self.edns_count, parsed_packet.edns_count);
+        assert_eq!(self.ext_rcode, parsed_packet.ext_rcode);
+        assert_eq!(self.edns_version, parsed_packet.edns_version);
+        assert_eq!(self.ext_flags, parsed_packet.ext_flags);
+        self.maybe_compressed = true;
+        Ok(())
     }
 }
