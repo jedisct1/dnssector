@@ -13,7 +13,7 @@ use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::slice;
 use synth::gen;
 
-const ABI_VERSION: u64 = 0x1;
+const ABI_VERSION: u64 = 0x2;
 
 #[repr(C)]
 pub struct CErr {
@@ -454,6 +454,23 @@ unsafe extern "C" fn question(
     }
 }
 
+unsafe extern "C" fn rename_with_raw_names(
+    parsed_packet: *mut ParsedPacket,
+    c_err: *mut *const CErr,
+    raw_target_name: *const u8,
+    raw_target_name_len: size_t,
+    raw_source_name: *const u8,
+    raw_source_name_len: size_t,
+    match_suffix: bool,
+) -> c_int {
+    let raw_target_name = slice::from_raw_parts(raw_target_name, raw_target_name_len);
+    let raw_source_name = slice::from_raw_parts(raw_source_name, raw_source_name_len);
+    match (*parsed_packet).rename_with_raw_names(raw_target_name, raw_source_name, match_suffix) {
+        Err(e) => throw_err(e, c_err),
+        Ok(_) => 0,
+    }
+}
+
 /// C wrappers to the internal API
 #[repr(C)]
 pub struct FnTable {
@@ -573,6 +590,15 @@ pub struct FnTable {
         name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
         rr_type: *mut u16,
     ) -> c_int,
+    pub rename_with_raw_names: unsafe extern "C" fn(
+        parsed_packet: *mut ParsedPacket,
+        c_err: *mut *const CErr,
+        raw_target_name: *const u8,
+        raw_target_name_len: size_t,
+        raw_source_name: *const u8,
+        raw_source_name_len: size_t,
+        match_suffix: bool,
+    ) -> c_int,
     pub abi_version: u64,
 }
 
@@ -606,6 +632,7 @@ pub fn fn_table() -> FnTable {
         add_to_additional,
         raw_packet,
         question,
+        rename_with_raw_names,
         abi_version: ABI_VERSION,
     }
 }
