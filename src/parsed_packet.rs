@@ -338,8 +338,9 @@ impl ParsedPacket {
         match_suffix: bool,
     ) -> Result<()> {
         let packet = Renamer::rename_with_raw_names(self, target_name, source_name, match_suffix)?;
-        let dns_sector = DNSSector::new(packet)?;
-        let parsed_packet = dns_sector.parse()?;
+        self.packet = packet;
+        let dns_sector = DNSSector::new(self.packet.clone())?;
+        let parsed_packet = dns_sector.parse()?; // XXX - This can be recomputed on the fly by Renamer::rename_with_raw_names()
         self.offset_question = parsed_packet.offset_question;
         self.offset_answers = parsed_packet.offset_answers;
         self.offset_nameservers = parsed_packet.offset_nameservers;
