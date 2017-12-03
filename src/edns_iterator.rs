@@ -43,7 +43,7 @@ impl<'t> DNSIterable for EdnsIterator<'t> {
     #[inline]
     fn raw(&self) -> RRRaw {
         RRRaw {
-            packet: &self.rr_iterator.parsed_packet.packet,
+            packet: &self.rr_iterator.parsed_packet.packet(),
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -52,7 +52,7 @@ impl<'t> DNSIterable for EdnsIterator<'t> {
     #[inline]
     fn raw_mut(&mut self) -> RRRawMut {
         RRRawMut {
-            packet: &mut self.rr_iterator.parsed_packet.packet,
+            packet: self.rr_iterator.parsed_packet.packet_mut(),
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -88,7 +88,8 @@ impl<'t> DNSIterable for EdnsIterator<'t> {
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
             rr_iterator.name_end = rr_iterator.offset.unwrap();
-            let offset_next = RRIterator::edns_skip_rr(&parsed_packet.packet, rr_iterator.name_end);
+            let offset_next =
+                RRIterator::edns_skip_rr(&parsed_packet.packet(), rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         Some(self)

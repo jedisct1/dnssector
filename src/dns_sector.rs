@@ -243,7 +243,7 @@ impl DNSSector {
         let ext_flags = self.ext_flags;
         let edns_count = self.edns_count;
         let parsed_packet = ParsedPacket {
-            packet: self.packet,
+            packet: Some(self.packet),
             offset_question: offset_question,
             offset_answers: offset_answers,
             offset_nameservers: offset_nameservers,

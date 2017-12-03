@@ -121,7 +121,7 @@ pub trait DNSIterable {
             let compressed = self.raw_mut().packet;
             Compress::uncompress_with_previous_offset(compressed, ref_offset_next)?
         };
-        self.parsed_packet_mut().packet = uncompressed;
+        self.parsed_packet_mut().packet = Some(uncompressed);
         self.set_offset_next(new_offset_next);
         self.recompute_sections();
         self.recompute_rr();
@@ -192,7 +192,7 @@ pub trait TypedIterable {
                 return Ok(());
             }
             let offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
-            let packet = &mut self.parsed_packet_mut().packet;
+            let packet = &mut self.parsed_packet_mut().packet_mut();
             let packet_len = packet.len();
             if shift > 0 {
                 let new_packet_len = packet_len + shift as usize;
@@ -262,7 +262,7 @@ pub trait TypedIterable {
                 let compressed = self.raw_mut().packet;
                 Compress::uncompress_with_previous_offset(compressed, ref_offset)?
             };
-            self.parsed_packet_mut().packet = uncompressed;
+            self.parsed_packet_mut().packet = Some(uncompressed);
             self.set_offset(new_offset);
             self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
             self.recompute_sections();
@@ -273,7 +273,7 @@ pub trait TypedIterable {
         let shift = new_name_len as isize - current_name_len as isize;
         self.resize_rr(shift)?;
         {
-            let packet = &mut self.parsed_packet_mut().packet;
+            let packet = &mut self.parsed_packet_mut().packet_mut();
             &mut packet[offset..offset + new_name_len].copy_from_slice(name);
         }
         self.recompute_rr();
@@ -294,7 +294,7 @@ pub trait TypedIterable {
                 let compressed = self.raw_mut().packet;
                 Compress::uncompress_with_previous_offset(compressed, ref_offset)?
             };
-            self.parsed_packet_mut().packet = uncompressed;
+            self.parsed_packet_mut().packet = Some(uncompressed);
             self.set_offset(new_offset);
             self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
             self.recompute_sections();
@@ -455,8 +455,8 @@ impl<'t> RRIterator<'t> {
     pub fn recompute(&mut self) {
         let offset = self.offset
             .expect("recompute() called prior to iterating over RRs");
-        let name_end = Self::skip_name(&self.parsed_packet.packet, offset);
-        let offset_next = Self::skip_rdata(&self.parsed_packet.packet, name_end);
+        let name_end = Self::skip_name(&self.parsed_packet.packet(), offset);
+        let offset_next = Self::skip_rdata(&self.parsed_packet.packet(), name_end);
         self.name_end = name_end;
         self.offset_next = offset_next;
     }

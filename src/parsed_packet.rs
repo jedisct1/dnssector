@@ -15,7 +15,7 @@ use synth::gen;
 /// DNS packet, that allows quick access to (extended) flags and to individual sections.
 #[derive(Debug)]
 pub struct ParsedPacket {
-    pub packet: Vec<u8>,
+    pub packet: Option<Vec<u8>>,
     pub offset_question: Option<usize>,
     pub offset_answers: Option<usize>,
     pub offset_nameservers: Option<usize>,
@@ -30,8 +30,20 @@ pub struct ParsedPacket {
 
 impl ParsedPacket {
     /// Converts a `ParsedPacket` back into a raw packet.
+    #[inline]
     pub fn into_packet(self) -> Vec<u8> {
-        self.packet
+        self.packet.unwrap()
+    }
+
+    /// Returns a reference to the packet
+    #[inline]
+    pub fn packet(&self) -> &[u8] {
+        self.packet.as_ref().unwrap()
+    }
+
+    #[inline]
+    pub fn packet_mut(&mut self) -> &mut Vec<u8> {
+        self.packet.as_mut().unwrap()
     }
 
     /// Iterates over the question section.
@@ -66,7 +78,7 @@ impl ParsedPacket {
 
     /// Copy the packet header
     pub fn copy_header(&self, header: &mut Vec<u8>) {
-        header.extend(&self.packet[..DNS_HEADER_SIZE]);
+        header.extend(&self.packet()[..DNS_HEADER_SIZE]);
     }
 
     /// Copy the EDNS section
@@ -80,21 +92,21 @@ impl ParsedPacket {
             return 0;
         }
         let offset_edns_header = offset_edns - (1 + DNS_RR_HEADER_SIZE);
-        debug_assert_eq!(self.packet[offset_edns_header], 0);
-        let edns_len = self.packet.len() - offset_edns_header;
-        raw_edns.extend_from_slice(&self.packet[offset_edns_header..]);
+        debug_assert_eq!(self.packet()[offset_edns_header], 0);
+        let edns_len = self.packet().len() - offset_edns_header;
+        raw_edns.extend_from_slice(&self.packet()[offset_edns_header..]);
         edns_len
     }
 
     /// Returns the transaction ID.
     #[inline]
     pub fn tid(&self) -> u16 {
-        BigEndian::read_u16(&self.packet[DNS_TID_OFFSET..])
+        BigEndian::read_u16(&self.packet()[DNS_TID_OFFSET..])
     }
 
     /// Changes the transaction ID.
     pub fn set_tid(&mut self, tid: u16) {
-        BigEndian::write_u16(&mut self.packet[DNS_TID_OFFSET..], tid)
+        BigEndian::write_u16(&mut self.packet_mut()[DNS_TID_OFFSET..], tid)
     }
 
     /// Returns the flags, including extended flags.
@@ -103,7 +115,7 @@ impl ParsedPacket {
     /// The opcode and rcode are intentionally masked in order to prevent misuse:
     /// these bits are never supposed to be accessed individually.
     pub fn flags(&self) -> u32 {
-        let mut rflags = BigEndian::read_u16(&self.packet[DNS_FLAGS_OFFSET..]);
+        let mut rflags = BigEndian::read_u16(&self.packet()[DNS_FLAGS_OFFSET..]);
         rflags &= !0x7800; // mask opcode
         rflags &= !0x000f; // mask rcode
         (self.ext_flags.unwrap_or(0) as u32) << 16 | (rflags as u32)
@@ -115,23 +127,23 @@ impl ParsedPacket {
         let mut rflags = (flags & 0xffff) as u16;
         rflags &= !0x7800; // mask opcode
         rflags &= !0x000f; // mask rcode
-        let mut v = BigEndian::read_u16(&self.packet[DNS_FLAGS_OFFSET..]);
+        let mut v = BigEndian::read_u16(&self.packet()[DNS_FLAGS_OFFSET..]);
         v &= !0x7800;
         v &= !0x000f;
         v |= rflags;
-        BigEndian::write_u16(&mut self.packet[DNS_FLAGS_OFFSET..], v);
+        BigEndian::write_u16(&mut self.packet_mut()[DNS_FLAGS_OFFSET..], v);
     }
 
     /// Returns the return code.
     #[inline]
     pub fn rcode(&self) -> u8 {
-        let rflags = self.packet[DNS_FLAGS_OFFSET + 1];
+        let rflags = self.packet()[DNS_FLAGS_OFFSET + 1];
         rflags & 0x0f
     }
 
     /// Changes the return code.
     pub fn set_rcode(&mut self, rcode: u8) {
-        let p = &mut self.packet[DNS_FLAGS_OFFSET + 1];
+        let p = &mut self.packet_mut()[DNS_FLAGS_OFFSET + 1];
         *p &= !0x0f;
         *p |= rcode & 0x0f;
     }
@@ -139,20 +151,20 @@ impl ParsedPacket {
     /// Returns the opcode.
     #[inline]
     pub fn opcode(&self) -> u8 {
-        let rflags = self.packet[DNS_FLAGS_OFFSET];
+        let rflags = self.packet()[DNS_FLAGS_OFFSET];
         (rflags & 0x78) >> 3
     }
 
     /// Changes the operation code.
     pub fn set_opcode(&mut self, opcode: u8) {
-        let p = &mut self.packet[DNS_FLAGS_OFFSET];
+        let p = &mut self.packet_mut()[DNS_FLAGS_OFFSET];
         *p &= !0x78;
         *p |= (opcode << 3) & 0x78;
     }
 
     /// Increments the number of records in a given section
     pub fn rrcount_inc(&mut self, section: Section) -> Result<u16> {
-        let mut packet = &mut self.packet;
+        let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => {
                 let rrcount = DNSSector::qdcount(&mut packet);
@@ -186,7 +198,7 @@ impl ParsedPacket {
 
     /// Decrements the number of records in a given section
     pub fn rrcount_dec(&mut self, section: Section) -> Result<u16> {
-        let mut packet = &mut self.packet;
+        let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => DNSSector::qdcount(&mut packet),
             Section::Answer => DNSSector::ancount(&mut packet),
@@ -217,12 +229,12 @@ impl ParsedPacket {
             Section::Question => self.offset_answers
                 .or(self.offset_nameservers)
                 .or(self.offset_additional)
-                .unwrap_or(self.packet.len()),
+                .unwrap_or(self.packet().len()),
             Section::Answer => self.offset_nameservers
                 .or(self.offset_additional)
-                .unwrap_or(self.packet.len()),
-            Section::NameServers => self.offset_additional.unwrap_or(self.packet.len()),
-            Section::Additional => self.packet.len(),
+                .unwrap_or(self.packet().len()),
+            Section::NameServers => self.offset_additional.unwrap_or(self.packet().len()),
+            Section::Additional => self.packet().len(),
             _ => panic!("insertion_offset() is not suitable to adding EDNS pseudorecords"),
         };
         Ok(offset)
@@ -230,31 +242,32 @@ impl ParsedPacket {
 
     pub fn insert_rr(&mut self, section: Section, rr: gen::RR) -> Result<()> {
         if self.maybe_compressed {
-            let uncompressed = Compress::uncompress(&self.packet)?;
-            self.packet = uncompressed;
+            let uncompressed = Compress::uncompress(&self.packet())?;
+            self.packet = Some(uncompressed);
             self.recompute()?;
             debug_assert_eq!(self.maybe_compressed, false);
         }
         let rr_len = rr.packet.len();
-        if DNS_MAX_UNCOMPRESSED_SIZE - self.packet.len() < rr_len {
+        if DNS_MAX_UNCOMPRESSED_SIZE - self.packet().len() < rr_len {
             bail!(ErrorKind::PacketTooLarge)
         }
         let insertion_offset = self.insertion_offset(section)?;
-        let new_len = self.packet.len() + rr_len;
-        self.packet.reserve(rr_len);
+        let new_len = self.packet().len() + rr_len;
+        self.packet_mut().reserve(rr_len);
         if insertion_offset == new_len {
-            self.packet.extend_from_slice(&rr.packet);
+            self.packet_mut().extend_from_slice(&rr.packet);
         } else {
             unsafe {
-                self.packet.set_len(new_len);
-                let packet_ptr = self.packet.as_mut_ptr();
+                self.packet_mut().set_len(new_len);
+                let packet_ptr = self.packet_mut().as_mut_ptr();
                 ptr::copy(
                     packet_ptr.offset(insertion_offset as isize),
                     packet_ptr.offset((insertion_offset + rr_len) as isize),
-                    self.packet.len() - insertion_offset,
+                    self.packet().len() - insertion_offset,
                 );
             }
-            &self.packet[insertion_offset..insertion_offset + rr_len].copy_from_slice(&rr.packet);
+            &self.packet_mut()[insertion_offset..insertion_offset + rr_len]
+                .copy_from_slice(&rr.packet);
         }
         self.rrcount_inc(section)?;
         match section {
@@ -300,7 +313,7 @@ impl ParsedPacket {
         if !self.maybe_compressed {
             return Ok(());
         }
-        let dns_sector = DNSSector::new(self.packet.clone())?; // XXX - TODO: This doesnt't require cloning.
+        let dns_sector = DNSSector::new(self.packet.take().unwrap())?; // XXX - TODO: This doesnt't require cloning.
         let parsed_packet = dns_sector.parse()?;
         self.offset_question = parsed_packet.offset_question;
         self.offset_answers = parsed_packet.offset_answers;
@@ -321,9 +334,9 @@ impl ParsedPacket {
             None => return None,
             Some(offset) => offset,
         };
-        let name_str = Compress::raw_name_to_str(&self.packet, offset);
-        let offset = offset + Compress::raw_name_len(&self.packet[offset..]);
-        let rdata = &self.packet[offset..];
+        let name_str = Compress::raw_name_to_str(&self.packet(), offset);
+        let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
+        let rdata = &self.packet()[offset..];
         let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
         Some((name_str, rr_type))
     }
@@ -338,8 +351,8 @@ impl ParsedPacket {
         match_suffix: bool,
     ) -> Result<()> {
         let packet = Renamer::rename_with_raw_names(self, target_name, source_name, match_suffix)?;
-        self.packet = packet;
-        let dns_sector = DNSSector::new(self.packet.clone())?;
+        self.packet = Some(packet);
+        let dns_sector = DNSSector::new(self.packet.take().unwrap())?;
         let parsed_packet = dns_sector.parse()?; // XXX - This can be recomputed on the fly by Renamer::rename_with_raw_names()
         self.offset_question = parsed_packet.offset_question;
         self.offset_answers = parsed_packet.offset_answers;

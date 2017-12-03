@@ -419,7 +419,7 @@ unsafe extern "C" fn raw_packet(
     raw_packet_len: *mut size_t,
     raw_packet_max_len: size_t,
 ) -> c_int {
-    let packet = &(*parsed_packet).packet;
+    let packet = &(*parsed_packet).packet();
     let packet_len = packet.len();
     if packet_len > raw_packet_max_len {
         return -1;

@@ -330,7 +330,7 @@ impl Renamer {
         if target_name.len() > DNS_MAX_HOSTNAME_LEN || source_name.len() > DNS_MAX_HOSTNAME_LEN {
             bail!("Name too long");
         }
-        let mut renamed_packet = Vec::with_capacity(parsed_packet.packet.len());
+        let mut renamed_packet = Vec::with_capacity(parsed_packet.packet().len());
         parsed_packet.copy_header(&mut renamed_packet);
         let mut suffix_dict = SuffixDict::new();
         Self::rename_question_section(

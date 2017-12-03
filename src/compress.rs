@@ -338,7 +338,7 @@ impl Compress {
                 it = item.next_including_opt();
             }
         }
-        if ref_offset == parsed_packet.packet.len() {
+        if ref_offset == parsed_packet.packet().len() {
             new_offset = Some(uncompressed.len());
         }
         Ok((
