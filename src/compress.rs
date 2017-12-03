@@ -516,7 +516,6 @@ impl Compress {
     /// `base_offset` is an additional offset added to the location stored in the dictionary.
     /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
     /// Returns the length of the name as well as the location right after the uncompressed name.
-    //  XXX - TODO: `compressed` could be a slice, since compression will never increase the required capacity.
     pub fn copy_compressed_name_with_base_offset(
         dict: &mut SuffixDict,
         compressed: &mut Vec<u8>,
@@ -556,7 +555,6 @@ impl Compress {
     /// Compress a name starting at `offset` using the suffix dictionary `dict`
     /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
     /// Returns the length of the name as well as the location right after the uncompressed name.
-    //  XXX - TODO: `compressed` could be a slice, since compression will never increase the required capacity.
     pub fn copy_compressed_name(
         dict: &mut SuffixDict,
         compressed: &mut Vec<u8>,
