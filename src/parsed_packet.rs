@@ -313,7 +313,7 @@ impl ParsedPacket {
         if !self.maybe_compressed {
             return Ok(());
         }
-        let dns_sector = DNSSector::new(self.packet.take().unwrap())?;
+        let dns_sector = DNSSector::new(self.packet.take().expect("self.packet is None"))?;
         let parsed_packet = dns_sector.parse()?;
         self.offset_question = parsed_packet.offset_question;
         self.offset_answers = parsed_packet.offset_answers;
