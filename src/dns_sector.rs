@@ -22,6 +22,11 @@ pub struct DNSSector {
 }
 
 impl DNSSector {
+    /// Consumes the parser and return the original packet
+    pub fn into_packet(self) -> Vec<u8> {
+        self.packet
+    }
+
     /// Returns the number of records in the question section.
     #[inline]
     pub fn qdcount(packet: &[u8]) -> u16 {

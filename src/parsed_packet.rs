@@ -325,6 +325,7 @@ impl ParsedPacket {
         assert_eq!(self.edns_version, parsed_packet.edns_version);
         assert_eq!(self.ext_flags, parsed_packet.ext_flags);
         self.maybe_compressed = false;
+        self.packet = Some(parsed_packet.into_packet());
         Ok(())
     }
 
