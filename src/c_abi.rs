@@ -1,6 +1,7 @@
 use constants::*;
 use edns_iterator::*;
 use errors::*;
+use failure;
 use libc::{c_char, c_int, c_void, size_t};
 use parsed_packet::*;
 use question_iterator::*;
@@ -26,11 +27,11 @@ thread_local!(
     })
 );
 
-fn throw_err(e: Error, c_err: *mut *const CErr) -> c_int {
+fn throw_err(e: failure::Error, c_err: *mut *const CErr) -> c_int {
     if !c_err.is_null() {
         CERR.with(|tc_err| {
             let mut tc_err = tc_err.borrow_mut();
-            tc_err.description_cs = CString::new(e.description()).unwrap();
+            tc_err.description_cs = CString::new(e.to_string()).unwrap();
             unsafe { *c_err = &*tc_err };
         });
     }
@@ -361,9 +362,9 @@ unsafe fn add_to_section(
     parsed_packet: *mut ParsedPacket,
     section: Section,
     rr_str: *const i8,
-) -> Result<()> {
+) -> Result<(), failure::Error> {
     let rr_str = match CStr::from_ptr(rr_str).to_str() {
-        Err(_) => bail!(ErrorKind::ParseError),
+        Err(_) => bail!(DSError::ParseError),
         Ok(rr_str) => rr_str,
     };
     (*parsed_packet).insert_rr_from_string(section, rr_str)

@@ -4,13 +4,15 @@ version = "0.1.0"
 authors = ["Frank Denis <github@pureftpd.org>"]
 
 [dependencies]
-clippy = {version = "~0", optional = true}
 byteorder = "*"
 chomp = "*"
+clippy = {version = "~0", optional = true}
 debug_stub_derive = "*"
+failure = "*"
+failure_derive = "*"
 libc = "*"
 libloading = "*"
-error-chain = {version = "*", default-features = false}
+xfailure = "*"
 
 [profile.release]
 lto = true

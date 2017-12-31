@@ -2,6 +2,7 @@ use byteorder::{BigEndian, ByteOrder};
 use compress::*;
 use constants::*;
 use errors::*;
+use failure;
 use parsed_packet::*;
 use std::mem;
 
@@ -87,17 +88,17 @@ impl DNSSector {
 
     /// Makes sure that at least `len` bytes remain to be parsed.
     #[inline]
-    fn ensure_remaining_len(&self, len: usize) -> Result<()> {
+    fn ensure_remaining_len(&self, len: usize) -> Result<(), failure::Error> {
         if self.remaining_len() < len {
-            bail!(ErrorKind::PacketTooSmall)
+            xbail!(DSError::PacketTooSmall)
         }
         Ok(())
     }
 
     /// Sets the internal offset to the data to be parsed to an arbitrary location
-    pub fn set_offset(&mut self, offset: usize) -> Result<usize> {
+    pub fn set_offset(&mut self, offset: usize) -> Result<usize, failure::Error> {
         if offset >= self.packet.len() {
-            bail!(ErrorKind::InternalError(
+            xbail!(DSError::InternalError(
                 "Setting offset past the end of the packet",
             ))
         }
@@ -106,21 +107,21 @@ impl DNSSector {
 
     /// Increments the internal offset
     #[inline]
-    pub fn increment_offset(&mut self, n: usize) -> Result<usize> {
+    pub fn increment_offset(&mut self, n: usize) -> Result<usize, failure::Error> {
         self.ensure_remaining_len(n)?;
         let new_offset = self.offset + n;
         Ok(mem::replace(&mut self.offset, new_offset))
     }
 
     #[inline]
-    fn u8_load(&self, rr_offset: usize) -> Result<u8> {
+    fn u8_load(&self, rr_offset: usize) -> Result<u8, failure::Error> {
         self.ensure_remaining_len(rr_offset + 1)?;
         let offset = self.offset + rr_offset;
         Ok(self.packet[offset])
     }
 
     #[inline]
-    fn be16_load(&self, rr_offset: usize) -> Result<u16> {
+    fn be16_load(&self, rr_offset: usize) -> Result<u16, failure::Error> {
         self.ensure_remaining_len(rr_offset + 2)?;
         let offset = self.offset + rr_offset;
         Ok((BigEndian::read_u16(&self.packet[offset..])))
@@ -128,7 +129,7 @@ impl DNSSector {
 
     #[allow(dead_code)]
     #[inline]
-    fn be32_load(&self, rr_offset: usize) -> Result<u32> {
+    fn be32_load(&self, rr_offset: usize) -> Result<u32, failure::Error> {
         self.ensure_remaining_len(rr_offset + 4)?;
         let offset = self.offset + rr_offset;
         Ok((BigEndian::read_u32(&self.packet[offset..])))
@@ -137,53 +138,53 @@ impl DNSSector {
     /// Checks that an encoded DNS name is valid. This includes following indirections for
     /// compressed names, checks for label lengths, checks for truncated names and checks for
     /// cycles.
-    fn check_compressed_name(&self, offset: usize) -> Result<usize> {
+    fn check_compressed_name(&self, offset: usize) -> Result<usize, failure::Error> {
         Compress::check_compressed_name(&self.packet, offset)
     }
 
     /// Verifies that a name has been properly encoded, and sets the internal
     /// offset to the location right after than name.
-    fn skip_name(&mut self) -> Result<()> {
+    fn skip_name(&mut self) -> Result<(), failure::Error> {
         let offset = self.check_compressed_name(self.offset)?;
         self.set_offset(offset).map(|_| {})
     }
 
     /// Returns the type of the record currently being parsed.
     #[inline]
-    fn rr_type(&self) -> Result<u16> {
+    fn rr_type(&self) -> Result<u16, failure::Error> {
         self.be16_load(DNS_RR_TYPE_OFFSET)
     }
 
     /// Returns the class of the record currently being parsed.
     #[inline]
-    fn rr_class(&self) -> Result<u16> {
+    fn rr_class(&self) -> Result<u16, failure::Error> {
         self.be16_load(DNS_RR_CLASS_OFFSET)
     }
 
     /// Returns the TTL of the record currently being parsed.
     #[allow(dead_code)]
     #[inline]
-    fn rr_ttl(&self) -> Result<u32> {
+    fn rr_ttl(&self) -> Result<u32, failure::Error> {
         self.be32_load(DNS_RR_TTL_OFFSET)
     }
 
     /// Returns the length of the data for the record currently being parsed.
     #[inline]
-    pub fn rr_rdlen(&self) -> Result<usize> {
+    pub fn rr_rdlen(&self) -> Result<usize, failure::Error> {
         self.be16_load(DNS_RR_RDLEN_OFFSET).map(|x| x as usize)
     }
 
     /// Ensure that the record currently being parsed has the `IN` class.
     #[inline]
-    fn ensure_in_class(&self) -> Result<()> {
+    fn ensure_in_class(&self) -> Result<(), failure::Error> {
         if self.rr_class()? != Class::IN.into() {
-            bail!(ErrorKind::UnsupportedClass);
+            xbail!(DSError::UnsupportedClass(self.rr_class().unwrap_or(0)));
         }
         Ok(())
     }
 
     /// Builds a `DNSSector` structure for a given untrusted DNS packet.
-    pub fn new(packet: Vec<u8>) -> Result<Self> {
+    pub fn new(packet: Vec<u8>) -> Result<Self, failure::Error> {
         let dns_sector = DNSSector {
             packet: packet,
             offset: 0,
@@ -200,19 +201,19 @@ impl DNSSector {
     /// Parses and validates all records from all sections of an untrusted DNS packet.
     /// If the validation succeeds, a `ParsedPacket` structure containing information
     /// to quickly access (extended) flags and individual sections is returned.
-    pub fn parse(mut self) -> Result<ParsedPacket> {
+    pub fn parse(mut self) -> Result<ParsedPacket, failure::Error> {
         let packet_len = self.packet.len();
         if packet_len < DNS_HEADER_SIZE {
-            bail!(ErrorKind::PacketTooSmall)
+            xbail!(DSError::PacketTooSmall)
         }
         let qdcount = Self::qdcount(&self.packet);
         if qdcount == 0 {
-            bail!(ErrorKind::InvalidPacket(
+            xbail!(DSError::InvalidPacket(
                 "A DNS packet should contain a question",
             ));
         }
         if qdcount > 1 {
-            bail!(ErrorKind::InvalidPacket(
+            xbail!(DSError::InvalidPacket(
                 "A DNS packet cannot contain more than one question",
             ));
         }
@@ -238,7 +239,7 @@ impl DNSSector {
             self.parse_rr(Section::Additional)?;
         }
         if self.remaining_len() > 0 {
-            bail!(ErrorKind::InvalidPacket(
+            xbail!(DSError::InvalidPacket(
                 "Extra data found after the last record",
             ));
         }
@@ -264,18 +265,18 @@ impl DNSSector {
     }
 
     /// Parses a question RR.
-    fn parse_question(&mut self) -> Result<()> {
+    fn parse_question(&mut self) -> Result<(), failure::Error> {
         self.skip_name()?;
         self.ensure_in_class()?;
         if self.rr_class()? != Class::IN.into() {
-            bail!(ErrorKind::UnsupportedClass);
+            xbail!(DSError::UnsupportedClass(self.rr_class().unwrap_or(0)));
         }
         self.increment_offset(DNS_RR_QUESTION_HEADER_SIZE)?;
         Ok(())
     }
 
     /// Parses a RR from the answer, nameservers or additional sections.
-    fn parse_rr(&mut self, section: Section) -> Result<()> {
+    fn parse_rr(&mut self, section: Section) -> Result<(), failure::Error> {
         let rr_start_offset = self.offset;
         self.skip_name()?;
         let rr_type = self.rr_type()?;
@@ -283,12 +284,12 @@ impl DNSSector {
         match rr_type {
             x if x == Type::OPT.into() => {
                 if section != Section::Additional {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "OPT RRs must be in the additional section"
                     ));
                 }
                 if self.offset - rr_start_offset != 1 {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "OPT RRs must have the root domain as the domain name"
                     ));
                 }
@@ -296,12 +297,12 @@ impl DNSSector {
             }
             x if x == Type::NS.into() || x == Type::CNAME.into() || x == Type::PTR.into() => {
                 if rr_rdlen <= 0 {
-                    bail!(ErrorKind::PacketTooSmall);
+                    xbail!(DSError::PacketTooSmall);
                 }
                 self.increment_offset(DNS_RR_HEADER_SIZE)?;
                 let final_offset = Compress::check_compressed_name(&self.packet, self.offset)?;
                 if final_offset - self.offset != rr_rdlen {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "Unexpected data after name in rdata",
                     ))
                 }
@@ -309,12 +310,12 @@ impl DNSSector {
             }
             x if x == Type::MX.into() => {
                 if rr_rdlen <= 2 {
-                    bail!(ErrorKind::PacketTooSmall);
+                    xbail!(DSError::PacketTooSmall);
                 }
                 self.increment_offset(DNS_RR_HEADER_SIZE)?;
                 let final_offset = Compress::check_compressed_name(&self.packet, self.offset + 2)?;
                 if final_offset - self.offset != rr_rdlen {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "Unexpected data after name in MX rdata",
                     ))
                 }
@@ -322,13 +323,13 @@ impl DNSSector {
             }
             x if x == Type::SOA.into() => {
                 if rr_rdlen <= 1 + 20 {
-                    bail!(ErrorKind::PacketTooSmall);
+                    xbail!(DSError::PacketTooSmall);
                 }
                 self.increment_offset(DNS_RR_HEADER_SIZE)?;
                 let final_offset_1 = Compress::check_compressed_name(&self.packet, self.offset)?;
                 let final_offset_2 = Compress::check_compressed_name(&self.packet, final_offset_1)?;
                 if final_offset_2 - self.offset != rr_rdlen - 20 {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "Unexpected data after name in SOA rdata",
                     ))
                 }
@@ -336,12 +337,12 @@ impl DNSSector {
             }
             x if x == Type::DNAME.into() => {
                 if rr_rdlen <= 0 {
-                    bail!(ErrorKind::PacketTooSmall);
+                    xbail!(DSError::PacketTooSmall);
                 }
                 self.increment_offset(DNS_RR_HEADER_SIZE)?;
                 let final_offset = Self::check_uncompressed_name(&self.packet, self.offset)?;
                 if final_offset - self.offset != rr_rdlen {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "Unexpected data after name in DNAME rdata",
                     ))
                 }
@@ -349,7 +350,7 @@ impl DNSSector {
             }
             x if x == Type::A.into() => {
                 if rr_rdlen != 4 {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "A record doesn't include a 4 bytes IP address"
                     ))
                 }
@@ -357,7 +358,7 @@ impl DNSSector {
             }
             x if x == Type::AAAA.into() => {
                 if rr_rdlen != 16 {
-                    bail!(ErrorKind::InvalidPacket(
+                    xbail!(DSError::InvalidPacket(
                         "AAAA record doesn't include a 16 bytes IP address"
                     ))
                 }
@@ -381,23 +382,23 @@ impl DNSSector {
 
     /// Makes sure that at least `len` bytes remain to be parsed in the edns pseudo-section.
     #[inline]
-    fn edns_ensure_remaining_len(&self, len: usize) -> Result<()> {
+    fn edns_ensure_remaining_len(&self, len: usize) -> Result<(), failure::Error> {
         if self.edns_remaining_len() < len {
-            bail!(ErrorKind::PacketTooSmall)
+            xbail!(DSError::PacketTooSmall)
         }
         Ok(())
     }
 
     /// Increments the internal offset of the edns pseudo-section.
     #[inline]
-    fn edns_increment_offset(&mut self, n: usize) -> Result<usize> {
+    fn edns_increment_offset(&mut self, n: usize) -> Result<usize, failure::Error> {
         self.edns_ensure_remaining_len(n)?;
         let new_offset = self.offset + n;
         Ok(mem::replace(&mut self.offset, new_offset))
     }
 
     #[inline]
-    fn edns_be16_load(&self, rr_offset: usize) -> Result<u16> {
+    fn edns_be16_load(&self, rr_offset: usize) -> Result<u16, failure::Error> {
         self.edns_ensure_remaining_len(rr_offset + 2)?;
         let offset = self.offset + rr_offset;
         Ok((self.packet[offset] as u16) << 8 | self.packet[offset + 1] as u16)
@@ -405,7 +406,7 @@ impl DNSSector {
 
     #[allow(dead_code)]
     #[inline]
-    fn edns_be32_load(&self, rr_offset: usize) -> Result<u32> {
+    fn edns_be32_load(&self, rr_offset: usize) -> Result<u32, failure::Error> {
         self.edns_ensure_remaining_len(rr_offset + 4)?;
         let offset = self.offset + rr_offset;
         Ok(
@@ -418,20 +419,20 @@ impl DNSSector {
     /// Returns the extended code of a record within the edns pseudo-section.
     #[allow(dead_code)]
     #[inline]
-    fn edns_rr_code(&self) -> Result<u16> {
+    fn edns_rr_code(&self) -> Result<u16, failure::Error> {
         self.edns_be16_load(DNS_EDNS_RR_CODE_OFFSET)
     }
 
     /// Returns the record length of a record within the edns pseudo-section.
     #[inline]
-    pub fn edns_rr_rdlen(&self) -> Result<usize> {
+    pub fn edns_rr_rdlen(&self) -> Result<usize, failure::Error> {
         self.edns_be16_load(DNS_EDNS_RR_RDLEN_OFFSET)
             .map(|x| x as usize)
     }
 
     /// Skips over a record of the edns pseudo-section.
     #[inline]
-    fn edns_skip_rr(&mut self) -> Result<()> {
+    fn edns_skip_rr(&mut self) -> Result<(), failure::Error> {
         let inc = DNS_EDNS_RR_HEADER_SIZE + self.edns_rr_rdlen()?;
         self.edns_increment_offset(inc).map(|_| {})
     }
@@ -439,39 +440,39 @@ impl DNSSector {
     /// Returns the maximum payload size for UDP packets, from an optional `OPT` record.
     #[allow(dead_code)]
     #[inline]
-    fn opt_rr_max_payload(&self) -> Result<usize> {
+    fn opt_rr_max_payload(&self) -> Result<usize, failure::Error> {
         self.be16_load(DNS_OPT_RR_MAX_PAYLOAD_OFFSET)
             .map(|x| x as usize)
     }
 
     /// Returns the extended return code, from an optional `OPT` record.
     #[inline]
-    fn opt_rr_ext_rcode(&self) -> Result<u8> {
+    fn opt_rr_ext_rcode(&self) -> Result<u8, failure::Error> {
         self.u8_load(DNS_OPT_RR_EXT_RCODE_OFFSET)
     }
 
     /// Returns the edns version, from an optional `OPT` record.
     #[inline]
-    fn opt_rr_edns_version(&self) -> Result<u8> {
+    fn opt_rr_edns_version(&self) -> Result<u8, failure::Error> {
         self.u8_load(DNS_OPT_RR_EDNS_VERSION_OFFSET)
     }
 
     /// Returns the edns extended flags, from an optional `OPT` record.
     #[inline]
-    fn opt_rr_edns_ext_flags(&self) -> Result<u16> {
+    fn opt_rr_edns_ext_flags(&self) -> Result<u16, failure::Error> {
         self.be16_load(DNS_OPT_RR_EDNS_EXT_FLAGS_OFFSET)
     }
 
     /// Returns the length of the data contained within an `OPT` record.
     #[inline]
-    fn opt_rr_rdlen(&self) -> Result<usize> {
+    fn opt_rr_rdlen(&self) -> Result<usize, failure::Error> {
         self.be16_load(DNS_OPT_RR_RDLEN_OFFSET).map(|x| x as usize)
     }
 
     /// Parses and validates an `OPT` section.
-    fn parse_opt(&mut self) -> Result<()> {
+    fn parse_opt(&mut self) -> Result<(), failure::Error> {
         if self.edns_end.is_some() {
-            bail!(ErrorKind::InvalidPacket("Only one OPT record is allowed"));
+            xbail!(DSError::InvalidPacket("Only one OPT record is allowed"));
         }
         self.ext_rcode = Some(self.opt_rr_ext_rcode()?);
         self.edns_version = Some(self.opt_rr_edns_version()?);
@@ -492,32 +493,33 @@ impl DNSSector {
 
     /// Checks that an untrusted encoded DNS name is valid and does not contain any indirections.
     /// Returns the location right after the name.
-    pub fn check_uncompressed_name(packet: &[u8], mut offset: usize) -> Result<usize> {
+    pub fn check_uncompressed_name(
+        packet: &[u8],
+        mut offset: usize,
+    ) -> Result<usize, failure::Error> {
         let packet_len = packet.len();
         let mut name_len = 0;
         if offset >= packet_len {
-            bail!(ErrorKind::InternalError("Offset outside packet boundaries"));
+            xbail!(DSError::InternalError("Offset outside packet boundaries"));
         }
         if 1 > packet_len - offset {
-            bail!(ErrorKind::InvalidName("Empty name"));
+            xbail!(DSError::InvalidName("Empty name"));
         }
         loop {
             if offset >= packet_len {
-                bail!(ErrorKind::InvalidName("Truncated name"));
+                xbail!(DSError::InvalidName("Truncated name"));
             }
             let label_len = match packet[offset] {
-                len if len & 0xc0 == 0xc0 => {
-                    bail!(ErrorKind::InvalidName("Unexpected compression"))
-                }
-                len if len > 0x3f => bail!(ErrorKind::InvalidName("Label length too long")),
+                len if len & 0xc0 == 0xc0 => xbail!(DSError::InvalidName("Unexpected compression")),
+                len if len > 0x3f => xbail!(DSError::InvalidName("Label length too long")),
                 len => len as usize,
             };
             if label_len >= packet_len - offset {
-                bail!(ErrorKind::InvalidName("Out-of-bounds name"));
+                xbail!(DSError::InvalidName("Out-of-bounds name"));
             }
             name_len += label_len + 1;
             if name_len > DNS_MAX_HOSTNAME_LEN {
-                bail!(ErrorKind::InvalidName("Name too long"));
+                xbail!(DSError::InvalidName("Name too long"));
             }
             offset += label_len + 1;
             if label_len == 0 {

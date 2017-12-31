@@ -3,6 +3,7 @@ use compress::*;
 use constants::*;
 use dns_sector::*;
 use errors::*;
+use failure;
 use parsed_packet::*;
 use std::marker;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -112,7 +113,7 @@ pub trait DNSIterable {
     }
 
     /// Decompresses the whole packet while keeping the iterator available.
-    fn uncompress(&mut self) -> Result<()> {
+    fn uncompress(&mut self) -> Result<(), failure::Error> {
         if !self.parsed_packet().maybe_compressed {
             return Ok(());
         }
@@ -158,14 +159,14 @@ pub trait TypedIterable {
     }
 
     /// Returns the section the current record belongs to.
-    fn current_section(&self) -> Result<Section>
+    fn current_section(&self) -> Result<Section, failure::Error>
     where
         Self: DNSIterable,
     {
         let offset = self.offset();
         let parsed_packet = self.parsed_packet();
         if offset < parsed_packet.offset_question {
-            bail!(ErrorKind::InternalError("name before the question section"));
+            xbail!(DSError::InternalError("name before the question section"));
         }
         let mut section = Section::Question;
         if parsed_packet.offset_answers.is_some() && offset >= parsed_packet.offset_answers {
@@ -183,7 +184,7 @@ pub trait TypedIterable {
 
     /// Resizes the current record, by growing or shrinking (with a negative value) the current
     /// record size by `shift` bytes.
-    fn resize_rr(&mut self, shift: isize) -> Result<()>
+    fn resize_rr(&mut self, shift: isize) -> Result<(), failure::Error>
     where
         Self: DNSIterable,
     {
@@ -191,13 +192,13 @@ pub trait TypedIterable {
             if shift == 0 {
                 return Ok(());
             }
-            let offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
+            let offset = self.offset().ok_or(DSError::VoidRecord)?;
             let packet = &mut self.parsed_packet_mut().packet_mut();
             let packet_len = packet.len();
             if shift > 0 {
                 let new_packet_len = packet_len + shift as usize;
                 if new_packet_len > 0xffff {
-                    bail!(ErrorKind::PacketTooLarge);
+                    xbail!(DSError::PacketTooLarge);
                 }
                 packet.resize(new_packet_len, 0);
                 debug_assert_eq!(
@@ -250,7 +251,7 @@ pub trait TypedIterable {
     }
 
     /// Changes the name (raw format, untrusted content).
-    fn set_raw_name(&mut self, name: &[u8]) -> Result<()>
+    fn set_raw_name(&mut self, name: &[u8]) -> Result<(), failure::Error>
     where
         Self: DNSIterable,
     {
@@ -258,7 +259,7 @@ pub trait TypedIterable {
         let name = &name[..new_name_len];
         if self.parsed_packet().maybe_compressed {
             let (uncompressed, new_offset) = {
-                let ref_offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
+                let ref_offset = self.offset().ok_or(DSError::VoidRecord)?;
                 let compressed = self.raw_mut().packet;
                 Compress::uncompress_with_previous_offset(compressed, ref_offset)?
             };
@@ -267,7 +268,7 @@ pub trait TypedIterable {
             self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
             self.recompute_sections();
         }
-        let offset = self.offset().ok_or(ErrorKind::VoidRecord)?;
+        let offset = self.offset().ok_or(DSError::VoidRecord)?;
         debug_assert_eq!(self.parsed_packet().maybe_compressed, false);
         let current_name_len = Compress::raw_name_len(self.name_slice());
         let shift = new_name_len as isize - current_name_len as isize;
@@ -282,11 +283,11 @@ pub trait TypedIterable {
     }
 
     /// Deletes the record
-    fn delete(&mut self) -> Result<()>
+    fn delete(&mut self) -> Result<(), failure::Error>
     where
         Self: DNSIterable,
     {
-        self.offset().ok_or(ErrorKind::VoidRecord)?;
+        self.offset().ok_or(DSError::VoidRecord)?;
         let section = self.current_section()?;
         if self.parsed_packet().maybe_compressed {
             let (uncompressed, new_offset) = {
@@ -369,7 +370,7 @@ pub trait RdataIterable {
     }
 
     /// Retrieves the IP address of an `A` or `AAAA` record.
-    fn rr_ip(&self) -> Result<IpAddr>
+    fn rr_ip(&self) -> Result<IpAddr, failure::Error>
     where
         Self: DNSIterable + TypedIterable,
     {
@@ -388,12 +389,12 @@ pub trait RdataIterable {
                 ip.copy_from_slice(&rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]);
                 Ok(IpAddr::V6(Ipv6Addr::from(ip)))
             }
-            _ => bail!(ErrorKind::PropertyNotFound),
+            _ => xbail!(DSError::PropertyNotFound),
         }
     }
 
     /// Changes the IP address of an `A` or `AAAA` record.
-    fn set_rr_ip(&mut self, ip: &IpAddr) -> Result<()>
+    fn set_rr_ip(&mut self, ip: &IpAddr) -> Result<(), failure::Error>
     where
         Self: DNSIterable + TypedIterable,
     {
@@ -405,7 +406,7 @@ pub trait RdataIterable {
                     rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4].copy_from_slice(&ip.octets());
                     Ok(())
                 }
-                _ => bail!(ErrorKind::WrongAddressFamily),
+                _ => xbail!(DSError::WrongAddressFamily),
             },
             x if x == Type::AAAA.into() => match *ip {
                 IpAddr::V6(ip) => {
@@ -415,9 +416,9 @@ pub trait RdataIterable {
                         .copy_from_slice(&ip.octets());
                     Ok(())
                 }
-                _ => bail!(ErrorKind::WrongAddressFamily),
+                _ => xbail!(DSError::WrongAddressFamily),
             },
-            _ => bail!(ErrorKind::PropertyNotFound),
+            _ => xbail!(DSError::PropertyNotFound),
         }
     }
 }

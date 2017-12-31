@@ -7,6 +7,7 @@ use chomp::prelude::{eof, not_token, satisfy, skip_while, token, Buffer, Input, 
 use chomp::primitives::Primitives;
 use constants::*;
 use errors::*;
+use failure;
 #[allow(unused_imports)]
 use std::ascii::AsciiExt;
 use std::net::{Ipv4Addr, Ipv6Addr};
@@ -370,7 +371,7 @@ fn rr_rdata_soa_parser<I: U8Input>(
     }
 }
 
-fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type> {
+fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, failure::Error> {
     match rr_type_str {
         s if s.eq_ignore_ascii_case(b"A") => Ok(Type::A),
         s if s.eq_ignore_ascii_case(b"AAAA") => Ok(Type::AAAA),
@@ -380,7 +381,7 @@ fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type> {
         s if s.eq_ignore_ascii_case(b"TXT") => Ok(Type::TXT),
         s if s.eq_ignore_ascii_case(b"MX") => Ok(Type::MX),
         s if s.eq_ignore_ascii_case(b"SOA") => Ok(Type::SOA),
-        _ => bail!(ErrorKind::UnsupportedRRType(
+        _ => xbail!(DSError::UnsupportedRRType(
             str::from_utf8(rr_type_str)
                 .unwrap_or("<invalid UTF8 sequence>")
                 .to_owned()
@@ -388,7 +389,7 @@ fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type> {
     }
 }
 
-pub fn rr_parser<I: U8Input>(i: I) -> SimpleResult<I, Result<RR>> {
+pub fn rr_parser<I: U8Input>(i: I) -> SimpleResult<I, Result<RR, failure::Error>> {
     parse!{i;
         let rr_common = rr_common_parser();
         skip_horizontal_whitespaces();

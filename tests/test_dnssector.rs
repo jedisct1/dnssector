@@ -1,3 +1,4 @@
+extern crate core;
 extern crate dnssector;
 
 mod tests {
@@ -16,8 +17,9 @@ mod tests {
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::PacketTooSmall, _)) => assert!(true),
+
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::PacketTooSmall => assert!(true),
             _ => assert!(false),
         }
     }
@@ -28,8 +30,8 @@ mod tests {
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::InvalidPacket(_), _)) => assert!(true),
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::InvalidPacket(_) => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -40,8 +42,8 @@ mod tests {
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::InternalError(_), _)) => assert!(true),
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::InternalError(_) => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -60,8 +62,8 @@ mod tests {
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::PacketTooSmall, _)) => assert!(true),
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::PacketTooSmall => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -77,8 +79,8 @@ mod tests {
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::InvalidName(_), _)) => assert!(true),
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::InvalidName(_) => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -103,8 +105,8 @@ mod tests {
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::InvalidName(_), _)) => assert!(true),
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::InvalidName(_) => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -148,10 +150,8 @@ mod tests {
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::InvalidName("Label length too long"), _)) => {
-                assert!(true)
-            }
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::InvalidName("Label length too long") => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -169,13 +169,10 @@ mod tests {
         let dns_sector = DNSSector::new(data).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(
-                errors::ErrorKind::InvalidPacket(
-                    "AAAA record doesn\'t include a 16 bytes IP address",
-                ),
-                _,
-            )) => assert!(true),
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::InvalidPacket("AAAA record doesn\'t include a 16 bytes IP address") => {
+                assert!(true)
+            }
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -361,8 +358,8 @@ mod tests {
         let dns_sector = DNSSector::new(data).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
-        match ret.err() {
-            Some(errors::Error(errors::ErrorKind::InvalidPacket(_), _)) => assert!(true),
+        match ret.err().expect("error").downcast::<DSError>().unwrap() {
+            DSError::InvalidPacket(_) => assert!(true),
             _ => assert!(false),
         }
     }

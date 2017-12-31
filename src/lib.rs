@@ -4,8 +4,12 @@ extern crate byteorder;
 #[macro_use]
 extern crate chomp;
 #[macro_use]
-extern crate error_chain;
+extern crate failure;
+#[macro_use]
+extern crate failure_derive;
 extern crate libc;
+#[macro_use]
+extern crate xfailure;
 
 pub mod c_abi;
 pub mod compress;

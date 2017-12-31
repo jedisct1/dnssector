@@ -3,6 +3,7 @@ use byteorder::{BigEndian, ByteOrder};
 use chomp::prelude::parse_only;
 use constants::*;
 use errors::*;
+use failure;
 use std::net::{Ipv4Addr, Ipv6Addr};
 
 #[derive(Clone, Debug)]
@@ -20,24 +21,24 @@ pub fn copy_raw_name_from_str(
     raw_name: &mut Vec<u8>,
     name: &[u8],
     raw_zone: Option<&[u8]>,
-) -> Result<()> {
+) -> Result<(), failure::Error> {
     let mut label_len = 0u8;
     let mut label_start = 0;
     if name.len() > 253 {
-        bail!(ErrorKind::InvalidName("Name too long"))
+        xbail!(DSError::InvalidName("Name too long"))
     }
     for (i, &c) in name.iter().enumerate() {
         match c {
             b'.' if label_len == 0 => if name.len() != 1 {
-                bail!(ErrorKind::InvalidName("Spurious dot in a label"))
+                xbail!(DSError::InvalidName("Spurious dot in a label"))
             },
             b'.' => {
                 raw_name.push(label_len);
                 raw_name.extend_from_slice(&name[label_start..i]);
                 label_len = 0;
             }
-            _ if label_len >= 63 - 1 => bail!(ErrorKind::InvalidName("Label too long")),
-            c if c > 128 => bail!(ErrorKind::InvalidName("Non-ASCII character in a label")),
+            _ if label_len >= 63 - 1 => xbail!(DSError::InvalidName("Label too long")),
+            c if c > 128 => xbail!(DSError::InvalidName("Non-ASCII character in a label")),
             _ if label_len == 0 => {
                 label_start = i;
                 label_len += 1;
@@ -57,14 +58,14 @@ pub fn copy_raw_name_from_str(
     }
     debug_assert!(DNS_MAX_HOSTNAME_LEN >= 253);
     if raw_name.len() > 253 {
-        bail!(ErrorKind::InvalidName("Name too long"))
+        xbail!(DSError::InvalidName("Name too long"))
     }
     Ok(())
 }
 
 /// Get the raw (binary, encoded) name for a name given as a string, and
 /// an optional default zone.
-pub fn raw_name_from_str(name: &[u8], raw_zone: Option<&[u8]>) -> Result<Vec<u8>> {
+pub fn raw_name_from_str(name: &[u8], raw_zone: Option<&[u8]>) -> Result<Vec<u8>, failure::Error> {
     let mut raw_name = Vec::with_capacity(name.len() + raw_zone.map_or(1, |x| x.len()));
     copy_raw_name_from_str(&mut raw_name, name, raw_zone)?;
     Ok(raw_name)
@@ -76,10 +77,10 @@ pub struct RR {
 }
 
 impl RR {
-    fn new(rr_header: RRHeader, rdata: &[u8]) -> Result<Self> {
+    fn new(rr_header: RRHeader, rdata: &[u8]) -> Result<Self, failure::Error> {
         let rdlen = rdata.len();
         if rdlen > 0xffff {
-            bail!(ErrorKind::InvalidPacket("RDATA too long"));
+            xbail!(DSError::InvalidPacket("RDATA too long"));
         }
         let mut packet = Vec::with_capacity(rr_header.name.len() + 1 + DNS_RR_HEADER_SIZE + rdlen);
         copy_raw_name_from_str(&mut packet, &rr_header.name, None)?;
@@ -93,11 +94,11 @@ impl RR {
         Ok(RR { packet: packet })
     }
 
-    pub fn from_string(s: &str) -> Result<RR> {
+    pub fn from_string(s: &str) -> Result<RR, failure::Error> {
         match parse_only(rr_parser, s.as_bytes()) {
-            Err(_) => bail!(ErrorKind::ParseError),
+            Err(_) => xbail!(DSError::ParseError),
             Ok(rr) => match rr {
-                Err(e) => bail!(e),
+                Err(e) => xbail!(e),
                 Ok(rr) => Ok(rr),
             },
         }
@@ -107,7 +108,7 @@ impl RR {
 pub struct A;
 
 impl A {
-    pub fn build(rr_header: RRHeader, ip: Ipv4Addr) -> Result<RR> {
+    pub fn build(rr_header: RRHeader, ip: Ipv4Addr) -> Result<RR, failure::Error> {
         let rdata = ip.octets();
         RR::new(rr_header, &rdata)
     }
@@ -116,7 +117,7 @@ impl A {
 pub struct AAAA;
 
 impl AAAA {
-    pub fn build(rr_header: RRHeader, ip: Ipv6Addr) -> Result<RR> {
+    pub fn build(rr_header: RRHeader, ip: Ipv6Addr) -> Result<RR, failure::Error> {
         let rdata = ip.octets();
         RR::new(rr_header, &rdata)
     }
@@ -125,7 +126,7 @@ impl AAAA {
 pub struct NS;
 
 impl NS {
-    pub fn build(rr_header: RRHeader, name: Vec<u8>) -> Result<RR> {
+    pub fn build(rr_header: RRHeader, name: Vec<u8>) -> Result<RR, failure::Error> {
         let rdata = raw_name_from_str(&name, None)?;
         RR::new(rr_header, &rdata)
     }
@@ -134,7 +135,7 @@ impl NS {
 pub struct CNAME;
 
 impl CNAME {
-    pub fn build(rr_header: RRHeader, name: Vec<u8>) -> Result<RR> {
+    pub fn build(rr_header: RRHeader, name: Vec<u8>) -> Result<RR, failure::Error> {
         let rdata = raw_name_from_str(&name, None)?;
         RR::new(rr_header, &rdata)
     }
@@ -143,7 +144,7 @@ impl CNAME {
 pub struct PTR;
 
 impl PTR {
-    pub fn build(rr_header: RRHeader, name: Vec<u8>) -> Result<RR> {
+    pub fn build(rr_header: RRHeader, name: Vec<u8>) -> Result<RR, failure::Error> {
         let rdata = raw_name_from_str(&name, None)?;
         RR::new(rr_header, &rdata)
     }
@@ -152,9 +153,9 @@ impl PTR {
 pub struct TXT;
 
 impl TXT {
-    pub fn build(rr_header: RRHeader, txt: Vec<u8>) -> Result<RR> {
+    pub fn build(rr_header: RRHeader, txt: Vec<u8>) -> Result<RR, failure::Error> {
         if txt.len() > (4096 - DNS_HEADER_SIZE - 1 - DNS_RR_HEADER_SIZE) / 256 * 255 {
-            bail!(ErrorKind::InvalidPacket("Text too long"));
+            xbail!(DSError::InvalidPacket("Text too long"));
         }
         let mut rdata = Vec::with_capacity(1 + txt.len());
         for chunk in txt.chunks(255) {
@@ -168,7 +169,11 @@ impl TXT {
 pub struct MX;
 
 impl MX {
-    pub fn build(rr_header: RRHeader, preference: u16, mxhost: Vec<u8>) -> Result<RR> {
+    pub fn build(
+        rr_header: RRHeader,
+        preference: u16,
+        mxhost: Vec<u8>,
+    ) -> Result<RR, failure::Error> {
         let mut rdata = Vec::with_capacity(2 + 1 + mxhost.len());
         rdata.push(0);
         rdata.push(0);
@@ -190,7 +195,7 @@ impl SOA {
         retry_ttl: u32,
         auth_ttl: u32,
         neg_ttl: u32,
-    ) -> Result<RR> {
+    ) -> Result<RR, failure::Error> {
         let mut rdata = Vec::with_capacity(primary_ns.len() + 1 + contact.len() + 1 + 20);
         let mut meta = [0u8; 20];
         copy_raw_name_from_str(&mut rdata, &primary_ns, None)?;
