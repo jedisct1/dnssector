@@ -24,9 +24,7 @@ mod tests {
 
     #[test]
     fn test_packet_has_two_questions() {
-        let data_small: Vec<u8> = vec![
-            0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0
-        ];
+        let data_small: Vec<u8> = vec![0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0];
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
@@ -38,9 +36,7 @@ mod tests {
 
     #[test]
     fn test_packet_advertises_one_question_but_is_missing_section() {
-        let data_small: Vec<u8> = vec![
-            0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
-        ];
+        let data_small: Vec<u8> = vec![0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0];
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
@@ -52,9 +48,7 @@ mod tests {
 
     #[test]
     fn test_packet_has_empty_name() {
-        let data_small: Vec<u8> = vec![
-            0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
-        ];
+        let data_small: Vec<u8> = vec![0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_ok());
@@ -62,9 +56,7 @@ mod tests {
 
     #[test]
     fn test_packet_name_does_not_end() {
-        let data_small: Vec<u8> = vec![
-            0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, b'a', 0, 0, 0, 1
-        ];
+        let data_small: Vec<u8> = vec![0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, b'a', 0, 0, 0, 1];
         let dns_sector = DNSSector::new(data_small).unwrap();
         let ret = dns_sector.parse();
         assert!(ret.is_err());
@@ -119,9 +111,7 @@ mod tests {
 
     #[test]
     fn test_packet_name_too_long_with_compression() {
-        let mut data_small: Vec<u8> = vec![
-            0, 0, 0, 0, 0, 1, 0, 3, 0, 0, 0, 0
-        ];
+        let mut data_small: Vec<u8> = vec![0, 0, 0, 0, 0, 1, 0, 3, 0, 0, 0, 0];
 
         // query
         data_small.extend(vec![
@@ -168,17 +158,13 @@ mod tests {
 
     #[test]
     fn test_packet_bogus_ipv6_length() {
-        let mut data: Vec<u8> = vec![
-            0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0
-        ];
+        let mut data: Vec<u8> = vec![0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0];
 
         // query
         data.extend(vec![0, 0, 28, 0, 1]);
 
         // 1st answer
-        data.extend(vec![
-            0, 0, 28, 0, 1, 0, 0, 0, 0, 0, 4, 1, 2, 3, 4
-        ]);
+        data.extend(vec![0, 0, 28, 0, 1, 0, 0, 0, 0, 0, 4, 1, 2, 3, 4]);
 
         let dns_sector = DNSSector::new(data).unwrap();
         let ret = dns_sector.parse();
