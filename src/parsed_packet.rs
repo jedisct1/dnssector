@@ -351,8 +351,8 @@ impl ParsedPacket {
         Ok(())
     }
 
-    /// Returns the question as a string, as well as the query type
-    pub fn question(&self) -> Option<((Vec<u8>, u16))> {
+    /// Returns the question as a string, as well as the query type and class
+    pub fn question(&self) -> Option<((Vec<u8>, u16, u16))> {
         let offset = match self.offset_question {
             None => return None,
             Some(offset) => offset,
@@ -361,7 +361,8 @@ impl ParsedPacket {
         let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
         let rdata = &self.packet()[offset..];
         let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
-        Some((name_str, rr_type))
+        let rr_class = BigEndian::read_u16(&rdata[DNS_RR_CLASS_OFFSET..]);
+        Some((name_str, rr_type, rr_class))
     }
 
     /// Replaces `source_name` with `target_name` in all names, in all records.

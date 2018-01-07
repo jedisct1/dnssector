@@ -441,7 +441,7 @@ unsafe extern "C" fn question(
             *rr_type = 0;
             -1
         }
-        Some((name_str, rr_type_)) => {
+        Some((name_str, rr_type_, _)) => {
             *rr_type = rr_type_;
             let name_str_len = name_str.len();
             if name_str_len > DNS_MAX_HOSTNAME_LEN {
