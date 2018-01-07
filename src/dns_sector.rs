@@ -264,6 +264,7 @@ impl DNSSector {
             edns_count,
             maybe_compressed: true,
             max_payload,
+            cached: None
         };
         Ok(parsed_packet)
     }

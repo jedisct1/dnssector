@@ -28,6 +28,7 @@ pub struct ParsedPacket {
     pub ext_flags: Option<u16>,
     pub maybe_compressed: bool,
     pub max_payload: usize,
+    pub cached: Option<(Vec<u8>, u16, u16)>,
 }
 
 impl ParsedPacket {
@@ -348,11 +349,16 @@ impl ParsedPacket {
         assert_eq!(self.ext_flags, parsed_packet.ext_flags);
         self.maybe_compressed = false;
         self.packet = Some(parsed_packet.into_packet());
+        self.cached = None;
         Ok(())
     }
 
     /// Returns the question as a string, as well as the query type and class
     pub fn question(&self) -> Option<((Vec<u8>, u16, u16))> {
+        match self.cached {
+            Some(ref cached) => return Some(cached.clone()),
+            None => {}
+        };
         let offset = match self.offset_question {
             None => return None,
             Some(offset) => offset,
