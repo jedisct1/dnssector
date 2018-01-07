@@ -137,7 +137,7 @@ impl ParsedPacket {
     }
 
     /// Check if this is question with the DO bit, or a response with the AD bit
-    pub fn has_dnssec(&self) -> bool {
+    pub fn dnssec(&self) -> bool {
         let flags = self.flags();
         if flags & DNS_FLAG_QR == 0 {
             (flags & DNS_FLAG_DO) != 0
