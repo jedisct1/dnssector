@@ -131,7 +131,7 @@ pub trait DNSIterable {
 }
 
 pub trait TypedIterable {
-    /// Returns the RR name (labels are dot-delimited), as a byte vector. The name is not supposed to be valid UTF-8.
+    /// Returns the RR name (labels are dot-delimited), as a byte vector. The name is not supposed to be valid UTF-8. It will be converted to lower-case, though, using traditional DNS conversion rules
     fn name(&self) -> Vec<u8>
     where
         Self: DNSIterable,
@@ -142,7 +142,9 @@ pub trait TypedIterable {
             return Vec::new();
         }
         let packet = raw.packet;
-        Compress::raw_name_to_str(&packet, offset)
+        let mut name = Compress::raw_name_to_str(&packet, offset);
+        name.make_ascii_lowercase();
+        name
     }
 
     /// Appends the uncompressed RR name (raw format, with labels prefixed by their length) to the given vector.

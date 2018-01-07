@@ -512,7 +512,6 @@ impl Compress {
             }
             res.extend(label);
         }
-        res.make_ascii_lowercase();
         res
     }
 

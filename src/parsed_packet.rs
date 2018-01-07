@@ -353,7 +353,7 @@ impl ParsedPacket {
         Ok(())
     }
 
-    /// Returns the question as a string, as well as the query type and class
+    /// Returns the question as a string, without case conversion, as well as the query type and class
     pub fn question(&mut self) -> Option<((&[u8], u16, u16))> {
         match self.cached {
             Some(ref cached) => return Some((&cached.0, cached.1, cached.2)),
@@ -374,6 +374,26 @@ impl ParsedPacket {
         self.cached = Some((name_str, rr_type, rr_class));
         let cached = self.cached.as_ref().unwrap();
         Some((&cached.0, cached.1, cached.2))
+    }
+
+    /// Return the query type and class
+    pub fn qtype_qclass(&self) -> Option<(u16, u16)> {
+        match self.cached {
+            Some(ref cached) => return Some((cached.1, cached.2)),
+            None => {}
+        };
+        let offset = match self.offset_question {
+            None => return None,
+            Some(offset) => offset,
+        };
+        let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
+        let (rr_type, rr_class) = {
+            let rdata = &self.packet()[offset..];
+            let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
+            let rr_class = BigEndian::read_u16(&rdata[DNS_RR_CLASS_OFFSET..]);
+            (rr_type, rr_class)
+        };
+        Some((rr_type, rr_class))
     }
 
     /// Replaces `source_name` with `target_name` in all names, in all records.
