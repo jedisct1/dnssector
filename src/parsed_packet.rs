@@ -27,6 +27,7 @@ pub struct ParsedPacket {
     pub edns_version: Option<u8>,
     pub ext_flags: Option<u16>,
     pub maybe_compressed: bool,
+    pub max_payload: usize,
 }
 
 impl ParsedPacket {
@@ -161,6 +162,12 @@ impl ParsedPacket {
         let p = &mut self.packet_mut()[DNS_FLAGS_OFFSET];
         *p &= !0x78;
         *p |= (opcode << 3) & 0x78;
+    }
+
+    /// Maximum payload size when using UDP
+    #[inline]
+    pub fn max_payload(&self) -> usize {
+        self.max_payload
     }
 
     /// Increments the number of records in a given section

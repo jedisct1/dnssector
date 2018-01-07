@@ -20,6 +20,7 @@ pub struct DNSSector {
     pub ext_rcode: Option<u8>,
     pub edns_version: Option<u8>,
     pub ext_flags: Option<u16>,
+    pub max_payload: usize,
 }
 
 impl DNSSector {
@@ -194,6 +195,7 @@ impl DNSSector {
             ext_rcode: None,
             edns_version: None,
             ext_flags: None,
+            max_payload: 512,
         };
         Ok(dns_sector)
     }
@@ -248,18 +250,20 @@ impl DNSSector {
         let edns_version = self.edns_version;
         let ext_flags = self.ext_flags;
         let edns_count = self.edns_count;
+        let max_payload = self.max_payload;
         let parsed_packet = ParsedPacket {
             packet: Some(self.packet),
-            offset_question: offset_question,
-            offset_answers: offset_answers,
-            offset_nameservers: offset_nameservers,
-            offset_additional: offset_additional,
+            offset_question,
+            offset_answers,
+            offset_nameservers,
+            offset_additional,
             offset_edns: edns_start,
-            ext_rcode: ext_rcode,
-            edns_version: edns_version,
-            ext_flags: ext_flags,
-            edns_count: edns_count,
+            ext_rcode,
+            edns_version,
+            ext_flags,
+            edns_count,
             maybe_compressed: true,
+            max_payload,
         };
         Ok(parsed_packet)
     }
@@ -476,6 +480,7 @@ impl DNSSector {
         }
         self.ext_rcode = Some(self.opt_rr_ext_rcode()?);
         self.edns_version = Some(self.opt_rr_edns_version()?);
+        self.max_payload = self.opt_rr_max_payload()?;
         self.ext_flags = Some(self.opt_rr_edns_ext_flags()?);
         let edns_len = self.opt_rr_rdlen()?;
         self.increment_offset(DNS_OPT_RR_HEADER_SIZE)?;
