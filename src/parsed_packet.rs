@@ -351,7 +351,7 @@ impl ParsedPacket {
         Ok(())
     }
 
-    /// Returns the question as a stirng, as well as the query type
+    /// Returns the question as a string, as well as the query type
     pub fn question(&self) -> Option<((Vec<u8>, u16))> {
         let offset = match self.offset_question {
             None => return None,
