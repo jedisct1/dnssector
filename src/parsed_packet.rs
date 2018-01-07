@@ -354,9 +354,9 @@ impl ParsedPacket {
     }
 
     /// Returns the question as a string, as well as the query type and class
-    pub fn question(&self) -> Option<((Vec<u8>, u16, u16))> {
+    pub fn question(&mut self) -> Option<((&[u8], u16, u16))> {
         match self.cached {
-            Some(ref cached) => return Some(cached.clone()),
+            Some(ref cached) => return Some((&cached.0, cached.1, cached.2)),
             None => {}
         };
         let offset = match self.offset_question {
@@ -365,10 +365,15 @@ impl ParsedPacket {
         };
         let name_str = Compress::raw_name_to_str(&self.packet(), offset);
         let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
-        let rdata = &self.packet()[offset..];
-        let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
-        let rr_class = BigEndian::read_u16(&rdata[DNS_RR_CLASS_OFFSET..]);
-        Some((name_str, rr_type, rr_class))
+        let (rr_type, rr_class) = {
+            let rdata = &self.packet()[offset..];
+            let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
+            let rr_class = BigEndian::read_u16(&rdata[DNS_RR_CLASS_OFFSET..]);
+            (rr_type, rr_class)
+        };
+        self.cached = Some((name_str, rr_type, rr_class));
+        let cached = self.cached.as_ref().unwrap();
+        Some((&cached.0, cached.1, cached.2))
     }
 
     /// Replaces `source_name` with `target_name` in all names, in all records.

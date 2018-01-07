@@ -73,7 +73,7 @@ typedef struct FnTable {
     int (*raw_packet)(const ParsedPacket *parsed_packet,
                       uint8_t             raw_packet[DNS_MAX_PACKET_SIZE],
                       size_t *raw_packet_len, size_t max_len);
-    int (*question)(const ParsedPacket *parsed_packet,
+    int (*question)(ParsedPacket *parsed_packet,
                     char name[DNS_MAX_HOSTNAME_LEN + 1], uint16_t *rr_type);
     int (*rename_with_raw_names)(const ParsedPacket *parsed_packet,
                                  const CErr **       err,

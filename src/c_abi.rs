@@ -431,7 +431,7 @@ unsafe extern "C" fn raw_packet(
 }
 
 unsafe extern "C" fn question(
-    parsed_packet: *const ParsedPacket,
+    parsed_packet: *mut ParsedPacket,
     name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
     rr_type: *mut u16,
 ) -> c_int {
@@ -587,7 +587,7 @@ pub struct FnTable {
         raw_packet_max_len: size_t,
     ) -> c_int,
     pub question: unsafe extern "C" fn(
-        parsed_packet: *const ParsedPacket,
+        parsed_packet: *mut ParsedPacket,
         name: &mut [u8; DNS_MAX_HOSTNAME_LEN + 1],
         rr_type: *mut u16,
     ) -> c_int,
