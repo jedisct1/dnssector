@@ -152,6 +152,7 @@ mod tests {
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
             DSError::InvalidName("Label length too long") => assert!(true),
+            DSError::InvalidPacket("A question shouldn\'t also contain answers") => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }
@@ -173,6 +174,7 @@ mod tests {
             DSError::InvalidPacket("AAAA record doesn\'t include a 16 bytes IP address") => {
                 assert!(true)
             }
+            DSError::InvalidPacket("A question shouldn\'t also contain answers") => assert!(true),
             a => assert!(false, "type: {:?}", a),
         }
     }

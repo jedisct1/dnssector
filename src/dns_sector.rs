@@ -29,6 +29,13 @@ impl DNSSector {
         self.packet
     }
 
+    /// Check if this is a response
+    #[inline]
+    pub fn is_response(packet: &[u8]) -> bool {
+        BigEndian::read_u16(&packet[DNS_FLAGS_OFFSET..]) & (DNS_FLAG_QR as u16)
+            == DNS_FLAG_QR as u16
+    }
+
     /// Returns the number of records in the question section.
     #[inline]
     pub fn qdcount(packet: &[u8]) -> u16 {
@@ -208,6 +215,7 @@ impl DNSSector {
         if packet_len < DNS_HEADER_SIZE {
             xbail!(DSError::PacketTooSmall)
         }
+        let is_response = Self::is_response(&self.packet);
         let qdcount = Self::qdcount(&self.packet);
         if qdcount == 0 {
             xbail!(DSError::InvalidPacket(
@@ -226,11 +234,21 @@ impl DNSSector {
             self.parse_question()?;
         }
         let ancount = Self::ancount(&self.packet);
+        if !is_response && ancount > 0 {
+            xbail!(DSError::InvalidPacket(
+                "A question shouldn't also contain answers"
+            ));
+        }
         let offset_answers = if ancount > 0 { Some(self.offset) } else { None };
         for _ in 0..ancount {
             self.parse_rr(Section::Answer)?;
         }
         let nscount = Self::nscount(&self.packet);
+        if !is_response && nscount > 0 {
+            xbail!(DSError::InvalidPacket(
+                "A question shouldn't also contain name servers"
+            ));
+        }
         let offset_nameservers = if nscount > 0 { Some(self.offset) } else { None };
         for _ in 0..nscount {
             self.parse_rr(Section::NameServers)?;
