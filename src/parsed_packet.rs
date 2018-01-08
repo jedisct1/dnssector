@@ -400,7 +400,8 @@ impl ParsedPacket {
     /// Returns the question as a raw vector, without case conversion, as well as the query type and class
     /// Names do not include trailing `0`
     pub fn question_raw(&mut self) -> Option<((&[u8], u16, u16))> {
-        self.question_raw0().map(|(name, rr_type, rr_class)| (&name[..name.len() - 1], rr_type, rr_class))
+        self.question_raw0()
+            .map(|(name, rr_type, rr_class)| (&name[..name.len() - 1], rr_type, rr_class))
     }
 
     /// Returns the question as a string, without case conversion, as well as the query type and class
