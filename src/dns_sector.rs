@@ -36,6 +36,18 @@ impl DNSSector {
             == DNS_FLAG_QR as u16
     }
 
+    /// Set the response bit
+    #[inline]
+    pub fn set_response(packet: &mut [u8], is_response: bool) {
+        let mut oll = BigEndian::read_u16(&packet[DNS_FLAGS_OFFSET..]);
+        if is_response {
+            oll |= DNS_FLAG_QR as u16
+        } else {
+            oll &= !(DNS_FLAG_QR as u16)
+        }
+        BigEndian::write_u16(&mut packet[DNS_FLAGS_OFFSET..], oll);
+    }
+
     /// Returns the number of records in the question section.
     #[inline]
     pub fn qdcount(packet: &[u8]) -> u16 {
