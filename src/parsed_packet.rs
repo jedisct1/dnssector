@@ -137,7 +137,7 @@ impl ParsedPacket {
         BigEndian::write_u16(&mut self.packet_mut()[DNS_FLAGS_OFFSET..], v);
     }
 
-    /// Check if this is question with the DO bit, or a response with the AD bit
+    /// Check if this is a question with the DO bit, or a response with the AD bit
     pub fn dnssec(&self) -> bool {
         let flags = self.flags();
         if flags & DNS_FLAG_QR == 0 {
@@ -145,6 +145,12 @@ impl ParsedPacket {
         } else {
             (flags & DNS_FLAG_AD) != 0
         }
+    }
+
+    /// Check if this is a response
+    #[inline]
+    pub fn is_response(&self) -> bool {
+        self.flags() & DNS_FLAG_QR == DNS_FLAG_QR
     }
 
     /// Returns the return code.
