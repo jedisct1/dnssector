@@ -372,7 +372,8 @@ impl ParsedPacket {
     }
 
     /// Returns the question as a raw vector, without case conversion, as well as the query type and class
-    pub fn question_raw(&mut self) -> Option<((&[u8], u16, u16))> {
+    /// Names include a trailing `0`
+    pub fn question_raw0(&mut self) -> Option<((&[u8], u16, u16))> {
         match self.cached {
             Some(ref cached) => return Some((&cached.0, cached.1, cached.2)),
             None => {}
@@ -394,6 +395,12 @@ impl ParsedPacket {
         self.cached = Some((name, rr_type, rr_class));
         let cached = self.cached.as_ref().unwrap();
         Some((&cached.0, cached.1, cached.2))
+    }
+
+    /// Returns the question as a raw vector, without case conversion, as well as the query type and class
+    /// Names do not include trailing `0`
+    pub fn question_raw(&mut self) -> Option<((&[u8], u16, u16))> {
+        self.question_raw0().map(|(name, rr_type, rr_class)| (&name[..name.len() - 1], rr_type, rr_class))
     }
 
     /// Returns the question as a string, without case conversion, as well as the query type and class
