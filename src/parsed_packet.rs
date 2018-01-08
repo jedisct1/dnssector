@@ -137,18 +137,6 @@ impl ParsedPacket {
         BigEndian::write_u16(&mut self.packet_mut()[DNS_FLAGS_OFFSET..], v);
     }
 
-    /// Set the response bit
-    #[inline]
-    pub fn set_response(&mut self, is_response: bool) {
-        let mut oll = BigEndian::read_u16(&self.packet()[DNS_FLAGS_OFFSET..]);
-        if is_response {
-            oll |= DNS_FLAG_QR as u16
-        } else {
-            oll &= !(DNS_FLAG_QR as u16)
-        }
-        BigEndian::write_u16(&mut self.packet_mut()[DNS_FLAGS_OFFSET..], oll);
-    }
-
     /// Check if this is a question with the DO bit, or a response with the AD bit
     pub fn dnssec(&self) -> bool {
         let flags = self.flags();
@@ -163,6 +151,18 @@ impl ParsedPacket {
     #[inline]
     pub fn is_response(&self) -> bool {
         self.flags() & DNS_FLAG_QR == DNS_FLAG_QR
+    }
+
+    /// Set the response bit
+    #[inline]
+    pub fn set_response(&mut self, is_response: bool) {
+        let mut oll = BigEndian::read_u16(&self.packet()[DNS_FLAGS_OFFSET..]);
+        if is_response {
+            oll |= DNS_FLAG_QR as u16
+        } else {
+            oll &= !(DNS_FLAG_QR as u16)
+        }
+        BigEndian::write_u16(&mut self.packet_mut()[DNS_FLAGS_OFFSET..], oll);
     }
 
     /// Returns the return code.
