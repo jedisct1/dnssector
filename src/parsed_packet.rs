@@ -371,8 +371,8 @@ impl ParsedPacket {
         Ok(())
     }
 
-    /// Returns the question as a string, without case conversion, as well as the query type and class
-    pub fn question(&mut self) -> Option<((&[u8], u16, u16))> {
+    /// Returns the question as a raw vector, without case conversion, as well as the query type and class
+    pub fn question_raw(&mut self) -> Option<((&[u8], u16, u16))> {
         match self.cached {
             Some(ref cached) => return Some((&cached.0, cached.1, cached.2)),
             None => {}
@@ -381,7 +381,37 @@ impl ParsedPacket {
             None => return None,
             Some(offset) => offset,
         };
-        let name_str = Compress::raw_name_to_str(&self.packet(), offset);
+        let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
+        let uncompressed_name_result =
+            Compress::copy_uncompressed_name(&mut name, &self.packet(), offset);
+        let offset = uncompressed_name_result.final_offset;
+        let (rr_type, rr_class) = {
+            let rdata = &self.packet()[offset..];
+            let rr_type = BigEndian::read_u16(&rdata[DNS_RR_TYPE_OFFSET..]);
+            let rr_class = BigEndian::read_u16(&rdata[DNS_RR_CLASS_OFFSET..]);
+            (rr_type, rr_class)
+        };
+        self.cached = Some((name, rr_type, rr_class));
+        let cached = self.cached.as_ref().unwrap();
+        Some((&cached.0, cached.1, cached.2))
+    }
+
+    /// Returns the question as a string, without case conversion, as well as the query type and class
+    pub fn question(&mut self) -> Option<((Vec<u8>, u16, u16))> {
+        match self.cached {
+            Some(ref cached) => {
+                let mut name_str = Compress::raw_name_to_str(&cached.0, 0);
+                name_str.make_ascii_lowercase();
+                return Some((name_str, cached.1, cached.2));
+            }
+            None => {}
+        };
+        let offset = match self.offset_question {
+            None => return None,
+            Some(offset) => offset,
+        };
+        let mut name_str = Compress::raw_name_to_str(&self.packet(), offset);
+        name_str.make_ascii_lowercase();
         let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
         let (rr_type, rr_class) = {
             let rdata = &self.packet()[offset..];
@@ -389,9 +419,7 @@ impl ParsedPacket {
             let rr_class = BigEndian::read_u16(&rdata[DNS_RR_CLASS_OFFSET..]);
             (rr_type, rr_class)
         };
-        self.cached = Some((name_str, rr_type, rr_class));
-        let cached = self.cached.as_ref().unwrap();
-        Some((&cached.0, cached.1, cached.2))
+        Some((name_str, rr_type, rr_class))
     }
 
     /// Return the query type and class
