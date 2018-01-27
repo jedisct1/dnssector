@@ -144,7 +144,7 @@ impl DNSSector {
     fn be16_load(&self, rr_offset: usize) -> Result<u16, failure::Error> {
         self.ensure_remaining_len(rr_offset + 2)?;
         let offset = self.offset + rr_offset;
-        Ok((BigEndian::read_u16(&self.packet[offset..])))
+        Ok(BigEndian::read_u16(&self.packet[offset..]))
     }
 
     #[allow(dead_code)]
@@ -152,7 +152,7 @@ impl DNSSector {
     fn be32_load(&self, rr_offset: usize) -> Result<u32, failure::Error> {
         self.ensure_remaining_len(rr_offset + 4)?;
         let offset = self.offset + rr_offset;
-        Ok((BigEndian::read_u32(&self.packet[offset..])))
+        Ok(BigEndian::read_u32(&self.packet[offset..]))
     }
 
     /// Checks that an encoded DNS name is valid. This includes following indirections for
