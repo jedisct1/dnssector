@@ -106,5 +106,11 @@ Action hook_recv(const EdgeDNSFnTable *edgedns_fn_table,
 Action hook_deliver(const EdgeDNSFnTable *edgedns_fn_table,
                     SessionState *session_state, const FnTable *fn_table,
                     ParsedPacket *parsed_packet);
+Action hook_hit(const EdgeDNSFnTable *edgedns_fn_table,
+                SessionState *session_state, const FnTable *fn_table,
+                ParsedPacket *parsed_packet);
+Action hook_miss(const EdgeDNSFnTable *edgedns_fn_table,
+                 SessionState *session_state, const FnTable *fn_table,
+                 ParsedPacket *parsed_packet);
 
 #endif
