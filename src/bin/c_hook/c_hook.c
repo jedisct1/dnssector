@@ -175,5 +175,5 @@ Action hook_deliver(const EdgeDNSFnTable *edgedns_fn_table, SessionState *sessio
     puts("New answer section");
     fn_table->iter_answer(parsed_packet, rr_it2, fn_table);
 
-    return ACTION_PASS;
+    return ACTION_DELIVER;
 }
