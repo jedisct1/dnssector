@@ -85,7 +85,16 @@ typedef struct FnTable {
     uint64_t abi_version;
 } FnTable;
 
-typedef enum Action { ACTION_PASS = 1, ACTION_LOOKUP, ACTION_DROP } Action;
+typedef enum Action {
+    ACTION_PASS = 1,
+    ACTION_LOOKUP,
+    ACTION_PIPE,
+    ACTION_HASH,
+    ACTION_PURGE,
+    ACTION_SYNTH,
+    ACTION_DROP,
+    ACTION_FAIL
+} Action;
 
 Action hook_recv(const EdgeDNSFnTable *edgedns_fn_table,
                  SessionState *session_state, const FnTable *fn_table,
