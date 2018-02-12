@@ -110,7 +110,7 @@ static bool rr_it(void *ctx, void *it)
     assert(ret == 0);
     ret = fn_table->delete_rr(it, &err);
     assert(ret == -1);
-    assert(strcmp(fn_table->error_description(err), "VoidRecord") == 0);
+    assert(strcmp(fn_table->error_description(err), "Void record") == 0);
 
     return 0;
 }
