@@ -96,6 +96,8 @@ typedef enum Action {
     ACTION_FAIL,
     ACTION_DELIVER,
     ACTION_RESTART,
+    ACTION_MISS,
+    ACTION_FETCH,
 } Action;
 
 Action hook_recv(const EdgeDNSFnTable *edgedns_fn_table,
