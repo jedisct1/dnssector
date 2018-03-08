@@ -4,8 +4,11 @@
 #include <ctype.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
-#define ABI_VERSION 0x2
+#define DNSSECTOR_ABI_VERSION 0x2
+#define EDGEDNS_ABI_VERSION 0x2
 
 #define DNS_MAX_HOSTNAME_LEN 255
 #define DNS_MAX_PACKET_SIZE 8192
@@ -16,7 +19,7 @@ typedef struct CErr         CErr;
 
 typedef struct EdgeDNSFnTable {
     const char *(*error_description)(const CErr *err);
-    int (*set_session_id)(SessionState *session_state, const CErr **err,
+    int (*set_service_id)(SessionState *session_state, const CErr **err,
                           const char *session_id, size_t session_id_len);
     int (*env_insert_str)(SessionState *session_state, const CErr **err,
                           const char *key, size_t key_len, const char *val,
@@ -28,6 +31,12 @@ typedef struct EdgeDNSFnTable {
                        size_t *val_len_p, size_t val_max_len);
     int (*env_get_i64)(const SessionState *session_state, const CErr **err,
                        const char *key, size_t key_len, int64_t *i64);
+    int (*register_backend)(const SessionState *session_state, const CErr **err,
+                            const char *key, size_t key_len,
+                            const struct sockaddr_storage *ss, size_t ss_len);
+    int (*add_backend_to_director)(const SessionState *session_state, const CErr **err,
+                                   const char *backend_key, size_t backend_key_len);
+    uint64_t abi_version;
 } EdgeDNSFnTable;
 
 typedef struct FnTable {

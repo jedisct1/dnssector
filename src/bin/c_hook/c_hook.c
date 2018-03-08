@@ -138,13 +138,14 @@ hook_recv(const EdgeDNSFnTable *edgedns_fn_table, SessionState *session_state,
     char     name[DNS_MAX_HOSTNAME_LEN + 1];
     uint16_t rr_type;
 
-    assert(fn_table->abi_version == ABI_VERSION);
+    assert(fn_table->abi_version == DNSSECTOR_ABI_VERSION);
     puts("Recv hook - Question received");
     if (fn_table->question(parsed_packet, name, &rr_type) == 0) {
         printf("Question received: [%s] with type: %" PRIu16 "\n", name,
                rr_type);
     }
-    edgedns_fn_table->set_session_id(session_state, NULL, "42", 2);
+    assert(edgedns_fn_table->abi_version == EDGEDNS_ABI_VERSION);
+    edgedns_fn_table->set_service_id(session_state, NULL, "42", 2);
 
     return ACTION_HASH;
 }
@@ -156,7 +157,7 @@ hook_deliver(const EdgeDNSFnTable *edgedns_fn_table,
 {
     uint32_t flags;
 
-    assert(fn_table->abi_version == ABI_VERSION);
+    assert(fn_table->abi_version == DNSSECTOR_ABI_VERSION);
     flags = fn_table->flags(parsed_packet);
     printf("flags as seen by the C hook: %" PRIx32 "\n", flags);
     fn_table->set_flags(parsed_packet, flags | 0x10);
