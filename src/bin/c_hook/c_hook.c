@@ -5,6 +5,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
 
 #include "c_hook.h"
 
@@ -106,11 +109,13 @@ rr_it(void *ctx, void *it)
                                 "example.com", sizeof "example.com" - 1);
     fn_table->set_name(it, NULL, "www.prod", sizeof "www.prod" - 1,
                        default_zone, default_zone_len);
+#ifdef DELETE
     ret = fn_table->delete_rr(it, &err);
     assert(ret == 0);
     ret = fn_table->delete_rr(it, &err);
     assert(ret == -1);
     assert(strcmp(fn_table->error_description(err), "Void record") == 0);
+#endif
 
     return 0;
 }
@@ -202,7 +207,29 @@ Action
 hook_miss(const EdgeDNSFnTable *edgedns_fn_table, SessionState *session_state,
           const FnTable *fn_table, ParsedPacket *parsed_packet)
 {
+    struct sockaddr_in si;
+
     puts("Cache miss");
+
+    memset(&si, 0, sizeof si);
+    si.sin_family = AF_INET;
+    si.sin_port = htons(53);
+#ifdef __BSD__
+    si.sin_len = sizeof(si);
+#endif
+
+    inet_aton("9.9.9.9", &si.sin_addr);
+    edgedns_fn_table->register_backend(session_state, NULL,
+                                       "quad9", sizeof "quad9" - 1U,
+                                       (struct sockaddr_storage *) (void *) &si, sizeof si);
+
+    inet_aton("8.8.8.8", &si.sin_addr);
+    edgedns_fn_table->register_backend(session_state, NULL,
+                                       "google", sizeof "google" - 1U,
+                                       (struct sockaddr_storage *) (void *) &si, sizeof si);
+
+    edgedns_fn_table->add_backend_to_director(session_state, NULL,
+                                              "google", sizeof "google" - 1U);
 
     return ACTION_FETCH;
 }
