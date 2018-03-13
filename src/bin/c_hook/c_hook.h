@@ -26,11 +26,15 @@ typedef struct EdgeDNSFnTable {
                           size_t val_len);
     int (*env_insert_i64)(SessionState *session_state, const CErr **err,
                           const char *key, size_t key_len, int64_t i64);
+    int (*env_insert_bool)(SessionState *session_state, const CErr **err,
+                           const char *key, size_t key_len, bool b);
     int (*env_get_str)(const SessionState *session_state, const CErr **err,
                        const char *key, size_t key_len, char *val_p,
                        size_t *val_len_p, size_t val_max_len);
     int (*env_get_i64)(const SessionState *session_state, const CErr **err,
                        const char *key, size_t key_len, int64_t *i64);
+    int (*env_get_bool)(const SessionState *session_state, const CErr **err,
+                        const char *key, size_t key_len, bool *b);
     int (*register_backend)(const SessionState *session_state, const CErr **err,
                             const char *key, size_t key_len,
                             const struct sockaddr_storage *ss, size_t ss_len);
