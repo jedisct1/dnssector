@@ -2,6 +2,7 @@
 #define C_HOOK_H
 
 #include <ctype.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/types.h>
