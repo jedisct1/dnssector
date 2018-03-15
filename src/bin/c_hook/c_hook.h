@@ -100,18 +100,23 @@ typedef struct FnTable {
 } FnTable;
 
 typedef enum Action {
-    ACTION_PASS = 1,
-    ACTION_LOOKUP,
-    ACTION_PIPE,
-    ACTION_HASH,
-    ACTION_PURGE,
-    ACTION_SYNTH,
-    ACTION_DROP,
-    ACTION_FAIL,
-    ACTION_DELIVER,
-    ACTION_RESTART,
-    ACTION_MISS,
-    ACTION_FETCH,
+        ACTION_DELIVER = 1,
+        ACTION_DELIVER_STALE = 2,
+        ACTION_DONE = 3,
+        ACTION_ERROR = 4,
+        ACTION_FETCH = 5,
+        ACTION_HASH = 6,
+        ACTION_HIT_FOR_PASS = 7,
+        ACTION_LOOKUP = 8,
+        ACTION_PASS = 9,
+        ACTION_PIPE = 10,
+        ACTION_RESTART = 11,
+        ACTION_PURGE = 12,
+        ACTION_SYNTH = 13,
+        ACTION_DROP = 14,
+        ACTION_FAIL = 15,
+        ACTION_MISS = 16,
+        ACTION_DEFAULT = 17
 } Action;
 
 Action hook_recv(const EdgeDNSFnTable *edgedns_fn_table,
