@@ -3,6 +3,7 @@ use byteorder::{BigEndian, ByteOrder};
 use chomp::prelude::parse_only;
 use crate::constants::*;
 use crate::errors::*;
+use crate::parsed_packet::*;
 use failure;
 use std::net::{Ipv4Addr, Ipv6Addr};
 
@@ -29,9 +30,11 @@ pub fn copy_raw_name_from_str(
     }
     for (i, &c) in name.iter().enumerate() {
         match c {
-            b'.' if label_len == 0 => if name.len() != 1 {
-                xbail!(DSError::InvalidName("Spurious dot in a label"))
-            },
+            b'.' if label_len == 0 => {
+                if name.len() != 1 {
+                    xbail!(DSError::InvalidName("Spurious dot in a label"))
+                }
+            }
             b'.' => {
                 raw_name.push(label_len);
                 raw_name.extend_from_slice(&name[label_start..i]);
@@ -71,13 +74,22 @@ pub fn raw_name_from_str(name: &[u8], raw_zone: Option<&[u8]>) -> Result<Vec<u8>
     Ok(raw_name)
 }
 
+/// Create a query from a string
+pub fn query(name: &[u8], rr_type: Type, class: Class) -> Result<ParsedPacket, failure::Error> {
+    let mut parsed_packet = ParsedPacket::empty();
+    parsed_packet.set_response(false);
+    let rr = RR::new_question(name, rr_type, class)?;
+    parsed_packet.insert_rr(Section::Question, rr)?;
+    Ok(parsed_packet)
+}
+
 #[derive(Clone, Debug)]
 pub struct RR {
     pub packet: Vec<u8>,
 }
 
 impl RR {
-    fn new(rr_header: RRHeader, rdata: &[u8]) -> Result<Self, failure::Error> {
+    pub fn new(rr_header: RRHeader, rdata: &[u8]) -> Result<Self, failure::Error> {
         let rdlen = rdata.len();
         if rdlen > 0xffff {
             xbail!(DSError::InvalidPacket("RDATA too long"));
@@ -91,7 +103,17 @@ impl RR {
         BigEndian::write_u16(&mut header[DNS_RR_RDLEN_OFFSET..], rdlen as u16);
         packet.extend_from_slice(&header);
         packet.extend_from_slice(rdata);
-        Ok(RR { packet: packet })
+        Ok(RR { packet })
+    }
+
+    pub fn new_question(name: &[u8], rr_type: Type, class: Class) -> Result<Self, failure::Error> {
+        let mut packet = Vec::with_capacity(name.len() + 1 + DNS_RR_QUESTION_HEADER_SIZE);
+        copy_raw_name_from_str(&mut packet, &name, None)?;
+        let mut header = [0u8; DNS_RR_QUESTION_HEADER_SIZE];
+        BigEndian::write_u16(&mut header[DNS_RR_TYPE_OFFSET..], rr_type.into());
+        BigEndian::write_u16(&mut header[DNS_RR_CLASS_OFFSET..], class.into());
+        packet.extend_from_slice(&header);
+        Ok(RR { packet })
     }
 
     pub fn from_string(s: &str) -> Result<RR, failure::Error> {

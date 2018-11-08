@@ -14,6 +14,8 @@ pub enum DSError {
     InvalidPacket(&'static str),
     #[fail(display = "Unsupported RR type: {}", _0)]
     UnsupportedRRType(String),
+    #[fail(display = "Unsupported class type: {}", _0)]
+    UnsupportedRRClass(String),
     #[fail(display = "Void record")]
     VoidRecord,
     #[fail(display = "Property not found")]

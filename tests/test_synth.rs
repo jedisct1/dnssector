@@ -1,7 +1,8 @@
 extern crate dnssector;
 
 mod tests {
-    use super::dnssector::synth::gen::RR;
+    use super::dnssector::constants::*;
+    use super::dnssector::synth::gen::{self, RR};
 
     #[test]
     fn test_gen_a() {
@@ -41,11 +42,10 @@ mod tests {
     #[test]
     fn test_gen_txt() {
         assert!(RR::from_string("example.com. 86399 IN TXT \"Sample text\"").is_ok());
-        assert!(
-            RR::from_string(
-                "example.com. 86399 IN TXT \"Sample escaped \\000\\008\\128\\255 text\""
-            ).is_ok()
-        );
+        assert!(RR::from_string(
+            "example.com. 86399 IN TXT \"Sample escaped \\000\\008\\128\\255 text\""
+        )
+        .is_ok());
         assert!(
             RR::from_string(
                 "example.com. 86399 IN TXT \"Long text that has to be split into chunks: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""
@@ -80,5 +80,27 @@ mod tests {
         assert!(RR::from_string("example.com. 86399 IN NS www1.example.com.").is_ok());
         assert!(RR::from_string("example.com. 86399 IN NS 1www.example.com.").is_ok());
         assert!(RR::from_string("example.com. 86399 IN NS").is_err());
+    }
+
+    #[test]
+    fn test_gen_question() {
+        RR::new_question(
+            b"example.com",
+            Type::from_string("A").unwrap(),
+            Class::from_string("IN").unwrap(),
+        )
+        .unwrap();
+        let parsed_packet = gen::query(
+            b"example.com",
+            Type::from_string("A").unwrap(),
+            Class::from_string("IN").unwrap(),
+        )
+        .unwrap();
+        let packet = parsed_packet.into_packet();
+        let expected: [u8; 29] = [
+            0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 101, 120, 97, 109, 112, 108, 101, 3, 99, 111,
+            109, 0, 0, 1, 0, 1,
+        ];
+        assert_eq!(&packet[2..], &expected[2..]);
     }
 }

@@ -10,6 +10,7 @@ use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use crate::synth::gen;
 use failure;
+use rand::prelude::*;
 use std::ptr;
 
 /// A `ParsedPacket` structure contains information about a successfully parsed
@@ -32,6 +33,31 @@ pub struct ParsedPacket {
 }
 
 impl ParsedPacket {
+    /// Creates an empty parsed_packet
+    pub fn empty() -> Self {
+        let mut parsed_packet = ParsedPacket {
+            packet: Some(vec![0; 12]),
+            offset_question: None,
+            offset_answers: None,
+            offset_nameservers: None,
+            offset_additional: None,
+            offset_edns: None,
+            edns_count: 0,
+            ext_rcode: None,
+            edns_version: None,
+            ext_flags: None,
+            maybe_compressed: false,
+            max_payload: DNS_MAX_UNCOMPRESSED_SIZE,
+            cached: None,
+        };
+        let mut rng = thread_rng();
+        let tid: u16 = rng.gen();
+        parsed_packet.set_tid(tid);
+        parsed_packet.set_flags(DNS_FLAG_RD);
+        parsed_packet.set_response(false);
+        parsed_packet
+    }
+
     /// Converts a `ParsedPacket` back into a raw packet.
     #[inline]
     pub fn into_packet(self) -> Vec<u8> {

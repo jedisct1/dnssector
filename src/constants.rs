@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 
+use crate::errors::*;
 use std::convert::From;
 use std::mem;
 
@@ -101,6 +102,19 @@ impl From<Class> for u16 {
     }
 }
 
+impl Class {
+    pub fn from_string(rr_type_str: &str) -> Result<Class, failure::Error> {
+        match rr_type_str {
+            s if s.eq_ignore_ascii_case("IN") => Ok(Class::IN),
+            s if s.eq_ignore_ascii_case("CH") => Ok(Class::CH),
+            s if s.eq_ignore_ascii_case("HS") => Ok(Class::HS),
+            s if s.eq_ignore_ascii_case("NONE") => Ok(Class::NONE),
+            s if s.eq_ignore_ascii_case("ANY") => Ok(Class::ANY),
+            _ => xbail!(DSError::UnsupportedRRClass(rr_type_str.to_owned())),
+        }
+    }
+}
+
 /// DNS query type
 #[allow(non_camel_case_types)]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
@@ -194,6 +208,22 @@ pub enum Type {
 impl From<Type> for u16 {
     fn from(v: Type) -> u16 {
         unsafe { mem::transmute(v as u16) }
+    }
+}
+
+impl Type {
+    pub fn from_string(rr_type_str: &str) -> Result<Type, failure::Error> {
+        match rr_type_str {
+            s if s.eq_ignore_ascii_case("A") => Ok(Type::A),
+            s if s.eq_ignore_ascii_case("AAAA") => Ok(Type::AAAA),
+            s if s.eq_ignore_ascii_case("NS") => Ok(Type::NS),
+            s if s.eq_ignore_ascii_case("CNAME") => Ok(Type::CNAME),
+            s if s.eq_ignore_ascii_case("PTR") => Ok(Type::PTR),
+            s if s.eq_ignore_ascii_case("TXT") => Ok(Type::TXT),
+            s if s.eq_ignore_ascii_case("MX") => Ok(Type::MX),
+            s if s.eq_ignore_ascii_case("SOA") => Ok(Type::SOA),
+            _ => xbail!(DSError::UnsupportedRRType(rr_type_str.to_owned())),
+        }
     }
 }
 
