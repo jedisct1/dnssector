@@ -9,8 +9,6 @@ use chomp::primitives::Primitives;
 use crate::constants::*;
 use crate::errors::*;
 use failure;
-#[allow(unused_imports)]
-use std::ascii::AsciiExt;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::{self, FromStr};
 use std::u32;

@@ -6,8 +6,6 @@ use crate::parsed_packet::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use failure;
-#[allow(unused_imports)]
-use std::ascii::AsciiExt;
 
 pub struct Renamer;
 

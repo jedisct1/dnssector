@@ -4,8 +4,6 @@ use crate::dns_sector::*;
 use crate::errors::*;
 use crate::rr_iterator::*;
 use failure;
-#[allow(unused_imports)]
-use std::ascii::AsciiExt;
 use std::cmp;
 
 /// Output of the `copy_uncompressed_name()` function.
