@@ -1,16 +1,16 @@
 use byteorder::{BigEndian, ByteOrder};
-use compress::*;
-use constants::*;
-use dns_sector::*;
-use edns_iterator::*;
-use errors::*;
+use crate::compress::*;
+use crate::constants::*;
+use crate::dns_sector::*;
+use crate::edns_iterator::*;
+use crate::errors::*;
+use crate::question_iterator::*;
+use crate::renamer::*;
+use crate::response_iterator::*;
+use crate::rr_iterator::*;
+use crate::synth::gen;
 use failure;
-use question_iterator::*;
-use renamer::*;
-use response_iterator::*;
-use rr_iterator::*;
 use std::ptr;
-use synth::gen;
 
 /// A `ParsedPacket` structure contains information about a successfully parsed
 /// DNS packet, that allows quick access to (extended) flags and to individual sections.
@@ -263,11 +263,13 @@ impl ParsedPacket {
 
     fn insertion_offset(&self, section: Section) -> Result<usize, failure::Error> {
         let offset = match section {
-            Section::Question => self.offset_answers
+            Section::Question => self
+                .offset_answers
                 .or(self.offset_nameservers)
                 .or(self.offset_additional)
                 .unwrap_or(self.packet().len()),
-            Section::Answer => self.offset_nameservers
+            Section::Answer => self
+                .offset_nameservers
                 .or(self.offset_additional)
                 .unwrap_or(self.packet().len()),
             Section::NameServers => self.offset_additional.unwrap_or(self.packet().len()),

@@ -1,11 +1,11 @@
 use byteorder::{BigEndian, ByteOrder};
-use compress::*;
-use constants::*;
-use errors::*;
+use crate::compress::*;
+use crate::constants::*;
+use crate::errors::*;
+use crate::parsed_packet::*;
+use crate::response_iterator::*;
+use crate::rr_iterator::*;
 use failure;
-use parsed_packet::*;
-use response_iterator::*;
-use rr_iterator::*;
 #[allow(unused_imports)]
 use std::ascii::AsciiExt;
 
@@ -168,7 +168,8 @@ impl Renamer {
                 renamed_packet.extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_HEADER_SIZE]);
                 let rr_type = item.rr_type();
                 match rr_type {
-                    x if x == Type::NS.into() || x == Type::CNAME.into()
+                    x if x == Type::NS.into()
+                        || x == Type::CNAME.into()
                         || x == Type::PTR.into() =>
                     {
                         let offset_rdata = raw.name_end;
@@ -204,7 +205,8 @@ impl Renamer {
                             &source_name,
                             match_suffix,
                         )?;
-                        let new_rdlen = 2 + renamed_packet.len() - renamed_packet_name_offset
+                        let new_rdlen = 2 + renamed_packet.len()
+                            - renamed_packet_name_offset
                             - DNS_RR_HEADER_SIZE;
                         BigEndian::write_u16(
                             &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],

@@ -1,9 +1,9 @@
 use byteorder::{BigEndian, ByteOrder};
-use constants::*;
-use dns_sector::*;
-use errors::*;
+use crate::constants::*;
+use crate::dns_sector::*;
+use crate::errors::*;
+use crate::rr_iterator::*;
 use failure;
-use rr_iterator::*;
 #[allow(unused_imports)]
 use std::ascii::AsciiExt;
 use std::cmp;
@@ -164,12 +164,11 @@ impl Compress {
             Some(x) if x == Type::MX.into() => {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
-                let new_rdlen = 2
-                    + Compress::copy_uncompressed_name(
-                        &mut uncompressed,
-                        packet,
-                        offset_rdata + DNS_RR_HEADER_SIZE + 2,
-                    ).name_len;
+                let new_rdlen = 2 + Compress::copy_uncompressed_name(
+                    &mut uncompressed,
+                    packet,
+                    offset_rdata + DNS_RR_HEADER_SIZE + 2,
+                ).name_len;
                 BigEndian::write_u16(
                     &mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
                     new_rdlen as u16,
@@ -231,13 +230,12 @@ impl Compress {
             Some(x) if x == Type::MX.into() => {
                 let offset = compressed.len();
                 compressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
-                let new_rdlen = 2
-                    + Compress::copy_compressed_name(
-                        &mut dict,
-                        &mut compressed,
-                        packet,
-                        offset_rdata + DNS_RR_HEADER_SIZE + 2,
-                    ).name_len;
+                let new_rdlen = 2 + Compress::copy_compressed_name(
+                    &mut dict,
+                    &mut compressed,
+                    packet,
+                    offset_rdata + DNS_RR_HEADER_SIZE + 2,
+                ).name_len;
                 BigEndian::write_u16(
                     &mut compressed[offset + DNS_RR_RDLEN_OFFSET..],
                     new_rdlen as u16,

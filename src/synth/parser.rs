@@ -2,11 +2,12 @@ use super::gen::*;
 use chomp::ascii::*;
 use chomp::combinators::*;
 use chomp::parsers;
-use chomp::prelude::{eof, not_token, satisfy, skip_while, token, Buffer, Input, SimpleResult,
-                     U8Input, take_while1};
+use chomp::prelude::{
+    eof, not_token, satisfy, skip_while, take_while1, token, Buffer, Input, SimpleResult, U8Input,
+};
 use chomp::primitives::Primitives;
-use constants::*;
-use errors::*;
+use crate::constants::*;
+use crate::errors::*;
 use failure;
 #[allow(unused_imports)]
 use std::ascii::AsciiExt;

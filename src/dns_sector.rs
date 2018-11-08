@@ -1,9 +1,9 @@
 use byteorder::{BigEndian, ByteOrder};
-use compress::*;
-use constants::*;
-use errors::*;
+use crate::compress::*;
+use crate::constants::*;
+use crate::errors::*;
+use crate::parsed_packet::*;
 use failure;
-use parsed_packet::*;
 use std::mem;
 
 /// A `DNSSector` object summarizes the structure of a DNS packet,
@@ -444,11 +444,10 @@ impl DNSSector {
     fn edns_be32_load(&self, rr_offset: usize) -> Result<u32, failure::Error> {
         self.edns_ensure_remaining_len(rr_offset + 4)?;
         let offset = self.offset + rr_offset;
-        Ok(
-            (self.packet[offset] as u32) << 24 | (self.packet[offset + 1] as u32) << 16
-                | (self.packet[offset + 2] as u32) << 8
-                | self.packet[offset + 3] as u32,
-        )
+        Ok((self.packet[offset] as u32) << 24
+            | (self.packet[offset + 1] as u32) << 16
+            | (self.packet[offset + 2] as u32) << 8
+            | self.packet[offset + 3] as u32)
     }
 
     /// Returns the extended code of a record within the edns pseudo-section.

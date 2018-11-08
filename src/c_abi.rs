@@ -1,18 +1,18 @@
-use constants::*;
-use edns_iterator::*;
-use errors::*;
+use crate::constants::*;
+use crate::edns_iterator::*;
+use crate::errors::*;
+use crate::parsed_packet::*;
+use crate::question_iterator::*;
+use crate::response_iterator::*;
+use crate::rr_iterator::*;
+use crate::synth::gen;
 use failure;
 use libc::{c_char, c_int, c_void, size_t};
-use parsed_packet::*;
-use question_iterator::*;
-use response_iterator::*;
-use rr_iterator::*;
 use std::cell::RefCell;
 use std::convert::From;
 use std::ffi::{CStr, CString};
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::slice;
-use synth::gen;
 
 const ABI_VERSION: u64 = 0x2;
 

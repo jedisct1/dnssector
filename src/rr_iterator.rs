@@ -1,10 +1,10 @@
 use byteorder::{BigEndian, ByteOrder};
-use compress::*;
-use constants::*;
-use dns_sector::*;
-use errors::*;
+use crate::compress::*;
+use crate::constants::*;
+use crate::dns_sector::*;
+use crate::errors::*;
+use crate::parsed_packet::*;
 use failure;
-use parsed_packet::*;
 use std::marker;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::ptr;
@@ -232,7 +232,8 @@ pub trait TypedIterable {
         self.set_offset_next(new_offset_next);
         let section = self.current_section()?;
         let parsed_packet = self.parsed_packet_mut();
-        if section == Section::NameServers || section == Section::Answer
+        if section == Section::NameServers
+            || section == Section::Answer
             || section == Section::Question
         {
             parsed_packet.offset_additional = parsed_packet
@@ -302,9 +303,9 @@ pub trait TypedIterable {
             self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
             self.recompute_sections();
         }
-        let rr_len = self.offset_next()
-            - self.offset()
-                .expect("Deleting record with no known offset after optional decompression");
+        let rr_len = self.offset_next() - self
+            .offset()
+            .expect("Deleting record with no known offset after optional decompression");
         assert!(rr_len > 0);
         self.resize_rr(-(rr_len as isize))?;
         let offset = self.offset().unwrap();
@@ -456,7 +457,8 @@ impl<'t> RRIterator<'t> {
     }
 
     pub fn recompute(&mut self) {
-        let offset = self.offset
+        let offset = self
+            .offset
             .expect("recompute() called prior to iterating over RRs");
         let name_end = Self::skip_name(&self.parsed_packet.packet(), offset);
         let offset_next = Self::skip_rdata(&self.parsed_packet.packet(), name_end);

@@ -1,7 +1,7 @@
-use constants::*;
-use dns_sector::*;
-use parsed_packet::*;
-use rr_iterator::*;
+use crate::constants::*;
+use crate::dns_sector::*;
+use crate::parsed_packet::*;
+use crate::rr_iterator::*;
 
 #[derive(Debug)]
 pub struct QuestionIterator<'t> {

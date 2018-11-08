@@ -2,7 +2,7 @@ extern crate dnssector;
 extern crate libc;
 extern crate libloading;
 
-use c_abi::{self, FnTable};
+use crate::c_abi::{self, FnTable};
 use dnssector::*;
 use libc::c_int;
 use libloading::{Library, Symbol};
