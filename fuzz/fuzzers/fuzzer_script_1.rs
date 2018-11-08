@@ -1,8 +1,9 @@
 #![no_main]
-#[macro_use] extern crate libfuzzer_sys;
+#[macro_use]
+extern crate libfuzzer_sys;
 extern crate dnssector;
 
-use compress::*;
+use crate::compress::*;
 use dnssector::*;
 
 fuzz_target!(|packet: &[u8]| {
@@ -10,13 +11,15 @@ fuzz_target!(|packet: &[u8]| {
     let parsed = dns_sector.parse();
     let packet = match parsed {
         Err(_) => return,
-        Ok(packet) => packet.into_packet()
+        Ok(packet) => packet.into_packet(),
     };
-    let uncompressed = match Compress::uncompress(&packet) {
-        Err(_) => {},
+    let _uncompressed = match Compress::uncompress(&packet) {
+        Err(_) => {}
         Ok(packet) => {
             let dns_sector = DNSSector::new(packet).unwrap();
-            let parsed = dns_sector.parse().expect("Couldn't parse uncompressed packet");
+            let parsed = dns_sector
+                .parse()
+                .expect("Couldn't parse uncompressed packet");
             let packet = parsed.into_packet();
             let recompressed = Compress::compress(&packet).expect("Couldn't recompress packet");
             let dns_sector = DNSSector::new(recompressed).unwrap();

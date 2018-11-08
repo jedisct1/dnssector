@@ -1,18 +1,17 @@
 [package]
 name = "dnssector"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Frank Denis <github@pureftpd.org>"]
 
 [dependencies]
-byteorder = "*"
-chomp = "*"
-clippy = {version = "~0", optional = true}
-debug_stub_derive = "*"
-failure = "*"
-failure_derive = "*"
-libc = "*"
-libloading = "*"
-xfailure = "*"
+byteorder = "1"
+chomp = "0.3"
+debug_stub_derive = "0.3"
+failure = "0.1"
+failure_derive = "0.1"
+libc = "0.2"
+libloading = "0.5"
+xfailure = "0.1"
 
 [profile.release]
 lto = true
