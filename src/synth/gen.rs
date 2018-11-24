@@ -1,9 +1,9 @@
 use super::parser::*;
-use byteorder::{BigEndian, ByteOrder};
-use chomp::prelude::parse_only;
 use crate::constants::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
+use byteorder::{BigEndian, ByteOrder};
+use chomp::prelude::parse_only;
 use failure;
 use std::net::{Ipv4Addr, Ipv6Addr};
 
@@ -228,6 +228,27 @@ impl SOA {
         BigEndian::write_u32(&mut meta[12..], auth_ttl);
         BigEndian::write_u32(&mut meta[16..], neg_ttl);
         rdata.extend_from_slice(&meta);
+        RR::new(rr_header, &rdata)
+    }
+}
+
+pub struct DS;
+
+impl DS {
+    pub fn build(
+        rr_header: RRHeader,
+        key_tag: u16,
+        algorithm: u8,
+        digest_type: u8,
+        digest: String,
+    ) -> Result<RR, failure::Error> {
+        let mut rdata = Vec::with_capacity(2 + 1 + 1 + digest.len());
+        rdata.push(0);
+        rdata.push(0);
+        BigEndian::write_u16(&mut rdata[0..2], key_tag);
+        rdata.push(algorithm);
+        rdata.push(digest_type);
+        rdata.extend_from_slice(digest.as_bytes());
         RR::new(rr_header, &rdata)
     }
 }

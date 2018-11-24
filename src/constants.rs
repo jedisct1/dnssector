@@ -222,6 +222,7 @@ impl Type {
             s if s.eq_ignore_ascii_case("TXT") => Ok(Type::TXT),
             s if s.eq_ignore_ascii_case("MX") => Ok(Type::MX),
             s if s.eq_ignore_ascii_case("SOA") => Ok(Type::SOA),
+            s if s.eq_ignore_ascii_case("DS") => Ok(Type::DS),
             _ => xbail!(DSError::UnsupportedRRType(rr_type_str.to_owned())),
         }
     }
