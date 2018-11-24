@@ -1,4 +1,6 @@
 use super::gen::*;
+use crate::constants::*;
+use crate::errors::*;
 use chomp::ascii::*;
 use chomp::combinators::*;
 use chomp::parsers;
@@ -6,8 +8,6 @@ use chomp::prelude::{
     eof, not_token, satisfy, skip_while, take_while1, token, Buffer, Input, SimpleResult, U8Input,
 };
 use chomp::primitives::Primitives;
-use crate::constants::*;
-use crate::errors::*;
 use failure;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::{self, FromStr};
@@ -54,7 +54,7 @@ fn maybe_skip_horizontal_whitespaces<I: Input<Token = u8>>(i: I) -> SimpleResult
 }
 
 fn skip_horizontal_whitespaces<I: Input<Token = u8>>(i: I) -> SimpleResult<I, ()> {
-    parse!{i;
+    parse! {i;
         horizontal_whitespace();
         maybe_skip_horizontal_whitespaces();
         ret ()
@@ -148,7 +148,7 @@ fn escaped_char<I: U8Input>(i: I) -> SimpleResult<I, u8> {
 }
 
 fn maybe_escaped_char<I: U8Input>(i: I) -> SimpleResult<I, u8> {
-    parse!{i;
+    parse! {i;
         let v = (token(b'\\') >> escaped_char()) <|> satisfy(|c| c > 31 && c < 128 && c != b'\\');
         ret v
     }
@@ -156,7 +156,7 @@ fn maybe_escaped_char<I: U8Input>(i: I) -> SimpleResult<I, u8> {
 
 #[allow(dead_code)]
 fn escaped_string_until_whitespace<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
-    parse!{i;
+    parse! {i;
         let all = i -> {
             many1(i, |i| look_ahead(i, |i| not_horizontal_whitespace(i)).then(|i| maybe_escaped_char(i)))
         };
@@ -165,7 +165,7 @@ fn escaped_string_until_whitespace<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>>
 }
 
 fn quoted_and_escaped_string<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
-    parse!{i;
+    parse! {i;
         token(b'"');
         let all = i -> {
             many1(i, |i| look_ahead(i, |i| not_token(i, b'"')).then(|i| maybe_escaped_char(i)))
@@ -176,14 +176,14 @@ fn quoted_and_escaped_string<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
 }
 
 fn ttl_parser<I: U8Input>(i: I) -> SimpleResult<I, u32> {
-    parse!{i;
+    parse! {i;
         let ttl: u32 = decimal_u32() <* horizontal_whitespace();
         ret ttl
     }
 }
 
 fn class_parser<I: U8Input>(i: I) -> SimpleResult<I, ()> {
-    parse!{i;
+    parse! {i;
         satisfy(|c| c == b'I' || c == b'i');
         satisfy(|c| c == b'N' || c == b'n');
         ret ()
@@ -198,7 +198,7 @@ pub fn rr_type_parser<I: U8Input>(i: I) -> SimpleResult<I, Type> {
 }
 
 fn ipv4_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv4Addr> {
-    parse!{i;
+    parse! {i;
         let a: u8 = decimal_u8() <* token(b'.');
         let b: u8 = decimal_u8() <* token(b'.');
         let c: u8 = decimal_u8() <* token(b'.');
@@ -230,13 +230,15 @@ fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     take_while1(i, |c| {
         name_len += 1;
         match c {
-            b'.' if label_len == 0 => if name_len != 1 {
-                format_err = true;
-                false
-            } else {
-                only_numeric = false;
-                true
-            },
+            b'.' if label_len == 0 => {
+                if name_len != 1 {
+                    format_err = true;
+                    false
+                } else {
+                    only_numeric = false;
+                    true
+                }
+            }
             b'.' => {
                 label_len = 0;
                 true
@@ -256,7 +258,8 @@ fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
             }
             _ => false,
         }
-    }).bind(|i, name| {
+    })
+    .bind(|i, name| {
         if format_err || (only_numeric && label_len == 0) {
             i.err(parsers::Error::unexpected())
         } else {
@@ -267,7 +270,7 @@ fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
 
 #[allow(dead_code)]
 fn addr_arpa_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
-    parse!{i;
+    parse! {i;
         let ptr = i -> {
             matched_by(i, |i| {
                 either(i, |i| ipv4_parser(i), |i| ipv6_parser(i)).bind(|i, _| { string_nocase(i, b".in-addr.arpa.") })
@@ -281,7 +284,7 @@ fn addr_arpa_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
 
 fn rr_common_parser<I: U8Input>(i: I) -> SimpleResult<I, RRHeader> {
     let class = Class::IN;
-    parse!{i;
+    parse! {i;
         maybe_skip_horizontal_whitespaces();
         let name = hostname_parser();
         maybe_skip_horizontal_whitespaces();
@@ -297,7 +300,7 @@ fn rr_common_parser<I: U8Input>(i: I) -> SimpleResult<I, RRHeader> {
 }
 
 fn rr_rdata_a_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv4Addr> {
-    parse!{i;
+    parse! {i;
         let ip = ipv4_parser();
         maybe_skip_horizontal_whitespaces();
         eof();
@@ -306,7 +309,7 @@ fn rr_rdata_a_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv4Addr> {
 }
 
 fn rr_rdata_aaaa_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv6Addr> {
-    parse!{i;
+    parse! {i;
         let ip = ipv6_parser();
         maybe_skip_horizontal_whitespaces();
         eof();
@@ -315,7 +318,7 @@ fn rr_rdata_aaaa_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv6Addr> {
 }
 
 fn rr_rdata_hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
-    parse!{i;
+    parse! {i;
         let hostname = hostname_parser();
         maybe_skip_horizontal_whitespaces();
         eof();
@@ -324,7 +327,7 @@ fn rr_rdata_hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
 }
 
 fn rr_rdata_string_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
-    parse!{i;
+    parse! {i;
         let txt = quoted_and_escaped_string();
         maybe_skip_horizontal_whitespaces();
         eof();
@@ -333,7 +336,7 @@ fn rr_rdata_string_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
 }
 
 fn rr_rdata_mx_parser<I: U8Input>(i: I) -> SimpleResult<I, (u16, Vec<u8>)> {
-    parse!{i;
+    parse! {i;
         let preference = decimal_u16();
         skip_horizontal_whitespaces();
         let mxname = hostname_parser();
@@ -346,7 +349,7 @@ fn rr_rdata_mx_parser<I: U8Input>(i: I) -> SimpleResult<I, (u16, Vec<u8>)> {
 fn rr_rdata_soa_parser<I: U8Input>(
     i: I,
 ) -> SimpleResult<I, (Vec<u8>, Vec<u8>, u32, u32, u32, u32, u32)> {
-    parse!{i;
+    parse! {i;
         let primary_ns = hostname_parser();
         skip_horizontal_whitespaces();
         let contact = hostname_parser();
@@ -370,6 +373,21 @@ fn rr_rdata_soa_parser<I: U8Input>(
     }
 }
 
+fn rr_rdata_ds_parser<I: U8Input>(i: I) -> SimpleResult<I, (u16, u8, u8, String)> {
+    parse! {i;
+        let key_tag = decimal_u16();
+        skip_horizontal_whitespaces();
+        let algorithm = decimal_u8();
+        skip_horizontal_whitespaces();
+        let digest_type = decimal_u8();
+        skip_horizontal_whitespaces();
+        let digest = hexstring_parser();
+        maybe_skip_horizontal_whitespaces();
+        eof();
+        ret (key_tag, algorithm, digest_type, digest)
+    }
+}
+
 fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, failure::Error> {
     match rr_type_str {
         s if s.eq_ignore_ascii_case(b"A") => Ok(Type::A),
@@ -380,6 +398,7 @@ fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, failure::Error> {
         s if s.eq_ignore_ascii_case(b"TXT") => Ok(Type::TXT),
         s if s.eq_ignore_ascii_case(b"MX") => Ok(Type::MX),
         s if s.eq_ignore_ascii_case(b"SOA") => Ok(Type::SOA),
+        s if s.eq_ignore_ascii_case(b"DS") => Ok(Type::DS),
         _ => xbail!(DSError::UnsupportedRRType(
             str::from_utf8(rr_type_str)
                 .unwrap_or("<invalid UTF8 sequence>")
@@ -389,7 +408,7 @@ fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, failure::Error> {
 }
 
 pub fn rr_parser<I: U8Input>(i: I) -> SimpleResult<I, Result<RR, failure::Error>> {
-    parse!{i;
+    parse! {i;
         let rr_common = rr_common_parser();
         skip_horizontal_whitespaces();
         let rr = i -> {
@@ -417,6 +436,9 @@ pub fn rr_parser<I: U8Input>(i: I) -> SimpleResult<I, Result<RR, failure::Error>
                 },
                 Type::SOA => {
                     rr_rdata_soa_parser(i).map(|(primary_ns, contact, ts, refresh_ttl, retry_ttl, auth_ttl, neg_ttl)| SOA::build(rr_common, primary_ns, contact, ts, refresh_ttl, retry_ttl, auth_ttl, neg_ttl))
+                },
+                Type::DS => {
+                    rr_rdata_ds_parser(i).map(|(key_tag, algorithm, digest_type, digest)| DS::build(rr_common, key_tag, algorithm, digest_type, digest))
                 },
                 _ => i.err(parsers::Error::unexpected())
             }
