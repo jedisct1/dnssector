@@ -84,10 +84,13 @@ mod tests {
 
     #[test]
     fn test_gen_ds() {
-        assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E").is_ok());
         assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E A").is_err());
         assert!(RR::from_string("fr. 10464 IN DS 35095 A 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E").is_err());
         assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 Z23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF843E2C4E").is_err());
+        let rr = RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E");
+        assert!(rr.is_ok());
+        let rr = rr.unwrap();
+        assert!(rr.rdata().len() > 0);
     }
 
     #[test]

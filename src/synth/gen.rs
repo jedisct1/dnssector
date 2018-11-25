@@ -86,6 +86,7 @@ pub fn query(name: &[u8], rr_type: Type, class: Class) -> Result<ParsedPacket, f
 #[derive(Clone, Debug)]
 pub struct RR {
     pub packet: Vec<u8>,
+    rdata_offset: u16,
 }
 
 impl RR {
@@ -102,8 +103,12 @@ impl RR {
         BigEndian::write_u16(&mut header[DNS_RR_TYPE_OFFSET..], rr_header.rr_type.into());
         BigEndian::write_u16(&mut header[DNS_RR_RDLEN_OFFSET..], rdlen as u16);
         packet.extend_from_slice(&header);
+        let rdata_offset = packet.len() as u16;
         packet.extend_from_slice(rdata);
-        Ok(RR { packet })
+        Ok(RR {
+            packet,
+            rdata_offset,
+        })
     }
 
     pub fn new_question(name: &[u8], rr_type: Type, class: Class) -> Result<Self, failure::Error> {
@@ -113,7 +118,11 @@ impl RR {
         BigEndian::write_u16(&mut header[DNS_RR_TYPE_OFFSET..], rr_type.into());
         BigEndian::write_u16(&mut header[DNS_RR_CLASS_OFFSET..], class.into());
         packet.extend_from_slice(&header);
-        Ok(RR { packet })
+        let rdata_offset = packet.len() as u16;
+        Ok(RR {
+            packet,
+            rdata_offset,
+        })
     }
 
     pub fn from_string(s: &str) -> Result<RR, failure::Error> {
@@ -124,6 +133,10 @@ impl RR {
                 Ok(rr) => Ok(rr),
             },
         }
+    }
+
+    pub fn rdata(&self) -> &[u8] {
+        &self.packet[self.rdata_offset as usize..]
     }
 }
 
