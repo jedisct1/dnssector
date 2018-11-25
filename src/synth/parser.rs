@@ -9,6 +9,7 @@ use chomp::prelude::{
 };
 use chomp::primitives::Primitives;
 use failure;
+use hex;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::{self, FromStr};
 use std::u32;
@@ -217,9 +218,9 @@ fn ipv6_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv6Addr> {
 }
 
 #[allow(dead_code)]
-fn hexstring_parser<I: U8Input>(i: I) -> SimpleResult<I, String> {
-    take_while1(i, |c| is_hexdigit(c))
-        .bind(|i, hex_str| i.ret(str::from_utf8(&hex_str.into_vec()).unwrap().to_owned()))
+fn hexstring_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
+    take_while1(i, is_hexdigit)
+        .bind(|i, hex_str| i.ret(hex::decode(hex_str.into_vec()).unwrap().to_owned()))
 }
 
 fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
@@ -373,7 +374,7 @@ fn rr_rdata_soa_parser<I: U8Input>(
     }
 }
 
-fn rr_rdata_ds_parser<I: U8Input>(i: I) -> SimpleResult<I, (u16, u8, u8, String)> {
+fn rr_rdata_ds_parser<I: U8Input>(i: I) -> SimpleResult<I, (u16, u8, u8, Vec<u8>)> {
     parse! {i;
         let key_tag = decimal_u16();
         skip_horizontal_whitespaces();

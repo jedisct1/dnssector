@@ -1,8 +1,10 @@
 extern crate dnssector;
+extern crate hex;
 
 mod tests {
     use super::dnssector::constants::*;
     use super::dnssector::synth::gen::{self, RR};
+    use hex;
 
     #[test]
     fn test_gen_a() {
@@ -84,10 +86,23 @@ mod tests {
 
     #[test]
     fn test_gen_ds() {
-        assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E").is_ok());
         assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E A").is_err());
         assert!(RR::from_string("fr. 10464 IN DS 35095 A 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E").is_err());
         assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 Z23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF843E2C4E").is_err());
+        let rr = RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E");
+        assert!(rr.is_ok());
+        let rr = rr.unwrap();
+        let rdata = rr.rdata();
+        assert_eq!(rdata.len(), 36);
+        assert_eq!(&rdata[0..2], [137, 23]);
+        assert_eq!(rdata[2], 8);
+        assert_eq!(rdata[3], 2);
+        assert_eq!(
+            &rdata[4..],
+            hex::decode("23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E")
+                .unwrap()
+                .as_slice()
+        );
     }
 
     #[test]
