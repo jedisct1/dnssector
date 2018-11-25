@@ -253,7 +253,7 @@ impl DS {
         key_tag: u16,
         algorithm: u8,
         digest_type: u8,
-        digest: String,
+        digest: Vec<u8>,
     ) -> Result<RR, failure::Error> {
         let mut rdata = Vec::with_capacity(2 + 1 + 1 + digest.len());
         rdata.push(0);
@@ -261,7 +261,7 @@ impl DS {
         BigEndian::write_u16(&mut rdata[0..2], key_tag);
         rdata.push(algorithm);
         rdata.push(digest_type);
-        rdata.extend_from_slice(digest.as_bytes());
+        rdata.extend_from_slice(&digest);
         RR::new(rr_header, &rdata)
     }
 }

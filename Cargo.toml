@@ -17,6 +17,7 @@ libc = "0.2"
 libloading = "0.5"
 rand = "0.5"
 xfailure = "0.1"
+hex = "0.3"
 
 [profile.release]
 lto = true

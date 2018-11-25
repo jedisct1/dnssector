@@ -11,6 +11,7 @@ extern crate libc;
 extern crate rand;
 #[macro_use]
 extern crate xfailure;
+extern crate hex;
 
 pub mod c_abi;
 pub mod compress;
