@@ -1,8 +1,8 @@
-use byteorder::{BigEndian, ByteOrder};
 use crate::compress::*;
 use crate::constants::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
+use byteorder::{BigEndian, ByteOrder};
 use failure;
 use std::mem;
 
@@ -206,7 +206,7 @@ impl DNSSector {
     /// Builds a `DNSSector` structure for a given untrusted DNS packet.
     pub fn new(packet: Vec<u8>) -> Result<Self, failure::Error> {
         let dns_sector = DNSSector {
-            packet: packet,
+            packet,
             offset: 0,
             edns_start: None,
             edns_end: None,
@@ -331,7 +331,7 @@ impl DNSSector {
                 return self.parse_opt();
             }
             x if x == Type::NS.into() || x == Type::CNAME.into() || x == Type::PTR.into() => {
-                if rr_rdlen <= 0 {
+                if rr_rdlen == 0 {
                     xbail!(DSError::PacketTooSmall);
                 }
                 self.increment_offset(DNS_RR_HEADER_SIZE)?;
@@ -371,7 +371,7 @@ impl DNSSector {
                 self.increment_offset(rr_rdlen)?;
             }
             x if x == Type::DNAME.into() => {
-                if rr_rdlen <= 0 {
+                if rr_rdlen == 0 {
                     xbail!(DSError::PacketTooSmall);
                 }
                 self.increment_offset(DNS_RR_HEADER_SIZE)?;

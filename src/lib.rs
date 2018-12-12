@@ -1,4 +1,9 @@
 #![recursion_limit = "128"]
+#![allow(clippy::absurd_extreme_comparisons)]
+#![allow(clippy::bool_comparison)]
+#![allow(clippy::int_plus_one)]
+#![allow(clippy::cast_lossless)]
+#![allow(clippy::useless_let_if_seq)]
 
 extern crate byteorder;
 #[macro_use]

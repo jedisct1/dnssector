@@ -159,7 +159,7 @@ fn maybe_escaped_char<I: U8Input>(i: I) -> SimpleResult<I, u8> {
 fn escaped_string_until_whitespace<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     parse! {i;
         let all = i -> {
-            many1(i, |i| look_ahead(i, |i| not_horizontal_whitespace(i)).then(|i| maybe_escaped_char(i)))
+            many1(i, |i| look_ahead(i, not_horizontal_whitespace).then(maybe_escaped_char))
         };
         ret all
     }
@@ -169,7 +169,7 @@ fn quoted_and_escaped_string<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     parse! {i;
         token(b'"');
         let all = i -> {
-            many1(i, |i| look_ahead(i, |i| not_token(i, b'"')).then(|i| maybe_escaped_char(i)))
+            many1(i, |i| look_ahead(i, |i| not_token(i, b'"')).then(maybe_escaped_char))
         };
         token(b'"');
         ret all
@@ -274,7 +274,7 @@ fn addr_arpa_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     parse! {i;
         let ptr = i -> {
             matched_by(i, |i| {
-                either(i, |i| ipv4_parser(i), |i| ipv6_parser(i)).bind(|i, _| { string_nocase(i, b".in-addr.arpa.") })
+                either(i, ipv4_parser, ipv6_parser).bind(|i, _| { string_nocase(i, b".in-addr.arpa.") })
             }).map(|(ptr, _)| {
                 ptr.into_vec()
             })

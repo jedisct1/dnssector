@@ -1,9 +1,9 @@
-use byteorder::{BigEndian, ByteOrder};
 use crate::compress::*;
 use crate::constants::*;
 use crate::dns_sector::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
+use byteorder::{BigEndian, ByteOrder};
 use failure;
 use std::marker;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
@@ -12,6 +12,7 @@ use std::ptr;
 /// Accessor to the raw packet data.
 /// `offset` is the offset to the current RR.
 /// `name_end` is the offset to the data right after the name.
+#[derive(Copy, Clone, Debug)]
 pub struct RRRaw<'t> {
     pub packet: &'t [u8],
     pub offset: usize,
@@ -210,7 +211,7 @@ pub trait TypedIterable {
                 unsafe {
                     let packet_ptr = packet.as_mut_ptr();
                     ptr::copy(
-                        packet_ptr.offset(offset as isize),
+                        packet_ptr.add(offset),
                         packet_ptr.offset((offset as isize + shift) as isize),
                         packet_len - offset,
                     );
@@ -221,7 +222,7 @@ pub trait TypedIterable {
                     let packet_ptr = packet.as_mut_ptr();
                     ptr::copy(
                         packet_ptr.offset((offset as isize - shift) as isize),
-                        packet_ptr.offset(offset as isize),
+                        packet_ptr.add(offset),
                         packet_len - (offset as isize - shift) as usize,
                     );
                 }
@@ -278,7 +279,7 @@ pub trait TypedIterable {
         self.resize_rr(shift)?;
         {
             let packet = &mut self.parsed_packet_mut().packet_mut();
-            &mut packet[offset..offset + new_name_len].copy_from_slice(name);
+            packet[offset..offset + new_name_len].copy_from_slice(name);
         }
         self.recompute_rr();
 
@@ -303,9 +304,10 @@ pub trait TypedIterable {
             self.recompute_rr(); // XXX - Just for sanity, but not strictly required here
             self.recompute_sections();
         }
-        let rr_len = self.offset_next() - self
-            .offset()
-            .expect("Deleting record with no known offset after optional decompression");
+        let rr_len = self.offset_next()
+            - self
+                .offset()
+                .expect("Deleting record with no known offset after optional decompression");
         assert!(rr_len > 0);
         self.resize_rr(-(rr_len as isize))?;
         let offset = self.offset().unwrap();

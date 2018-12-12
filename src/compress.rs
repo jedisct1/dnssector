@@ -1,8 +1,8 @@
-use byteorder::{BigEndian, ByteOrder};
 use crate::constants::*;
 use crate::dns_sector::*;
 use crate::errors::*;
 use crate::rr_iterator::*;
+use byteorder::{BigEndian, ByteOrder};
 use failure;
 use std::cmp;
 
@@ -70,7 +70,7 @@ impl Compress {
                             "Reference to a name that cannot be compressed"
                         ));
                     }
-                    final_offset = final_offset.or(Some(offset + 2));
+                    final_offset = final_offset.or_else(|| Some(offset + 2));
                     offset = ref_offset;
                     barrier_offset = lowest_offset;
                     lowest_offset = ref_offset;
@@ -108,7 +108,7 @@ impl Compress {
         loop {
             let label_len = match packet[offset] {
                 len if len & 0xc0 == 0xc0 => {
-                    final_offset = final_offset.or(Some(offset + 2));
+                    final_offset = final_offset.or_else(|| Some(offset + 2));
                     let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
                     assert!(new_offset < offset);
                     offset = new_offset;
@@ -153,7 +153,8 @@ impl Compress {
                     &mut uncompressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
-                ).name_len;
+                )
+                .name_len;
                 BigEndian::write_u16(
                     &mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
                     new_rdlen as u16,
@@ -166,7 +167,8 @@ impl Compress {
                     &mut uncompressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE + 2,
-                ).name_len;
+                )
+                .name_len;
                 BigEndian::write_u16(
                     &mut uncompressed[offset + DNS_RR_RDLEN_OFFSET..],
                     new_rdlen as u16,
@@ -219,7 +221,8 @@ impl Compress {
                     &mut compressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
-                ).name_len;
+                )
+                .name_len;
                 BigEndian::write_u16(
                     &mut compressed[offset + DNS_RR_RDLEN_OFFSET..],
                     new_rdlen as u16,
@@ -233,7 +236,8 @@ impl Compress {
                     &mut compressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE + 2,
-                ).name_len;
+                )
+                .name_len;
                 BigEndian::write_u16(
                     &mut compressed[offset + DNS_RR_RDLEN_OFFSET..],
                     new_rdlen as u16,
@@ -370,7 +374,8 @@ impl Compress {
                         &mut compressed,
                         raw.packet,
                         raw.offset,
-                    ).final_offset;
+                    )
+                    .final_offset;
                     Self::compress_rdata(&mut dict, &mut compressed, raw, None, None);
                 }
                 it = item.next();
@@ -386,7 +391,8 @@ impl Compress {
                         &mut compressed,
                         raw.packet,
                         raw.offset,
-                    ).final_offset;
+                    )
+                    .final_offset;
                     Self::compress_rdata(
                         &mut dict,
                         &mut compressed,
@@ -408,7 +414,8 @@ impl Compress {
                         &mut compressed,
                         raw.packet,
                         raw.offset,
-                    ).final_offset;
+                    )
+                    .final_offset;
                     Self::compress_rdata(
                         &mut dict,
                         &mut compressed,
@@ -430,7 +437,8 @@ impl Compress {
                         &mut compressed,
                         raw.packet,
                         raw.offset,
-                    ).final_offset;
+                    )
+                    .final_offset;
                     Self::compress_rdata(
                         &mut dict,
                         &mut compressed,
@@ -635,7 +643,7 @@ impl SuffixDict {
     /// Returns the length of the name.
     fn raw_name_copy(to: &mut [u8], name: &[u8]) -> usize {
         let len = Compress::raw_name_len(name);
-        &to[..len].copy_from_slice(&name[..len]);
+        to[..len].copy_from_slice(&name[..len]);
         len
     }
 

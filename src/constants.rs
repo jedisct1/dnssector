@@ -2,7 +2,6 @@
 
 use crate::errors::*;
 use std::convert::From;
-use std::mem;
 
 /// Size of the main DNS header, that includes flags and the size of each section.
 pub const DNS_HEADER_SIZE: usize = 12;
@@ -98,7 +97,7 @@ pub enum Class {
 
 impl From<Class> for u16 {
     fn from(v: Class) -> u16 {
-        unsafe { mem::transmute(v as u16) }
+        v as u16
     }
 }
 
@@ -207,7 +206,7 @@ pub enum Type {
 
 impl From<Type> for u16 {
     fn from(v: Type) -> u16 {
-        unsafe { mem::transmute(v as u16) }
+        v as u16
     }
 }
 
@@ -245,7 +244,7 @@ pub enum EdnsOption {
 
 impl From<EdnsOption> for u16 {
     fn from(v: EdnsOption) -> u16 {
-        unsafe { mem::transmute(v as u16) }
+        v as u16
     }
 }
 
@@ -267,7 +266,7 @@ pub enum Rcode {
 
 impl From<Rcode> for u8 {
     fn from(v: Rcode) -> u8 {
-        unsafe { mem::transmute(v as u8) }
+        v as u8
     }
 }
 
@@ -283,7 +282,7 @@ pub enum Opcode {
 
 impl From<Opcode> for u8 {
     fn from(v: Opcode) -> u8 {
-        unsafe { mem::transmute(v as u8) }
+        v as u8
     }
 }
 
@@ -299,6 +298,6 @@ pub enum Section {
 
 impl From<Section> for u8 {
     fn from(v: Section) -> u8 {
-        unsafe { mem::transmute(v as u8) }
+        v as u8
     }
 }

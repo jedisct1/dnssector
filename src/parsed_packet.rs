@@ -1,4 +1,3 @@
-use byteorder::{BigEndian, ByteOrder};
 use crate::compress::*;
 use crate::constants::*;
 use crate::dns_sector::*;
@@ -9,6 +8,7 @@ use crate::renamer::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use crate::synth::gen;
+use byteorder::{BigEndian, ByteOrder};
 use failure;
 use rand::prelude::*;
 use std::ptr;
@@ -230,7 +230,7 @@ impl ParsedPacket {
         let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => {
-                let rrcount = DNSSector::qdcount(&mut packet);
+                let rrcount = DNSSector::qdcount(&packet);
                 if rrcount >= 1 {
                     bail!(DSError::InvalidPacket(
                         "A DNS packet can only contain up to one question"
@@ -238,9 +238,9 @@ impl ParsedPacket {
                 }
                 rrcount
             }
-            Section::Answer => DNSSector::ancount(&mut packet),
-            Section::NameServers => DNSSector::nscount(&mut packet),
-            Section::Additional => DNSSector::arcount(&mut packet),
+            Section::Answer => DNSSector::ancount(&packet),
+            Section::NameServers => DNSSector::nscount(&packet),
+            Section::Additional => DNSSector::arcount(&packet),
             _ => panic!("Trying to increment a the number of records in a pseudosection"),
         };
         if rrcount >= 0xffff {
@@ -263,10 +263,10 @@ impl ParsedPacket {
     pub fn rrcount_dec(&mut self, section: Section) -> Result<u16, failure::Error> {
         let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
-            Section::Question => DNSSector::qdcount(&mut packet),
-            Section::Answer => DNSSector::ancount(&mut packet),
-            Section::NameServers => DNSSector::nscount(&mut packet),
-            Section::Additional => DNSSector::arcount(&mut packet),
+            Section::Question => DNSSector::qdcount(&packet),
+            Section::Answer => DNSSector::ancount(&packet),
+            Section::NameServers => DNSSector::nscount(&packet),
+            Section::Additional => DNSSector::arcount(&packet),
             _ => panic!("Trying to decrement a the number of records in a pseudosection"),
         };
         if rrcount <= 0 {
@@ -293,12 +293,14 @@ impl ParsedPacket {
                 .offset_answers
                 .or(self.offset_nameservers)
                 .or(self.offset_additional)
-                .unwrap_or(self.packet().len()),
+                .unwrap_or_else(|| self.packet().len()),
             Section::Answer => self
                 .offset_nameservers
                 .or(self.offset_additional)
-                .unwrap_or(self.packet().len()),
-            Section::NameServers => self.offset_additional.unwrap_or(self.packet().len()),
+                .unwrap_or_else(|| self.packet().len()),
+            Section::NameServers => self
+                .offset_additional
+                .unwrap_or_else(|| self.packet().len()),
             Section::Additional => self.packet().len(),
             _ => panic!("insertion_offset() is not suitable to adding EDNS pseudorecords"),
         };
@@ -326,18 +328,18 @@ impl ParsedPacket {
                 self.packet_mut().set_len(new_len);
                 let packet_ptr = self.packet_mut().as_mut_ptr();
                 ptr::copy(
-                    packet_ptr.offset(insertion_offset as isize),
-                    packet_ptr.offset((insertion_offset + rr_len) as isize),
+                    packet_ptr.add(insertion_offset),
+                    packet_ptr.add(insertion_offset + rr_len),
                     self.packet().len() - insertion_offset,
                 );
             }
-            &self.packet_mut()[insertion_offset..insertion_offset + rr_len]
+            self.packet_mut()[insertion_offset..insertion_offset + rr_len]
                 .copy_from_slice(&rr.packet);
         }
         self.rrcount_inc(section)?;
         match section {
             Section::Question => {
-                self.offset_question = self.offset_question.or(Some(insertion_offset));
+                self.offset_question = self.offset_question.or_else(|| Some(insertion_offset));
 
                 self.offset_answers = self.offset_answers.map(|x| x + rr_len);
                 self.offset_nameservers = self.offset_nameservers.map(|x| x + rr_len);
@@ -345,20 +347,21 @@ impl ParsedPacket {
                 self.offset_edns = self.offset_edns.map(|x| x + rr_len);
             }
             Section::Answer => {
-                self.offset_answers = self.offset_answers.or(Some(insertion_offset));
+                self.offset_answers = self.offset_answers.or_else(|| Some(insertion_offset));
 
                 self.offset_nameservers = self.offset_nameservers.map(|x| x + rr_len);
                 self.offset_additional = self.offset_additional.map(|x| x + rr_len);
                 self.offset_edns = self.offset_edns.map(|x| x + rr_len);
             }
             Section::NameServers => {
-                self.offset_nameservers = self.offset_nameservers.or(Some(insertion_offset));
+                self.offset_nameservers =
+                    self.offset_nameservers.or_else(|| Some(insertion_offset));
 
                 self.offset_additional = self.offset_additional.map(|x| x + rr_len);
                 self.offset_edns = self.offset_edns.map(|x| x + rr_len);
             }
             Section::Additional => {
-                self.offset_additional = self.offset_additional.or(Some(insertion_offset));
+                self.offset_additional = self.offset_additional.or_else(|| Some(insertion_offset));
             }
             _ => panic!("insertion_offset() is not suitable to adding EDNS pseudorecords"),
         }
@@ -402,10 +405,9 @@ impl ParsedPacket {
     /// Returns the question as a raw vector, without case conversion, as well as the query type and class
     /// Names include a trailing `0`
     pub fn question_raw0(&mut self) -> Option<((&[u8], u16, u16))> {
-        match self.cached {
-            Some(ref cached) => return Some((&cached.0, cached.1, cached.2)),
-            None => {}
-        };
+        if let Some(ref cached) = self.cached {
+            return Some((&cached.0, cached.1, cached.2));
+        }
         let offset = match self.offset_question {
             None => return None,
             Some(offset) => offset,
@@ -434,14 +436,11 @@ impl ParsedPacket {
 
     /// Returns the question as a string, without case conversion, as well as the query type and class
     pub fn question(&mut self) -> Option<((Vec<u8>, u16, u16))> {
-        match self.cached {
-            Some(ref cached) => {
-                let mut name_str = Compress::raw_name_to_str(&cached.0, 0);
-                name_str.make_ascii_lowercase();
-                return Some((name_str, cached.1, cached.2));
-            }
-            None => {}
-        };
+        if let Some(ref cached) = self.cached {
+            let mut name_str = Compress::raw_name_to_str(&cached.0, 0);
+            name_str.make_ascii_lowercase();
+            return Some((name_str, cached.1, cached.2));
+        }
         let offset = match self.offset_question {
             None => return None,
             Some(offset) => offset,
@@ -460,10 +459,9 @@ impl ParsedPacket {
 
     /// Return the query type and class
     pub fn qtype_qclass(&self) -> Option<(u16, u16)> {
-        match self.cached {
-            Some(ref cached) => return Some((cached.1, cached.2)),
-            None => {}
-        };
+        if let Some(ref cached) = self.cached {
+            return Some((cached.1, cached.2));
+        }
         let offset = match self.offset_question {
             None => return None,
             Some(offset) => offset,

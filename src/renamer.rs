@@ -1,10 +1,10 @@
-use byteorder::{BigEndian, ByteOrder};
 use crate::compress::*;
 use crate::constants::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
+use byteorder::{BigEndian, ByteOrder};
 use failure;
 
 pub struct Renamer;
@@ -191,7 +191,7 @@ impl Renamer {
                         let offset_rdata = raw.name_end;
                         renamed_packet.extend(
                             &raw.packet[offset_rdata + DNS_RR_HEADER_SIZE
-                                            ..offset_rdata + DNS_RR_HEADER_SIZE + 2],
+                                ..offset_rdata + DNS_RR_HEADER_SIZE + 2],
                         );
                         let renamed_packet_name_offset = renamed_packet.len();
                         Self::copy_with_replaced_name(
