@@ -325,13 +325,13 @@ impl ParsedPacket {
             self.packet_mut().extend_from_slice(&rr.packet);
         } else {
             unsafe {
-                self.packet_mut().set_len(new_len);
                 let packet_ptr = self.packet_mut().as_mut_ptr();
                 ptr::copy(
                     packet_ptr.add(insertion_offset),
                     packet_ptr.add(insertion_offset + rr_len),
                     self.packet().len() - insertion_offset,
                 );
+                self.packet_mut().set_len(new_len);
             }
             self.packet_mut()[insertion_offset..insertion_offset + rr_len]
                 .copy_from_slice(&rr.packet);
