@@ -15,9 +15,9 @@ failure = "0.1"
 failure_derive = "0.1"
 libc = "0.2"
 libloading = "0.5"
-rand = "0.6"
+rand = "0.7"
 xfailure = "0.1"
-hex = "0.3"
+hex = "0.4"
 
 [profile.release]
 lto = true
