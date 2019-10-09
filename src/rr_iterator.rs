@@ -398,6 +398,39 @@ pub trait RdataIterable {
         }
     }
 
+    /// Retrieves the value of a `TXT` record
+    fn rr_txt(&self) -> Result<String, failure::Error>
+    where
+        Self: DNSIterable + TypedIterable,
+    {
+        match self.rr_type() {
+            x if x == Type::TXT.into() => {
+                let rdata = self.rdata_slice();
+                assert!(rdata.len() >= DNS_RR_HEADER_SIZE);
+                let mut s = String::from_utf8(rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + self.rr_rdlen()].to_vec()).map_err(|_e| DSError::ParseError)?;
+                s.retain(|c| !c.is_control()); // Strip control characters
+                Ok(s)
+            }
+            _ => xbail!(DSError::ParseError),
+        }
+    }
+
+    /// Not tested! Sets the value of a `TXT` record.
+    fn set_rr_txt(&mut self, txt: &str) -> Result<(), failure::Error>
+    where
+        Self: DNSIterable + TypedIterable,
+    {
+        match self.rr_type() {
+            x if x == Type::TXT.into() => {
+                let rdata = self.rdata_slice_mut();
+                assert!(rdata.len() >= DNS_RR_HEADER_SIZE);
+                rdata[DNS_RR_HEADER_SIZE..].copy_from_slice(txt.as_bytes());
+                Ok(())
+            }
+            _ => xbail!(DSError::ParseError),
+        }
+    }
+
     /// Changes the IP address of an `A` or `AAAA` record.
     fn set_rr_ip(&mut self, ip: &IpAddr) -> Result<(), failure::Error>
     where
