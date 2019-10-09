@@ -103,7 +103,7 @@ fn decimal_u32<I: Input<Token = u8>>(i: I) -> SimpleResult<I, u32> {
 
 fn is_hexdigit(c: u8) -> bool {
     match c {
-        b'0'...b'9' | b'a'...b'f' | b'A'...b'F' => true,
+        b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F' => true,
         _ => false,
     }
 }
@@ -111,9 +111,9 @@ fn is_hexdigit(c: u8) -> bool {
 #[allow(dead_code)]
 fn from_hexdigit(c: u8) -> u8 {
     match c {
-        b'0'...b'9' => c - b'0',
-        b'a'...b'f' => c - b'a' + 10,
-        b'A'...b'F' => c - b'A' + 10,
+        b'0'..=b'9' => c - b'0',
+        b'a'..=b'f' => c - b'a' + 10,
+        b'A'..=b'F' => c - b'A' + 10,
         _ => panic!("Invalid hex digit"),
     }
 }
@@ -140,7 +140,7 @@ fn escaped_char<I: U8Input>(i: I) -> SimpleResult<I, u8> {
         let v = i -> {
             let r = (a as i16 - 48) * 100 + (b as i16 - 48) * 10 + (c as i16 - 48);
             match r {
-                0...255 => i.ret(r as u8),
+                0..=255 => i.ret(r as u8),
                 _ => i.err(parsers::Error::unexpected())
             }
         };
