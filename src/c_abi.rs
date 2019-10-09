@@ -218,7 +218,7 @@ unsafe extern "C" fn rr_ip(
 ) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let ip = match section_iterator.section {
-        Section::Answer | Section::NameServers | Section::Additional => (&mut *(section_iterator.it
+        Section::Answer | Section::NameServers | Section::Additional => (&*(section_iterator.it
             as *mut ResponseIterator))
             .rr_ip()
             .expect("rr_ip() called on a record with no IP"),
@@ -245,7 +245,7 @@ unsafe extern "C" fn set_rr_ip(
 ) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
-        Section::Answer | Section::NameServers | Section::Additional => (&mut *(section_iterator.it
+        Section::Answer | Section::NameServers | Section::Additional => (&*(section_iterator.it
             as *mut ResponseIterator))
             .rr_ip()
             .expect("set_rr_ip() called on a record with no IP"),
