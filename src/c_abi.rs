@@ -134,7 +134,7 @@ unsafe extern "C" fn iter_additional(
 
 unsafe extern "C" fn iter_edns(
     parsed_packet: *mut ParsedPacket,
-    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const EdnsIterator) -> bool,
+    cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const EdnsIterator<'_>) -> bool,
     ctx: *mut c_void,
 ) {
     let mut it = (*parsed_packet).into_iter_edns();
@@ -154,9 +154,9 @@ unsafe extern "C" fn iter_edns(
 unsafe extern "C" fn rr_type(section_iterator: &mut SectionIterator) -> u16 {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
-        Section::Question => (&*(section_iterator.it as *mut QuestionIterator)).rr_type(),
+        Section::Question => (&*(section_iterator.it as *mut QuestionIterator<'_>)).rr_type(),
         Section::Answer | Section::NameServers | Section::Additional => {
-            (&*(section_iterator.it as *mut ResponseIterator)).rr_type()
+            (&*(section_iterator.it as *mut ResponseIterator<'_>)).rr_type()
         }
         _ => panic!("rr_type() called on a record with no type"),
     }
@@ -165,9 +165,9 @@ unsafe extern "C" fn rr_type(section_iterator: &mut SectionIterator) -> u16 {
 unsafe extern "C" fn rr_class(section_iterator: &mut SectionIterator) -> u16 {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
-        Section::Question => (&*(section_iterator.it as *mut QuestionIterator)).rr_class(),
+        Section::Question => (&*(section_iterator.it as *mut QuestionIterator<'_>)).rr_class(),
         Section::Answer | Section::NameServers | Section::Additional => {
-            (&*(section_iterator.it as *mut ResponseIterator)).rr_class()
+            (&*(section_iterator.it as *mut ResponseIterator<'_>)).rr_class()
         }
         _ => panic!("rr_class() called on a record with no class"),
     }
@@ -179,9 +179,9 @@ unsafe extern "C" fn name(
 ) {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let name_vec = match section_iterator.section {
-        Section::Question => (&*(section_iterator.it as *mut QuestionIterator)).name(),
+        Section::Question => (&*(section_iterator.it as *mut QuestionIterator<'_>)).name(),
         Section::Answer | Section::NameServers | Section::Additional => {
-            (&*(section_iterator.it as *mut ResponseIterator)).name()
+            (&*(section_iterator.it as *mut ResponseIterator<'_>)).name()
         }
         _ => panic!("name() called on a record with no name"),
     };
@@ -195,7 +195,7 @@ unsafe extern "C" fn rr_ttl(section_iterator: &mut SectionIterator) -> u32 {
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
-            (&*(section_iterator.it as *mut ResponseIterator)).rr_ttl()
+            (&*(section_iterator.it as *mut ResponseIterator<'_>)).rr_ttl()
         }
         _ => panic!("ttl() called on a record with no TTL"),
     }
@@ -205,7 +205,7 @@ unsafe extern "C" fn set_rr_ttl(section_iterator: &mut SectionIterator, ttl: u32
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
-            (&mut *(section_iterator.it as *mut ResponseIterator)).set_rr_ttl(ttl)
+            (&mut *(section_iterator.it as *mut ResponseIterator<'_>)).set_rr_ttl(ttl)
         }
         _ => panic!("set_ttl() called on a record with no TTL"),
     }
@@ -219,7 +219,7 @@ unsafe extern "C" fn rr_ip(
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     let ip = match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => (&*(section_iterator.it
-            as *mut ResponseIterator))
+            as *mut ResponseIterator<'_>))
             .rr_ip()
             .expect("rr_ip() called on a record with no IP"),
         _ => panic!("rr_ip() called on a record with no IP"),
@@ -246,7 +246,7 @@ unsafe extern "C" fn set_rr_ip(
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => (&*(section_iterator.it
-            as *mut ResponseIterator))
+            as *mut ResponseIterator<'_>))
             .rr_ip()
             .expect("set_rr_ip() called on a record with no IP"),
         _ => panic!("set_rr_ip() called on a record with no IP"),
@@ -264,7 +264,7 @@ unsafe extern "C" fn set_rr_ip(
         }
         _ => panic!("Unsupported address length"),
     };
-    (&mut *(section_iterator.it as *mut ResponseIterator))
+    (&mut *(section_iterator.it as *mut ResponseIterator<'_>))
         .set_rr_ip(&ip)
         .expect("Wrong IP address family for this record");
 }
@@ -298,7 +298,8 @@ unsafe extern "C" fn set_raw_name(
     let raw_name = slice::from_raw_parts(raw_name, raw_name_len);
     match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
-            match (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(raw_name) {
+            match (&mut *(section_iterator.it as *mut ResponseIterator<'_>)).set_raw_name(raw_name)
+            {
                 Err(e) => throw_err(e, c_err),
                 Ok(()) => 0,
             }
@@ -333,7 +334,8 @@ unsafe extern "C" fn set_name(
     };
     match section_iterator.section {
         Section::Answer | Section::NameServers | Section::Additional => {
-            match (&mut *(section_iterator.it as *mut ResponseIterator)).set_raw_name(&raw_name) {
+            match (&mut *(section_iterator.it as *mut ResponseIterator<'_>)).set_raw_name(&raw_name)
+            {
                 Err(e) => throw_err(e, c_err),
                 Ok(()) => 0,
             }
@@ -349,7 +351,7 @@ unsafe extern "C" fn delete(
     assert_eq!(section_iterator.magic, SECTION_ITERATOR_MAGIC);
     match section_iterator.section {
         Section::Question | Section::Answer | Section::NameServers | Section::Additional => {
-            match (&mut *(section_iterator.it as *mut ResponseIterator)).delete() {
+            match (&mut *(section_iterator.it as *mut ResponseIterator<'_>)).delete() {
                 Err(e) => throw_err(e, c_err),
                 Ok(()) => 0,
             }
@@ -499,7 +501,10 @@ pub struct FnTable {
     ),
     pub iter_edns: unsafe extern "C" fn(
         parsed_packet: *mut ParsedPacket,
-        cb: unsafe extern "C" fn(ctx: *mut c_void, section_iterator: *const EdnsIterator) -> bool,
+        cb: unsafe extern "C" fn(
+            ctx: *mut c_void,
+            section_iterator: *const EdnsIterator<'_>,
+        ) -> bool,
         *mut c_void,
     ),
     pub name: unsafe extern "C" fn(

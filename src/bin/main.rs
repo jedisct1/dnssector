@@ -1,7 +1,3 @@
-extern crate dnssector;
-extern crate libc;
-extern crate libloading;
-
 use crate::c_abi::{self, FnTable};
 use dnssector::*;
 use libc::c_int;
@@ -59,7 +55,7 @@ pub fn main() {
     let dlh =
         Library::new("src/bin/c_hook/c_hook.dylib").expect("Cannot load the sample C library");
 
-    let hook_deliver: Symbol<unsafe extern "C" fn(*const FnTable, *mut ParsedPacket) -> c_int> =
+    let hook_deliver: Symbol<'_, unsafe extern "C" fn(*const FnTable, *mut ParsedPacket) -> c_int> =
         unsafe { dlh.get(b"hook_deliver").unwrap() };
 
     let ds = DNSSector::new(packet).expect("cannot parse packet");

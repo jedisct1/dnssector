@@ -1,5 +1,5 @@
-extern crate dnssector;
-extern crate hex;
+use dnssector;
+
 
 mod tests {
     use super::dnssector::constants::*;

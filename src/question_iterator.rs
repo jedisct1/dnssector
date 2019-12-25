@@ -44,7 +44,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
     }
 
     #[inline]
-    fn raw(&self) -> RRRaw {
+    fn raw(&self) -> RRRaw<'_> {
         RRRaw {
             packet: &self.rr_iterator.parsed_packet.packet(),
             offset: self.rr_iterator.offset.unwrap(),
@@ -53,7 +53,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
     }
 
     #[inline]
-    fn raw_mut(&mut self) -> RRRawMut {
+    fn raw_mut(&mut self) -> RRRawMut<'_> {
         RRRawMut {
             packet: self.rr_iterator.parsed_packet.packet_mut(),
             offset: self.rr_iterator.offset.unwrap(),

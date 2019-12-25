@@ -76,32 +76,32 @@ impl ParsedPacket {
     }
 
     /// Iterates over the question section.
-    pub fn into_iter_question(&mut self) -> Option<QuestionIterator> {
+    pub fn into_iter_question(&mut self) -> Option<QuestionIterator<'_>> {
         QuestionIterator::new(RRIterator::new(self, Section::Question)).next()
     }
 
     /// Iterates over the answer section.
-    pub fn into_iter_answer(&mut self) -> Option<AnswerIterator> {
+    pub fn into_iter_answer(&mut self) -> Option<AnswerIterator<'_>> {
         AnswerIterator::new(RRIterator::new(self, Section::Answer)).next()
     }
 
     /// Iterates over the list of name servers.
-    pub fn into_iter_nameservers(&mut self) -> Option<NameServersIterator> {
+    pub fn into_iter_nameservers(&mut self) -> Option<NameServersIterator<'_>> {
         NameServersIterator::new(RRIterator::new(self, Section::NameServers)).next()
     }
 
     /// Iterates over the additional section - OPT RRs are skipped.
-    pub fn into_iter_additional(&mut self) -> Option<AdditionalIterator> {
+    pub fn into_iter_additional(&mut self) -> Option<AdditionalIterator<'_>> {
         AdditionalIterator::new(RRIterator::new(self, Section::Additional)).next()
     }
 
     /// Iterates over the additional section - OPT RRs are included.
-    pub fn into_iter_additional_including_opt(&mut self) -> Option<AdditionalIterator> {
+    pub fn into_iter_additional_including_opt(&mut self) -> Option<AdditionalIterator<'_>> {
         AdditionalIterator::new(RRIterator::new(self, Section::Additional)).next_including_opt()
     }
 
     /// Iterates over the records from the optional edns pseudo-section.
-    pub fn into_iter_edns(&mut self) -> Option<EdnsIterator> {
+    pub fn into_iter_edns(&mut self) -> Option<EdnsIterator<'_>> {
         EdnsIterator::new(RRIterator::new(self, Section::Edns)).next()
     }
 

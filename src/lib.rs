@@ -14,18 +14,15 @@
 #![allow(clippy::useless_let_if_seq)]
 #![allow(clippy::wrong_self_convention)]
 
-extern crate byteorder;
 #[macro_use]
 extern crate chomp;
 #[macro_use]
 extern crate failure;
 #[macro_use]
 extern crate failure_derive;
-extern crate libc;
-extern crate rand;
+
 #[macro_use]
 extern crate xfailure;
-extern crate hex;
 
 pub mod c_abi;
 pub mod compress;

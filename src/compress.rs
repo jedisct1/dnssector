@@ -134,7 +134,7 @@ impl Compress {
     /// Uncompresses trusted record's data and puts the result into `name`.
     fn uncompress_rdata(
         mut uncompressed: &mut Vec<u8>,
-        raw: RRRaw,
+        raw: RRRaw<'_>,
         rr_type: Option<u16>,
         rr_rdlen: Option<usize>,
     ) {
@@ -201,7 +201,7 @@ impl Compress {
     pub fn compress_rdata(
         mut dict: &mut SuffixDict,
         mut compressed: &mut Vec<u8>,
-        raw: RRRaw,
+        raw: RRRaw<'_>,
         rr_type: Option<u16>,
         rr_rdlen: Option<usize>,
     ) {

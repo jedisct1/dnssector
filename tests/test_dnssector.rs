@@ -1,5 +1,4 @@
-extern crate core;
-extern crate dnssector;
+use dnssector;
 
 mod tests {
     use super::dnssector::*;

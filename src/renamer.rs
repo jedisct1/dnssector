@@ -140,7 +140,7 @@ impl Renamer {
     }
 
     fn rename_response_section(
-        mut it: Option<ResponseIterator>,
+        mut it: Option<ResponseIterator<'_>>,
         mut renamed_packet: &mut Vec<u8>,
         mut suffix_dict: &mut SuffixDict,
         target_name: &[u8],
@@ -269,7 +269,7 @@ impl Renamer {
         source_name: &[u8],
         match_suffix: bool,
     ) -> Result<(), failure::Error> {
-        let it = parsed_packet.into_iter_answer() as Option<ResponseIterator>;
+        let it = parsed_packet.into_iter_answer() as Option<ResponseIterator<'_>>;
         Self::rename_response_section(
             it,
             renamed_packet,
@@ -288,7 +288,7 @@ impl Renamer {
         source_name: &[u8],
         match_suffix: bool,
     ) -> Result<(), failure::Error> {
-        let it = parsed_packet.into_iter_nameservers() as Option<ResponseIterator>;
+        let it = parsed_packet.into_iter_nameservers() as Option<ResponseIterator<'_>>;
         Self::rename_response_section(
             it,
             renamed_packet,
@@ -307,7 +307,7 @@ impl Renamer {
         source_name: &[u8],
         match_suffix: bool,
     ) -> Result<(), failure::Error> {
-        let it = parsed_packet.into_iter_additional() as Option<ResponseIterator>;
+        let it = parsed_packet.into_iter_additional() as Option<ResponseIterator<'_>>;
         Self::rename_response_section(
             it,
             renamed_packet,

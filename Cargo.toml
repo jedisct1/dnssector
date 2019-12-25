@@ -4,6 +4,7 @@ version = "0.1.4"
 authors = ["Frank Denis <github@pureftpd.org>"]
 description = "A very fast library to parse, validate, create and mangle DNS packets"
 license = "ISC"
+edition = "2018"
 homepage = "https://github.com/jedisct1/dnssector"
 repository = "https://github.com/jedisct1/dnssector"
 

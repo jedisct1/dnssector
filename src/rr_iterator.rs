@@ -67,10 +67,10 @@ pub trait DNSIterable {
     fn recompute_sections(&mut self);
 
     /// Accesses the raw packet data.
-    fn raw(&self) -> RRRaw;
+    fn raw(&self) -> RRRaw<'_>;
 
     /// Accesses the mutable raw packet data.
-    fn raw_mut(&mut self) -> RRRawMut;
+    fn raw_mut(&mut self) -> RRRawMut<'_>;
 
     /// Accesses the parsed packet structure.
     fn parsed_packet(&self) -> &ParsedPacket;
