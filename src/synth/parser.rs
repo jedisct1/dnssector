@@ -220,7 +220,7 @@ fn ipv6_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv6Addr> {
 #[allow(dead_code)]
 fn hexstring_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
     take_while1(i, is_hexdigit)
-        .bind(|i, hex_str| i.ret(hex::decode(hex_str.into_vec()).unwrap().to_owned()))
+        .bind(|i, hex_str| i.ret(hex::decode(hex_str.into_vec()).unwrap()))
 }
 
 fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
