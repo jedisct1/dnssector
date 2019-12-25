@@ -404,7 +404,7 @@ impl ParsedPacket {
 
     /// Returns the question as a raw vector, without case conversion, as well as the query type and class
     /// Names include a trailing `0`
-    pub fn question_raw0(&mut self) -> Option<((&[u8], u16, u16))> {
+    pub fn question_raw0(&mut self) -> Option<(&[u8], u16, u16)> {
         if let Some(ref cached) = self.cached {
             return Some((&cached.0, cached.1, cached.2));
         }
@@ -429,13 +429,13 @@ impl ParsedPacket {
 
     /// Returns the question as a raw vector, without case conversion, as well as the query type and class
     /// Names do not include trailing `0`
-    pub fn question_raw(&mut self) -> Option<((&[u8], u16, u16))> {
+    pub fn question_raw(&mut self) -> Option<(&[u8], u16, u16)> {
         self.question_raw0()
             .map(|(name, rr_type, rr_class)| (&name[..name.len() - 1], rr_type, rr_class))
     }
 
     /// Returns the question as a string, without case conversion, as well as the query type and class
-    pub fn question(&mut self) -> Option<((Vec<u8>, u16, u16))> {
+    pub fn question(&mut self) -> Option<(Vec<u8>, u16, u16)> {
         if let Some(ref cached) = self.cached {
             let mut name_str = Compress::raw_name_to_str(&cached.0, 0);
             name_str.make_ascii_lowercase();
