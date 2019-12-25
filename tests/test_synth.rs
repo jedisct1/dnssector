@@ -1,6 +1,5 @@
 use dnssector;
 
-
 mod tests {
     use super::dnssector::constants::*;
     use super::dnssector::synth::gen::{self, RR};

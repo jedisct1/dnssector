@@ -5,7 +5,6 @@ use crate::parsed_packet::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use byteorder::{BigEndian, ByteOrder};
-use failure;
 
 pub struct Renamer;
 
@@ -18,17 +17,17 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<Option<Vec<u8>>, failure::Error> {
+    ) -> Result<Option<Vec<u8>>, Error> {
         let (name_len, source_name_len, target_name_len) =
             (name.len(), source_name.len(), target_name.len());
         if name_len < source_name_len || (match_suffix == false && name_len != source_name_len) {
             return Ok(None);
         }
         if source_name_len <= 0 || target_name_len <= 0 {
-            xbail!(DSError::InvalidName("Empty name"));
+            bail!(DSError::InvalidName("Empty name"));
         }
         if source_name[0] == 0 || target_name[0] == 0 {
-            xbail!(DSError::InvalidName(
+            bail!(DSError::InvalidName(
                 "A non-empty name cannot start with a NUL byte"
             ));
         }
@@ -45,7 +44,7 @@ impl Renamer {
             return Ok(None);
         }
         if i != offset {
-            xbail!(DSError::InvalidName("Inconsistent encoding"));
+            bail!(DSError::InvalidName("Inconsistent encoding"));
         }
         assert_eq!(i, offset);
         while name[i] != 0 {
@@ -63,7 +62,7 @@ impl Renamer {
             i += label_len;
         }
         if offset + target_name_len > DNS_MAX_HOSTNAME_LEN {
-            xbail!(DSError::InvalidName("Name too long"));
+            bail!(DSError::InvalidName("Name too long"));
         }
         let mut res: Vec<u8> = Vec::with_capacity(offset + target_name_len);
         res.extend(&name[0..offset]);
@@ -79,7 +78,7 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), Error> {
         let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
         let _compressed_name_len = Compress::copy_uncompressed_name(&mut name, packet, offset);
         let replaced_name = Self::replace_raw(&name, target_name, source_name, match_suffix)?;
@@ -114,7 +113,7 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), Error> {
         let mut it = parsed_packet.into_iter_question();
         while let Some(item) = it {
             {
@@ -129,7 +128,7 @@ impl Renamer {
                     match_suffix,
                 )?;
                 if raw.packet.len() < raw.name_end + DNS_RR_QUESTION_HEADER_SIZE {
-                    xbail!(DSError::PacketTooSmall)
+                    bail!(DSError::PacketTooSmall)
                 }
                 renamed_packet
                     .extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_QUESTION_HEADER_SIZE]);
@@ -146,7 +145,7 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), Error> {
         while let Some(item) = it {
             {
                 let raw = item.raw();
@@ -160,7 +159,7 @@ impl Renamer {
                     match_suffix,
                 )?;
                 if raw.packet.len() < raw.name_end + DNS_RR_HEADER_SIZE {
-                    xbail!(DSError::PacketTooSmall)
+                    bail!(DSError::PacketTooSmall)
                 }
                 let renamed_packet_offset_data = renamed_packet.len();
                 renamed_packet.extend(&raw.packet[raw.name_end..raw.name_end + DNS_RR_HEADER_SIZE]);
@@ -268,7 +267,7 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), Error> {
         let it = parsed_packet.into_iter_answer() as Option<ResponseIterator<'_>>;
         Self::rename_response_section(
             it,
@@ -287,7 +286,7 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), Error> {
         let it = parsed_packet.into_iter_nameservers() as Option<ResponseIterator<'_>>;
         Self::rename_response_section(
             it,
@@ -306,7 +305,7 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), Error> {
         let it = parsed_packet.into_iter_additional() as Option<ResponseIterator<'_>>;
         Self::rename_response_section(
             it,
@@ -326,12 +325,12 @@ impl Renamer {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<Vec<u8>, failure::Error> {
+    ) -> Result<Vec<u8>, Error> {
         if target_name.len() <= 0 || source_name.len() <= 0 {
-            xbail!(DSError::InvalidName("Empty name"));
+            bail!(DSError::InvalidName("Empty name"));
         }
         if target_name.len() > DNS_MAX_HOSTNAME_LEN || source_name.len() > DNS_MAX_HOSTNAME_LEN {
-            xbail!(DSError::InvalidName("Name too long"));
+            bail!(DSError::InvalidName("Name too long"));
         }
         let mut renamed_packet = Vec::with_capacity(parsed_packet.packet().len());
         parsed_packet.copy_header(&mut renamed_packet);

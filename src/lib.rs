@@ -16,13 +16,6 @@
 
 #[macro_use]
 extern crate chomp;
-#[macro_use]
-extern crate failure;
-#[macro_use]
-extern crate failure_derive;
-
-#[macro_use]
-extern crate xfailure;
 
 pub mod c_abi;
 pub mod compress;

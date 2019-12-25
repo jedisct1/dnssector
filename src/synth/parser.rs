@@ -8,7 +8,6 @@ use chomp::prelude::{
     eof, not_token, satisfy, skip_while, take_while1, token, Buffer, Input, SimpleResult, U8Input,
 };
 use chomp::primitives::Primitives;
-use failure;
 use hex;
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::{self, FromStr};
@@ -219,8 +218,7 @@ fn ipv6_parser<I: U8Input>(i: I) -> SimpleResult<I, Ipv6Addr> {
 
 #[allow(dead_code)]
 fn hexstring_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
-    take_while1(i, is_hexdigit)
-        .bind(|i, hex_str| i.ret(hex::decode(hex_str.into_vec()).unwrap()))
+    take_while1(i, is_hexdigit).bind(|i, hex_str| i.ret(hex::decode(hex_str.into_vec()).unwrap()))
 }
 
 fn hostname_parser<I: U8Input>(i: I) -> SimpleResult<I, Vec<u8>> {
@@ -389,7 +387,7 @@ fn rr_rdata_ds_parser<I: U8Input>(i: I) -> SimpleResult<I, (u16, u8, u8, Vec<u8>
     }
 }
 
-fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, failure::Error> {
+fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, Error> {
     match rr_type_str {
         s if s.eq_ignore_ascii_case(b"A") => Ok(Type::A),
         s if s.eq_ignore_ascii_case(b"AAAA") => Ok(Type::AAAA),
@@ -400,7 +398,7 @@ fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, failure::Error> {
         s if s.eq_ignore_ascii_case(b"MX") => Ok(Type::MX),
         s if s.eq_ignore_ascii_case(b"SOA") => Ok(Type::SOA),
         s if s.eq_ignore_ascii_case(b"DS") => Ok(Type::DS),
-        _ => xbail!(DSError::UnsupportedRRType(
+        _ => bail!(DSError::UnsupportedRRType(
             str::from_utf8(rr_type_str)
                 .unwrap_or("<invalid UTF8 sequence>")
                 .to_owned()
@@ -408,7 +406,7 @@ fn rr_type_from_str(rr_type_str: &[u8]) -> Result<Type, failure::Error> {
     }
 }
 
-pub fn rr_parser<I: U8Input>(i: I) -> SimpleResult<I, Result<RR, failure::Error>> {
+pub fn rr_parser<I: U8Input>(i: I) -> SimpleResult<I, Result<RR, Error>> {
     parse! {i;
         let rr_common = rr_common_parser();
         skip_horizontal_whitespaces();

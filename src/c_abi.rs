@@ -6,7 +6,6 @@ use crate::question_iterator::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use crate::synth::gen;
-use failure;
 use libc::{c_char, c_int, c_void, size_t};
 use std::cell::RefCell;
 use std::convert::From;
@@ -27,7 +26,7 @@ thread_local!(
     })
 );
 
-fn throw_err(e: failure::Error, c_err: *mut *const CErr) -> c_int {
+fn throw_err(e: Error, c_err: *mut *const CErr) -> c_int {
     if !c_err.is_null() {
         CERR.with(|tc_err| {
             let mut tc_err = tc_err.borrow_mut();
@@ -364,7 +363,7 @@ unsafe fn add_to_section(
     parsed_packet: *mut ParsedPacket,
     section: Section,
     rr_str: *const i8,
-) -> Result<(), failure::Error> {
+) -> Result<(), Error> {
     let rr_str = match CStr::from_ptr(rr_str).to_str() {
         Err(_) => bail!(DSError::ParseError),
         Ok(rr_str) => rr_str,

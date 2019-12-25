@@ -9,7 +9,6 @@ use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use crate::synth::gen;
 use byteorder::{BigEndian, ByteOrder};
-use failure;
 use rand::prelude::*;
 use std::ptr;
 
@@ -226,7 +225,7 @@ impl ParsedPacket {
     }
 
     /// Increments the number of records in a given section
-    pub fn rrcount_inc(&mut self, section: Section) -> Result<u16, failure::Error> {
+    pub fn rrcount_inc(&mut self, section: Section) -> Result<u16, Error> {
         let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => {
@@ -260,7 +259,7 @@ impl ParsedPacket {
     }
 
     /// Decrements the number of records in a given section
-    pub fn rrcount_dec(&mut self, section: Section) -> Result<u16, failure::Error> {
+    pub fn rrcount_dec(&mut self, section: Section) -> Result<u16, Error> {
         let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => DNSSector::qdcount(&packet),
@@ -287,7 +286,7 @@ impl ParsedPacket {
         Ok(rrcount)
     }
 
-    fn insertion_offset(&self, section: Section) -> Result<usize, failure::Error> {
+    fn insertion_offset(&self, section: Section) -> Result<usize, Error> {
         let offset = match section {
             Section::Question => self
                 .offset_answers
@@ -307,7 +306,7 @@ impl ParsedPacket {
         Ok(offset)
     }
 
-    pub fn insert_rr(&mut self, section: Section, rr: gen::RR) -> Result<(), failure::Error> {
+    pub fn insert_rr(&mut self, section: Section, rr: gen::RR) -> Result<(), Error> {
         if self.maybe_compressed {
             let uncompressed = Compress::uncompress(&self.packet())?;
             self.packet = Some(uncompressed);
@@ -368,11 +367,7 @@ impl ParsedPacket {
         Ok(())
     }
 
-    pub fn insert_rr_from_string(
-        &mut self,
-        section: Section,
-        rr_str: &str,
-    ) -> Result<(), failure::Error> {
+    pub fn insert_rr_from_string(&mut self, section: Section, rr_str: &str) -> Result<(), Error> {
         let rr = gen::RR::from_string(rr_str)?;
         self.insert_rr(section, rr)
     }
@@ -381,7 +376,7 @@ impl ParsedPacket {
     /// It is currently re-parsing everything by calling `parse()`, but this can be
     /// optimized later to skip over RDATA, and by assuming that the input
     /// is always well-formed.
-    pub fn recompute(&mut self) -> Result<(), failure::Error> {
+    pub fn recompute(&mut self) -> Result<(), Error> {
         if !self.maybe_compressed {
             return Ok(());
         }
@@ -484,7 +479,7 @@ impl ParsedPacket {
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
-    ) -> Result<(), failure::Error> {
+    ) -> Result<(), Error> {
         let packet = Renamer::rename_with_raw_names(self, target_name, source_name, match_suffix)?;
         self.packet = Some(packet);
         let dns_sector = DNSSector::new(self.packet.take().unwrap())?;

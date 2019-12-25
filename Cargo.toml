@@ -9,16 +9,15 @@ homepage = "https://github.com/jedisct1/dnssector"
 repository = "https://github.com/jedisct1/dnssector"
 
 [dependencies]
+anyhow = "1"
 byteorder = "1"
 chomp = "0.3"
 debug_stub_derive = "0.3"
-failure = "0.1"
-failure_derive = "0.1"
+hex = "0.4"
 libc = "0.2"
 libloading = "0.5"
 rand = "0.7"
-xfailure = "0.1"
-hex = "0.4"
+thiserror = "1"
 
 [profile.release]
 lto = true

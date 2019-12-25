@@ -3,7 +3,6 @@ use crate::dns_sector::*;
 use crate::errors::*;
 use crate::rr_iterator::*;
 use byteorder::{BigEndian, ByteOrder};
-use failure;
 use std::cmp;
 
 /// Output of the `copy_uncompressed_name()` function.
@@ -27,46 +26,43 @@ impl Compress {
     /// compressed names, checks for label lengths, checks for truncated names and checks for
     /// cycles.
     /// Returns the location right after the name.
-    pub fn check_compressed_name(
-        packet: &[u8],
-        mut offset: usize,
-    ) -> Result<usize, failure::Error> {
+    pub fn check_compressed_name(packet: &[u8], mut offset: usize) -> Result<usize, Error> {
         let packet_len = packet.len();
         let mut name_len = 0;
         let (mut barrier_offset, mut lowest_offset, mut final_offset) = (packet_len, offset, None);
         let mut refs_allowed = DNS_MAX_HOSTNAME_INDIRECTIONS;
         if offset >= packet_len {
-            xbail!(DSError::InternalError("Offset outside packet boundaries"));
+            bail!(DSError::InternalError("Offset outside packet boundaries"));
         }
         if 1 > packet_len - offset {
-            xbail!(DSError::InvalidName("Empty name"));
+            bail!(DSError::InvalidName("Empty name"));
         }
         loop {
             if offset >= barrier_offset {
                 if offset >= packet_len {
-                    xbail!(DSError::InvalidName("Truncated name"));
+                    bail!(DSError::InvalidName("Truncated name"));
                 }
-                xbail!(DSError::InvalidName("Cycle"));
+                bail!(DSError::InvalidName("Cycle"));
             }
             let label_len = match packet[offset] {
                 len if len & 0xc0 == 0xc0 => {
                     if refs_allowed <= 0 {
-                        xbail!(DSError::InvalidName("Too many indirections"));
+                        bail!(DSError::InvalidName("Too many indirections"));
                     }
                     refs_allowed -= 1;
                     if 2 > packet_len - offset {
-                        xbail!(DSError::InvalidName("Invalid internal offset"));
+                        bail!(DSError::InvalidName("Invalid internal offset"));
                     }
                     let ref_offset =
                         ((((len & 0x3f) as u16) << 8) | (packet[offset + 1]) as u16) as usize;
                     if ref_offset == offset || ref_offset >= lowest_offset {
-                        xbail!(DSError::InvalidName("Forward/self reference"));
+                        bail!(DSError::InvalidName("Forward/self reference"));
                     }
                     if packet[ref_offset] & 0xc0 == 0xc0 {
-                        xbail!(DSError::InvalidName("Double reference"));
+                        bail!(DSError::InvalidName("Double reference"));
                     }
                     if packet[ref_offset] < 1 {
-                        xbail!(DSError::InvalidName(
+                        bail!(DSError::InvalidName(
                             "Reference to a name that cannot be compressed"
                         ));
                     }
@@ -76,15 +72,15 @@ impl Compress {
                     lowest_offset = ref_offset;
                     continue;
                 }
-                len if len > 0x3f => xbail!(DSError::InvalidName("Label length too long")),
+                len if len > 0x3f => bail!(DSError::InvalidName("Label length too long")),
                 len => len as usize,
             };
             if label_len >= packet_len - offset {
-                xbail!(DSError::InvalidName("Out-of-bounds name"));
+                bail!(DSError::InvalidName("Out-of-bounds name"));
             }
             name_len += label_len + 1;
             if name_len > DNS_MAX_HOSTNAME_LEN {
-                xbail!(DSError::InvalidName("Name too long"));
+                bail!(DSError::InvalidName("Name too long"));
             }
             offset += label_len + 1;
             if label_len == 0 {
@@ -274,10 +270,10 @@ impl Compress {
     pub fn uncompress_with_previous_offset(
         packet: &[u8],
         ref_offset: usize,
-    ) -> Result<(Vec<u8>, usize), failure::Error> {
+    ) -> Result<(Vec<u8>, usize), Error> {
         let packet = packet.to_owned(); // XXX - TODO: use `ParsedPacket` directly after having removed its dependency on `dns_sector`
         if packet.len() < DNS_HEADER_SIZE {
-            xbail!(DSError::PacketTooSmall);
+            bail!(DSError::PacketTooSmall);
         }
         let mut new_offset = None;
         let mut uncompressed = Vec::new();
@@ -351,14 +347,14 @@ impl Compress {
         ))
     }
 
-    pub fn uncompress(packet: &[u8]) -> Result<Vec<u8>, failure::Error> {
+    pub fn uncompress(packet: &[u8]) -> Result<Vec<u8>, Error> {
         Self::uncompress_with_previous_offset(packet, DNS_HEADER_SIZE).map(|x| x.0)
     }
 
-    pub fn compress(packet: &[u8]) -> Result<Vec<u8>, failure::Error> {
+    pub fn compress(packet: &[u8]) -> Result<Vec<u8>, Error> {
         let packet = packet.to_owned(); // XXX - TODO: use `ParsedPacket` directly after having removed its dependency on `dns_sector`
         if packet.len() < DNS_HEADER_SIZE {
-            xbail!(DSError::PacketTooSmall);
+            bail!(DSError::PacketTooSmall);
         }
         let mut compressed = Vec::new();
         compressed.extend_from_slice(&packet[..DNS_HEADER_SIZE]);

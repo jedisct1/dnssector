@@ -102,14 +102,14 @@ impl From<Class> for u16 {
 }
 
 impl Class {
-    pub fn from_string(rr_type_str: &str) -> Result<Class, failure::Error> {
+    pub fn from_string(rr_type_str: &str) -> Result<Class, Error> {
         match rr_type_str {
             s if s.eq_ignore_ascii_case("IN") => Ok(Class::IN),
             s if s.eq_ignore_ascii_case("CH") => Ok(Class::CH),
             s if s.eq_ignore_ascii_case("HS") => Ok(Class::HS),
             s if s.eq_ignore_ascii_case("NONE") => Ok(Class::NONE),
             s if s.eq_ignore_ascii_case("ANY") => Ok(Class::ANY),
-            _ => xbail!(DSError::UnsupportedRRClass(rr_type_str.to_owned())),
+            _ => bail!(DSError::UnsupportedRRClass(rr_type_str.to_owned())),
         }
     }
 }
@@ -211,7 +211,7 @@ impl From<Type> for u16 {
 }
 
 impl Type {
-    pub fn from_string(rr_type_str: &str) -> Result<Type, failure::Error> {
+    pub fn from_string(rr_type_str: &str) -> Result<Type, Error> {
         match rr_type_str {
             s if s.eq_ignore_ascii_case("A") => Ok(Type::A),
             s if s.eq_ignore_ascii_case("AAAA") => Ok(Type::AAAA),
@@ -222,7 +222,7 @@ impl Type {
             s if s.eq_ignore_ascii_case("MX") => Ok(Type::MX),
             s if s.eq_ignore_ascii_case("SOA") => Ok(Type::SOA),
             s if s.eq_ignore_ascii_case("DS") => Ok(Type::DS),
-            _ => xbail!(DSError::UnsupportedRRType(rr_type_str.to_owned())),
+            _ => bail!(DSError::UnsupportedRRType(rr_type_str.to_owned())),
         }
     }
 }

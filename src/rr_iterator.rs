@@ -4,7 +4,6 @@ use crate::dns_sector::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
 use byteorder::{BigEndian, ByteOrder};
-use failure;
 use std::marker;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 use std::ptr;
@@ -114,7 +113,7 @@ pub trait DNSIterable {
     }
 
     /// Decompresses the whole packet while keeping the iterator available.
-    fn uncompress(&mut self) -> Result<(), failure::Error> {
+    fn uncompress(&mut self) -> Result<(), Error> {
         if !self.parsed_packet().maybe_compressed {
             return Ok(());
         }
@@ -162,14 +161,14 @@ pub trait TypedIterable {
     }
 
     /// Returns the section the current record belongs to.
-    fn current_section(&self) -> Result<Section, failure::Error>
+    fn current_section(&self) -> Result<Section, Error>
     where
         Self: DNSIterable,
     {
         let offset = self.offset();
         let parsed_packet = self.parsed_packet();
         if offset < parsed_packet.offset_question {
-            xbail!(DSError::InternalError("name before the question section"));
+            bail!(DSError::InternalError("name before the question section"));
         }
         let mut section = Section::Question;
         if parsed_packet.offset_answers.is_some() && offset >= parsed_packet.offset_answers {
@@ -187,7 +186,7 @@ pub trait TypedIterable {
 
     /// Resizes the current record, by growing or shrinking (with a negative value) the current
     /// record size by `shift` bytes.
-    fn resize_rr(&mut self, shift: isize) -> Result<(), failure::Error>
+    fn resize_rr(&mut self, shift: isize) -> Result<(), Error>
     where
         Self: DNSIterable,
     {
@@ -201,7 +200,7 @@ pub trait TypedIterable {
             if shift > 0 {
                 let new_packet_len = packet_len + shift as usize;
                 if new_packet_len > 0xffff {
-                    xbail!(DSError::PacketTooLarge);
+                    bail!(DSError::PacketTooLarge);
                 }
                 packet.resize(new_packet_len, 0);
                 debug_assert_eq!(
@@ -255,7 +254,7 @@ pub trait TypedIterable {
     }
 
     /// Changes the name (raw format, untrusted content).
-    fn set_raw_name(&mut self, name: &[u8]) -> Result<(), failure::Error>
+    fn set_raw_name(&mut self, name: &[u8]) -> Result<(), Error>
     where
         Self: DNSIterable,
     {
@@ -287,7 +286,7 @@ pub trait TypedIterable {
     }
 
     /// Deletes the record
-    fn delete(&mut self) -> Result<(), failure::Error>
+    fn delete(&mut self) -> Result<(), Error>
     where
         Self: DNSIterable,
     {
@@ -375,7 +374,7 @@ pub trait RdataIterable {
     }
 
     /// Retrieves the IP address of an `A` or `AAAA` record.
-    fn rr_ip(&self) -> Result<IpAddr, failure::Error>
+    fn rr_ip(&self) -> Result<IpAddr, Error>
     where
         Self: DNSIterable + TypedIterable,
     {
@@ -394,12 +393,12 @@ pub trait RdataIterable {
                 ip.copy_from_slice(&rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 16]);
                 Ok(IpAddr::V6(Ipv6Addr::from(ip)))
             }
-            _ => xbail!(DSError::PropertyNotFound),
+            _ => bail!(DSError::PropertyNotFound),
         }
     }
 
     /// Changes the IP address of an `A` or `AAAA` record.
-    fn set_rr_ip(&mut self, ip: &IpAddr) -> Result<(), failure::Error>
+    fn set_rr_ip(&mut self, ip: &IpAddr) -> Result<(), Error>
     where
         Self: DNSIterable + TypedIterable,
     {
@@ -411,7 +410,7 @@ pub trait RdataIterable {
                     rdata[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + 4].copy_from_slice(&ip.octets());
                     Ok(())
                 }
-                _ => xbail!(DSError::WrongAddressFamily),
+                _ => bail!(DSError::WrongAddressFamily),
             },
             x if x == Type::AAAA.into() => match *ip {
                 IpAddr::V6(ip) => {
@@ -421,9 +420,9 @@ pub trait RdataIterable {
                         .copy_from_slice(&ip.octets());
                     Ok(())
                 }
-                _ => xbail!(DSError::WrongAddressFamily),
+                _ => bail!(DSError::WrongAddressFamily),
             },
-            _ => xbail!(DSError::PropertyNotFound),
+            _ => bail!(DSError::PropertyNotFound),
         }
     }
 }
