@@ -373,6 +373,32 @@ pub trait RdataIterable {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_RDLEN_OFFSET..]) as usize
     }
 
+    /// Retrieves the string of an `TXT` record.
+    fn rr_txt(&self) -> Result<Vec<u8>, Error>
+    where
+        Self: DNSIterable + TypedIterable,
+    {
+        match self.rr_type() {
+            x if x == Type::TXT.into() => {
+                let rdata = self.rdata_slice();
+                let mut text: Vec<u8> = Vec::new();
+                let mut i = usize::from(DNS_RR_HEADER_SIZE);
+                while i < rdata.len() {
+                    let chunklen = usize::from(rdata[i]);
+                    i = i+1;
+                    text.extend_from_slice(&rdata[i..i+chunklen]);
+                    i += chunklen
+                }
+                if i > DNS_RR_HEADER_SIZE {
+                    Ok(text)
+                } else {
+                    bail!(DSError::PropertyNotFound)
+                }
+            }
+            _ => bail!(DSError::PropertyNotFound),
+        }
+    }
+
     /// Retrieves the IP address of an `A` or `AAAA` record.
     fn rr_ip(&self) -> Result<IpAddr, Error>
     where
