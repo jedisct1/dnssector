@@ -14,7 +14,7 @@ byteorder = "1"
 chomp = "0.3"
 hex = "0.4"
 libc = "0.2"
-libloading = "0.5"
+libloading = "0.6"
 rand = "0.7"
 thiserror = "1"
 
