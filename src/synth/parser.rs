@@ -8,7 +8,7 @@ use chomp::prelude::{
     eof, not_token, satisfy, skip_while, take_while1, token, Buffer, Input, SimpleResult, U8Input,
 };
 use chomp::primitives::Primitives;
-use hex;
+
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::{self, FromStr};
 use std::u32;

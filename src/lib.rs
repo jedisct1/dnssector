@@ -1,7 +1,7 @@
 #![recursion_limit = "128"]
 #![allow(clippy::absurd_extreme_comparisons)]
 #![allow(clippy::assertions_on_constants)]
-#![allow(clippy::block_in_if_condition_stmt)]
+#![allow(clippy::blocks_in_if_conditions)]
 #![allow(clippy::bool_comparison)]
 #![allow(clippy::cast_lossless)]
 #![allow(clippy::comparison_chain)]
