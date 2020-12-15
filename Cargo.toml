@@ -14,7 +14,7 @@ byteorder = "1"
 chomp = "0.3"
 hex = "0.4"
 libc = "0.2"
-libloading = "0.6"
+libloading = { version = "0.6", optional = true }
 rand = "0.7"
 thiserror = "1"
 
@@ -22,3 +22,7 @@ thiserror = "1"
 lto = true
 panic = "abort"
 opt-level = 3
+
+[features]
+hooks = [ "libloading" ]
+default = [ ]

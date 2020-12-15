@@ -1,7 +1,11 @@
+#[cfg(feature = "hooks")]
 use crate::c_abi::{self, FnTable};
-use dnssector::*;
+#[cfg(feature = "hooks")]
 use libc::c_int;
+#[cfg(feature = "hooks")]
 use libloading::{Library, Symbol};
+
+use dnssector::*;
 
 pub fn main() {
     let packet: Vec<u8> = vec![
@@ -52,17 +56,26 @@ pub fn main() {
         0x10, 0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00,
     ];
 
-    let dlh =
-        Library::new("src/bin/c_hook/c_hook.dylib").expect("Cannot load the sample C library");
-
-    let hook_deliver: Symbol<'_, unsafe extern "C" fn(*const FnTable, *mut ParsedPacket) -> c_int> =
-        unsafe { dlh.get(b"hook_deliver").unwrap() };
-
     let ds = DNSSector::new(packet).expect("cannot parse packet");
     let mut parsed_packet = ds.parse().expect("cannot run parser");
 
-    let fn_table = c_abi::fn_table();
-    let _ = unsafe { hook_deliver(&fn_table, &mut parsed_packet) };
+    #[cfg(feature = "hooks")]
+    {
+        let dlh =
+            Library::new("src/bin/c_hook/c_hook.dylib").expect("Cannot load the sample C library");
 
-    println!("flags after the C hook:      {:x}", parsed_packet.flags());
+        let hook_deliver: Symbol<
+            '_,
+            unsafe extern "C" fn(*const FnTable, *mut ParsedPacket) -> c_int,
+        > = unsafe { dlh.get(b"hook_deliver").unwrap() };
+
+        let fn_table = c_abi::fn_table();
+        let _ = unsafe { hook_deliver(&fn_table, &mut parsed_packet) };
+        println!("flags after the C hook:      {:x}", parsed_packet.flags());
+    }
+
+    #[cfg(not(feature = "hooks"))]
+    {
+        parsed_packet.set_rcode(0);
+    }
 }
