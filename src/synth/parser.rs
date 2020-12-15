@@ -101,10 +101,7 @@ fn decimal_u32<I: Input<Token = u8>>(i: I) -> SimpleResult<I, u32> {
 }
 
 fn is_hexdigit(c: u8) -> bool {
-    match c {
-        b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F' => true,
-        _ => false,
-    }
+    matches!(c, b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F')
 }
 
 #[allow(dead_code)]
