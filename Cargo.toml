@@ -1,6 +1,6 @@
 [package]
 name = "dnssector"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Frank Denis <github@pureftpd.org>"]
 description = "A very fast library to parse, validate, create and mangle DNS packets"
 license = "ISC"
@@ -15,7 +15,7 @@ chomp = "0.3"
 hex = "0.4"
 libc = "0.2"
 libloading = { version = "0.6", optional = true }
-rand = "0.7"
+rand = "0.8"
 thiserror = "1"
 
 [profile.release]
