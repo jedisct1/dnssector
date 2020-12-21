@@ -15,7 +15,7 @@ chomp = "0.3"
 hex = "0.4"
 libc = "0.2"
 libloading = "0.6"
-rand = "0.7"
+rand = "0.8"
 thiserror = "1"
 
 [profile.release]
