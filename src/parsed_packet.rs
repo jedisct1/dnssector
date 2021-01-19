@@ -10,7 +10,6 @@ use crate::rr_iterator::*;
 use crate::synth::gen;
 use byteorder::{BigEndian, ByteOrder};
 use rand::prelude::*;
-use std::ptr;
 
 /// A `ParsedPacket` structure contains information about a successfully parsed
 /// DNS packet, that allows quick access to (extended) flags and to individual sections.
@@ -318,22 +317,16 @@ impl ParsedPacket {
             bail!(DSError::PacketTooLarge)
         }
         let insertion_offset = self.insertion_offset(section)?;
-        let new_len = self.packet().len() + rr_len;
+        let packet_len = self.packet().len();
+        let new_len = packet_len + rr_len;
         self.packet_mut().reserve(rr_len);
         if insertion_offset == new_len {
             self.packet_mut().extend_from_slice(&rr.packet);
         } else {
-            unsafe {
-                let packet_ptr = self.packet_mut().as_mut_ptr();
-                ptr::copy(
-                    packet_ptr.add(insertion_offset),
-                    packet_ptr.add(insertion_offset + rr_len),
-                    self.packet().len() - insertion_offset,
-                );
-                self.packet_mut().set_len(new_len);
-            }
-            self.packet_mut()[insertion_offset..insertion_offset + rr_len]
-                .copy_from_slice(&rr.packet);
+            let packet = self.packet_mut();
+            packet.resize(new_len, 0);
+            packet.copy_within(insertion_offset..packet_len, insertion_offset + rr_len);
+            packet[insertion_offset..insertion_offset + rr_len].copy_from_slice(&rr.packet);
         }
         self.rrcount_inc(section)?;
         match section {

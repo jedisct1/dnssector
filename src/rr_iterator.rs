@@ -6,7 +6,6 @@ use crate::parsed_packet::*;
 use byteorder::{BigEndian, ByteOrder};
 use std::marker;
 use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::ptr;
 
 /// Accessor to the raw packet data.
 /// `offset` is the offset to the current RR.
@@ -207,25 +206,12 @@ pub trait TypedIterable {
                     new_packet_len,
                     (offset as isize + shift) as usize + (packet_len - offset) as usize
                 );
-                unsafe {
-                    let packet_ptr = packet.as_mut_ptr();
-                    ptr::copy(
-                        packet_ptr.add(offset),
-                        packet_ptr.offset((offset as isize + shift) as isize),
-                        packet_len - offset,
-                    );
-                }
+                packet.copy_within(offset..offset + packet_len, offset + shift as usize);
             } else if shift < 0 {
-                assert!(packet_len >= (-shift) as usize);
-                unsafe {
-                    let packet_ptr = packet.as_mut_ptr();
-                    ptr::copy(
-                        packet_ptr.offset((offset as isize - shift) as isize),
-                        packet_ptr.add(offset),
-                        packet_len - (offset as isize - shift) as usize,
-                    );
-                }
-                packet.truncate((packet_len as isize + shift) as usize);
+                let shift = (-shift) as usize;
+                assert!(packet_len >= shift);
+                packet.copy_within(offset + shift.., offset);
+                packet.truncate(packet_len - shift);
             }
         }
         let new_offset_next = (self.offset_next() as isize + shift) as usize;
