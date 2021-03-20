@@ -18,8 +18,8 @@ mod tests {
         assert!(ret.is_err());
 
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::PacketTooSmall => assert!(true),
-            _ => assert!(false),
+            DSError::PacketTooSmall => {}
+            _ => panic!(),
         }
     }
 
@@ -30,8 +30,8 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::InvalidPacket(_) => assert!(true),
-            a => assert!(false, "type: {:?}", a),
+            DSError::InvalidPacket(_) => {}
+            a => panic!("type: {:?}", a),
         }
     }
 
@@ -42,8 +42,8 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::InternalError(_) => assert!(true),
-            a => assert!(false, "type: {:?}", a),
+            DSError::InternalError(_) => {}
+            a => panic!("type: {:?}", a),
         }
     }
 
@@ -62,8 +62,8 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::PacketTooSmall => assert!(true),
-            a => assert!(false, "type: {:?}", a),
+            DSError::PacketTooSmall => {}
+            a => panic!("type: {:?}", a),
         }
     }
 
@@ -79,8 +79,8 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::InvalidName(_) => assert!(true),
-            a => assert!(false, "type: {:?}", a),
+            DSError::InvalidName(_) => {}
+            a => panic!("type: {:?}", a),
         }
     }
 
@@ -105,8 +105,8 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::InvalidName(_) => assert!(true),
-            a => assert!(false, "type: {:?}", a),
+            DSError::InvalidName(_) => {}
+            a => panic!("type: {:?}", a),
         }
     }
 
@@ -150,9 +150,9 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::InvalidName("Label length too long") => assert!(true),
-            DSError::InvalidPacket("A question shouldn\'t also contain answers") => assert!(true),
-            a => assert!(false, "type: {:?}", a),
+            DSError::InvalidName("Label length too long") => {}
+            DSError::InvalidPacket("A question shouldn\'t also contain answers") => {}
+            a => panic!("type: {:?}", a),
         }
     }
 
@@ -170,11 +170,9 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::InvalidPacket("AAAA record doesn\'t include a 16 bytes IP address") => {
-                assert!(true)
-            }
-            DSError::InvalidPacket("A question shouldn\'t also contain answers") => assert!(true),
-            a => assert!(false, "type: {:?}", a),
+            DSError::InvalidPacket("AAAA record doesn\'t include a 16 bytes IP address") => {}
+            DSError::InvalidPacket("A question shouldn\'t also contain answers") => {}
+            a => panic!("type: {:?}", a),
         }
     }
 
@@ -360,8 +358,8 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_err());
         match ret.err().expect("error").downcast::<DSError>().unwrap() {
-            DSError::InvalidPacket(_) => assert!(true),
-            _ => assert!(false),
+            DSError::InvalidPacket(_) => {}
+            _ => panic!(),
         }
     }
 }
