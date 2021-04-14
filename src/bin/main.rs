@@ -61,8 +61,8 @@ pub fn main() {
 
     #[cfg(feature = "hooks")]
     {
-        let dlh =
-            Library::new("src/bin/c_hook/c_hook.dylib").expect("Cannot load the sample C library");
+        let dlh = unsafe { Library::new("src/bin/c_hook/c_hook.dylib") }
+            .expect("Cannot load the sample C library");
 
         let hook_deliver: Symbol<
             '_,
