@@ -362,7 +362,7 @@ unsafe extern "C" fn delete(
 unsafe fn add_to_section(
     parsed_packet: *mut ParsedPacket,
     section: Section,
-    rr_str: *const i8,
+    rr_str: *const c_char,
 ) -> Result<(), Error> {
     let rr_str = match CStr::from_ptr(rr_str).to_str() {
         Err(_) => bail!(DSError::ParseError),
@@ -374,7 +374,7 @@ unsafe fn add_to_section(
 unsafe extern "C" fn add_to_question(
     parsed_packet: *mut ParsedPacket,
     c_err: *mut *const CErr,
-    rr_str: *const i8,
+    rr_str: *const c_char,
 ) -> c_int {
     match add_to_section(parsed_packet, Section::Question, rr_str) {
         Err(e) => throw_err(e, c_err),
@@ -385,7 +385,7 @@ unsafe extern "C" fn add_to_question(
 unsafe extern "C" fn add_to_answer(
     parsed_packet: *mut ParsedPacket,
     c_err: *mut *const CErr,
-    rr_str: *const i8,
+    rr_str: *const c_char,
 ) -> c_int {
     match add_to_section(parsed_packet, Section::Answer, rr_str) {
         Err(e) => throw_err(e, c_err),
@@ -396,7 +396,7 @@ unsafe extern "C" fn add_to_answer(
 unsafe extern "C" fn add_to_nameservers(
     parsed_packet: *mut ParsedPacket,
     c_err: *mut *const CErr,
-    rr_str: *const i8,
+    rr_str: *const c_char,
 ) -> c_int {
     match add_to_section(parsed_packet, Section::NameServers, rr_str) {
         Err(e) => throw_err(e, c_err),
@@ -407,7 +407,7 @@ unsafe extern "C" fn add_to_nameservers(
 unsafe extern "C" fn add_to_additional(
     parsed_packet: *mut ParsedPacket,
     c_err: *mut *const CErr,
-    rr_str: *const i8,
+    rr_str: *const c_char,
 ) -> c_int {
     match add_to_section(parsed_packet, Section::Additional, rr_str) {
         Err(e) => throw_err(e, c_err),
@@ -552,22 +552,22 @@ pub struct FnTable {
     pub add_to_question: unsafe extern "C" fn(
         parsed_packet: *mut ParsedPacket,
         c_err: *mut *const CErr,
-        rr_str: *const i8,
+        rr_str: *const c_char,
     ) -> c_int,
     pub add_to_answer: unsafe extern "C" fn(
         parsed_packet: *mut ParsedPacket,
         c_err: *mut *const CErr,
-        rr_str: *const i8,
+        rr_str: *const c_char,
     ) -> c_int,
     pub add_to_nameservers: unsafe extern "C" fn(
         parsed_packet: *mut ParsedPacket,
         c_err: *mut *const CErr,
-        rr_str: *const i8,
+        rr_str: *const c_char,
     ) -> c_int,
     pub add_to_additional: unsafe extern "C" fn(
         parsed_packet: *mut ParsedPacket,
         c_err: *mut *const CErr,
-        rr_str: *const i8,
+        rr_str: *const c_char,
     ) -> c_int,
     pub raw_packet: unsafe extern "C" fn(
         parsed_packet: *const ParsedPacket,
