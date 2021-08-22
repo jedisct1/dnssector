@@ -112,7 +112,7 @@ impl RR {
 
     pub fn new_question(name: &[u8], rr_type: Type, class: Class) -> Result<Self, Error> {
         let mut packet = Vec::with_capacity(name.len() + 1 + DNS_RR_QUESTION_HEADER_SIZE);
-        copy_raw_name_from_str(&mut packet, &name, None)?;
+        copy_raw_name_from_str(&mut packet, name, None)?;
         let mut header = [0u8; DNS_RR_QUESTION_HEADER_SIZE];
         BigEndian::write_u16(&mut header[DNS_RR_TYPE_OFFSET..], rr_type.into());
         BigEndian::write_u16(&mut header[DNS_RR_CLASS_OFFSET..], class.into());

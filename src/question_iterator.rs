@@ -46,7 +46,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
     #[inline]
     fn raw(&self) -> RRRaw<'_> {
         RRRaw {
-            packet: &self.rr_iterator.parsed_packet.packet(),
+            packet: self.rr_iterator.parsed_packet.packet(),
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -63,7 +63,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
 
     #[inline]
     fn parsed_packet(&self) -> &ParsedPacket {
-        &self.rr_iterator.parsed_packet
+        self.rr_iterator.parsed_packet
     }
 
     #[inline]
@@ -76,7 +76,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
             let rr_iterator = &mut self.rr_iterator;
             debug_assert_eq!(rr_iterator.section, Section::Question);
             if rr_iterator.offset.is_none() {
-                let count = DNSSector::qdcount(&rr_iterator.parsed_packet.packet());
+                let count = DNSSector::qdcount(rr_iterator.parsed_packet.packet());
                 if count == 0 {
                     return None;
                 }
@@ -90,7 +90,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
             rr_iterator.name_end = RRIterator::skip_name(
-                &rr_iterator.parsed_packet.packet(),
+                rr_iterator.parsed_packet.packet(),
                 rr_iterator.offset.unwrap(),
             );
             let offset_next = rr_iterator.name_end + DNS_RR_QUESTION_HEADER_SIZE;

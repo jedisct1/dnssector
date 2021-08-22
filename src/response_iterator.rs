@@ -51,7 +51,7 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
     #[inline]
     fn raw(&self) -> RRRaw<'_> {
         RRRaw {
-            packet: &self.rr_iterator.parsed_packet.packet(),
+            packet: self.rr_iterator.parsed_packet.packet(),
             offset: self.rr_iterator.offset.unwrap(),
             name_end: self.rr_iterator.name_end,
         }
@@ -68,7 +68,7 @@ impl<'t> DNSIterable for ResponseIterator<'t> {
 
     #[inline]
     fn parsed_packet(&self) -> &ParsedPacket {
-        &self.rr_iterator.parsed_packet
+        self.rr_iterator.parsed_packet
     }
 
     #[inline]
@@ -94,15 +94,15 @@ impl<'t> ResponseIterator<'t> {
             if rr_iterator.offset.is_none() {
                 let (count, offset) = match rr_iterator.section {
                     Section::Answer => (
-                        DNSSector::ancount(&parsed_packet.packet()),
+                        DNSSector::ancount(parsed_packet.packet()),
                         parsed_packet.offset_answers,
                     ),
                     Section::NameServers => (
-                        DNSSector::nscount(&parsed_packet.packet()),
+                        DNSSector::nscount(parsed_packet.packet()),
                         parsed_packet.offset_nameservers,
                     ),
                     Section::Additional => (
-                        DNSSector::arcount(&parsed_packet.packet()),
+                        DNSSector::arcount(parsed_packet.packet()),
                         parsed_packet.offset_additional,
                     ),
                     _ => unreachable!("Unexpected section"),
@@ -119,8 +119,8 @@ impl<'t> ResponseIterator<'t> {
             rr_iterator.rrs_left -= 1;
             rr_iterator.offset = Some(rr_iterator.offset_next);
             rr_iterator.name_end =
-                RRIterator::skip_name(&parsed_packet.packet(), rr_iterator.offset.unwrap());
-            let offset_next = RRIterator::skip_rdata(&parsed_packet.packet(), rr_iterator.name_end);
+                RRIterator::skip_name(parsed_packet.packet(), rr_iterator.offset.unwrap());
+            let offset_next = RRIterator::skip_rdata(parsed_packet.packet(), rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         Some(self)
@@ -136,8 +136,8 @@ impl<'t> ResponseIterator<'t> {
             }
             rr_iterator.offset = Some(rr_iterator.offset_next);
             rr_iterator.name_end =
-                RRIterator::skip_name(&parsed_packet.packet(), rr_iterator.offset.unwrap());
-            let offset_next = RRIterator::skip_rdata(&parsed_packet.packet(), rr_iterator.name_end);
+                RRIterator::skip_name(parsed_packet.packet(), rr_iterator.offset.unwrap());
+            let offset_next = RRIterator::skip_rdata(parsed_packet.packet(), rr_iterator.name_end);
             rr_iterator.offset_next = offset_next;
         }
         debug_assert!(self.rr_type() != Type::OPT.into());

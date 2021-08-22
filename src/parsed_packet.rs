@@ -228,7 +228,7 @@ impl ParsedPacket {
         let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => {
-                let rrcount = DNSSector::qdcount(&packet);
+                let rrcount = DNSSector::qdcount(packet);
                 if rrcount >= 1 {
                     bail!(DSError::InvalidPacket(
                         "A DNS packet can only contain up to one question"
@@ -236,9 +236,9 @@ impl ParsedPacket {
                 }
                 rrcount
             }
-            Section::Answer => DNSSector::ancount(&packet),
-            Section::NameServers => DNSSector::nscount(&packet),
-            Section::Additional => DNSSector::arcount(&packet),
+            Section::Answer => DNSSector::ancount(packet),
+            Section::NameServers => DNSSector::nscount(packet),
+            Section::Additional => DNSSector::arcount(packet),
             _ => panic!("Trying to increment a the number of records in a pseudosection"),
         };
         if rrcount >= 0xffff {
@@ -261,10 +261,10 @@ impl ParsedPacket {
     pub fn rrcount_dec(&mut self, section: Section) -> Result<u16, Error> {
         let mut packet = &mut self.packet_mut();
         let mut rrcount = match section {
-            Section::Question => DNSSector::qdcount(&packet),
-            Section::Answer => DNSSector::ancount(&packet),
-            Section::NameServers => DNSSector::nscount(&packet),
-            Section::Additional => DNSSector::arcount(&packet),
+            Section::Question => DNSSector::qdcount(packet),
+            Section::Answer => DNSSector::ancount(packet),
+            Section::NameServers => DNSSector::nscount(packet),
+            Section::Additional => DNSSector::arcount(packet),
             _ => panic!("Trying to decrement a the number of records in a pseudosection"),
         };
         if rrcount <= 0 {
@@ -307,7 +307,7 @@ impl ParsedPacket {
 
     pub fn insert_rr(&mut self, section: Section, rr: gen::RR) -> Result<(), Error> {
         if self.maybe_compressed {
-            let uncompressed = Compress::uncompress(&self.packet())?;
+            let uncompressed = Compress::uncompress(self.packet())?;
             self.packet = Some(uncompressed);
             self.recompute()?;
             debug_assert_eq!(self.maybe_compressed, false);
@@ -401,7 +401,7 @@ impl ParsedPacket {
         };
         let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
         let uncompressed_name_result =
-            Compress::copy_uncompressed_name(&mut name, &self.packet(), offset);
+            Compress::copy_uncompressed_name(&mut name, self.packet(), offset);
         let offset = uncompressed_name_result.final_offset;
         let (rr_type, rr_class) = {
             let rdata = &self.packet()[offset..];
@@ -432,7 +432,7 @@ impl ParsedPacket {
             None => return None,
             Some(offset) => offset,
         };
-        let mut name_str = Compress::raw_name_to_str(&self.packet(), offset);
+        let mut name_str = Compress::raw_name_to_str(self.packet(), offset);
         name_str.make_ascii_lowercase();
         let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
         let (rr_type, rr_class) = {

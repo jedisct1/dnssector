@@ -120,11 +120,11 @@ impl Renamer {
                 let raw = item.raw();
                 Self::copy_with_replaced_name(
                     &mut renamed_packet,
-                    &raw.packet,
+                    raw.packet,
                     raw.offset,
                     &mut suffix_dict,
-                    &target_name,
-                    &source_name,
+                    target_name,
+                    source_name,
                     match_suffix,
                 )?;
                 if raw.packet.len() < raw.name_end + DNS_RR_QUESTION_HEADER_SIZE {
@@ -151,11 +151,11 @@ impl Renamer {
                 let raw = item.raw();
                 Self::copy_with_replaced_name(
                     &mut renamed_packet,
-                    &raw.packet,
+                    raw.packet,
                     raw.offset,
                     &mut suffix_dict,
-                    &target_name,
-                    &source_name,
+                    target_name,
+                    source_name,
                     match_suffix,
                 )?;
                 if raw.packet.len() < raw.name_end + DNS_RR_HEADER_SIZE {
@@ -172,11 +172,11 @@ impl Renamer {
                         let offset_rdata = raw.name_end;
                         Self::copy_with_replaced_name(
                             &mut renamed_packet,
-                            &raw.packet,
+                            raw.packet,
                             offset_rdata + DNS_RR_HEADER_SIZE,
                             &mut suffix_dict,
-                            &target_name,
-                            &source_name,
+                            target_name,
+                            source_name,
                             match_suffix,
                         )?;
                         let new_rdlen =
@@ -195,11 +195,11 @@ impl Renamer {
                         let renamed_packet_name_offset = renamed_packet.len();
                         Self::copy_with_replaced_name(
                             &mut renamed_packet,
-                            &raw.packet,
+                            raw.packet,
                             offset_rdata + DNS_RR_HEADER_SIZE + 2,
                             &mut suffix_dict,
-                            &target_name,
-                            &source_name,
+                            target_name,
+                            source_name,
                             match_suffix,
                         )?;
                         let new_rdlen = 2 + renamed_packet.len()
@@ -217,22 +217,22 @@ impl Renamer {
                         let name1_len = Compress::raw_name_len(&raw.packet[name1_offset..]);
                         Self::copy_with_replaced_name(
                             &mut renamed_packet,
-                            &raw.packet,
+                            raw.packet,
                             name1_offset,
                             &mut suffix_dict,
-                            &target_name,
-                            &source_name,
+                            target_name,
+                            source_name,
                             match_suffix,
                         )?;
                         let name2_offset = name1_offset + name1_len;
                         let name2_len = Compress::raw_name_len(&raw.packet[name2_offset..]);
                         Self::copy_with_replaced_name(
                             &mut renamed_packet,
-                            &raw.packet,
+                            raw.packet,
                             name2_offset,
                             &mut suffix_dict,
-                            &target_name,
-                            &source_name,
+                            target_name,
+                            source_name,
                             match_suffix,
                         )?;
                         let soa_metadata_offset = name2_offset + name2_len;

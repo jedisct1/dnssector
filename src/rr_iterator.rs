@@ -141,7 +141,7 @@ pub trait TypedIterable {
             return Vec::new();
         }
         let packet = raw.packet;
-        let mut name = Compress::raw_name_to_str(&packet, offset);
+        let mut name = Compress::raw_name_to_str(packet, offset);
         name.make_ascii_lowercase();
         name
     }
@@ -447,8 +447,8 @@ impl<'t> RRIterator<'t> {
         let offset = self
             .offset
             .expect("recompute() called prior to iterating over RRs");
-        let name_end = Self::skip_name(&self.parsed_packet.packet(), offset);
-        let offset_next = Self::skip_rdata(&self.parsed_packet.packet(), name_end);
+        let name_end = Self::skip_name(self.parsed_packet.packet(), offset);
+        let offset_next = Self::skip_rdata(self.parsed_packet.packet(), name_end);
         self.name_end = name_end;
         self.offset_next = offset_next;
     }
