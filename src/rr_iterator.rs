@@ -333,6 +333,7 @@ pub trait TypedIterable {
 }
 
 /// Raw RR data.
+#[derive(Copy, Clone, Debug)]
 pub enum RawRRData<'t> {
     IpAddr(IpAddr),
     Data(&'t [u8]),
