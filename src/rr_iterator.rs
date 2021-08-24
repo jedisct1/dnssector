@@ -332,6 +332,12 @@ pub trait TypedIterable {
     }
 }
 
+/// Raw RR data.
+pub enum RawRRData<'t> {
+    IpAddr(IpAddr),
+    Data(&'t [u8]),
+}
+
 pub trait RdataIterable {
     /// Returns the TTL for the current RR.
     #[inline]
@@ -357,6 +363,19 @@ pub trait RdataIterable {
         Self: DNSIterable + TypedIterable,
     {
         BigEndian::read_u16(&self.rdata_slice()[DNS_RR_RDLEN_OFFSET..]) as usize
+    }
+
+    /// Returns the raw record data for the current RR.
+    fn rr_rd(&self) -> Result<RawRRData, Error>
+    where
+        Self: DNSIterable + TypedIterable,
+    {
+        if let Ok(ip_addr) = self.rr_ip() {
+            return Ok(RawRRData::IpAddr(ip_addr));
+        }
+        let rdata_len = self.rr_rdlen();
+        let rdata = &self.rdata_slice()[DNS_RR_HEADER_SIZE..DNS_RR_HEADER_SIZE + rdata_len];
+        Ok(RawRRData::Data(rdata))
     }
 
     /// Retrieves the IP address of an `A` or `AAAA` record.
