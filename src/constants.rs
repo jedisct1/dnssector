@@ -179,7 +179,10 @@ pub enum Type {
     CDNSKEY = 60,    // RFC 7344
     OPENPGPKEY = 61, // RFC 7929
     CSYNC = 62,      // RFC 7477
-    SPF = 99,        // RFC 4408
+    ZONEMD = 63,
+    SVCB = 64,
+    HTTPS = 65,
+    SPF = 99, // RFC 4408
     UINFO = 100,
     UID = 101,
     GID = 102,
