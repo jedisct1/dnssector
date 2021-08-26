@@ -516,7 +516,12 @@ impl Compress {
             if !res.is_empty() {
                 res.push(b'.');
             }
-            res.extend(label);
+            for &c in label {
+                match c {
+                    b'.' => res.extend(b"\\060"),
+                    _ => res.push(c),
+                }
+            }
         }
         res
     }
