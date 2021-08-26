@@ -82,6 +82,12 @@ impl Compress {
             if name_len > DNS_MAX_HOSTNAME_LEN {
                 bail!(DSError::InvalidName("Name too long"));
             }
+            if packet[offset + 1..offset + label_len + 1]
+                .iter()
+                .any(|&c| c.is_ascii_control() || c == b'.' || c == b'\\' || c == 0)
+            {
+                bail!(DSError::InvalidName("Invalid character in name"));
+            };
             offset += label_len + 1;
             if label_len == 0 {
                 break;
