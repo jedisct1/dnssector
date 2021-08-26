@@ -86,7 +86,7 @@ impl Compress {
                 .iter()
                 .any(|&c| c.is_ascii_control() || c == b'.' || c == b'\\' || c == 0)
             {
-                bail!(DSError::InvalidName("Invalid character in name"));
+                bail!(DSError::InvalidName("Unexpected character in name"));
             };
             offset += label_len + 1;
             if label_len == 0 {
