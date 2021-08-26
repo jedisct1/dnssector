@@ -9,14 +9,14 @@ homepage = "https://github.com/jedisct1/dnssector"
 repository = "https://github.com/jedisct1/dnssector"
 
 [dependencies]
-anyhow = "1"
-byteorder = "1"
+anyhow = "1.0"
+byteorder = "1.4"
 chomp = "0.3"
 hex = "0.4"
 libc = "0.2"
 libloading = { version = "0.7", optional = true }
 rand = "0.8"
-thiserror = "1"
+thiserror = "1.0"
 
 [profile.release]
 lto = true
