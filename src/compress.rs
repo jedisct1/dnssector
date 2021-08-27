@@ -277,7 +277,7 @@ impl Compress {
         packet: &[u8],
         ref_offset: usize,
     ) -> Result<(Vec<u8>, usize), Error> {
-        let packet = packet.to_owned(); // XXX - TODO: use `ParsedPacket` directly after having removed its dependency on `dns_sector`
+        let packet = packet.to_owned();
         if packet.len() < DNS_HEADER_SIZE {
             bail!(DSError::PacketTooSmall);
         }
@@ -358,7 +358,7 @@ impl Compress {
     }
 
     pub fn compress(packet: &[u8]) -> Result<Vec<u8>, Error> {
-        let packet = packet.to_owned(); // XXX - TODO: use `ParsedPacket` directly after having removed its dependency on `dns_sector`
+        let packet = packet.to_owned();
         if packet.len() < DNS_HEADER_SIZE {
             bail!(DSError::PacketTooSmall);
         }
