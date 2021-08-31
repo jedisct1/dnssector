@@ -58,13 +58,8 @@ impl Compress {
                     if ref_offset == offset || ref_offset >= lowest_offset {
                         bail!(DSError::InvalidName("Forward/self reference"));
                     }
-                    if packet[ref_offset] & 0xc0 == 0xc0 {
-                        bail!(DSError::InvalidName("Double reference"));
-                    }
-                    if packet[ref_offset] < 1 {
-                        bail!(DSError::InvalidName(
-                            "Reference to a name that cannot be compressed"
-                        ));
+                    if packet[ref_offset] & 0xc0 != 0xc0 && packet[ref_offset] < 1 {
+                        bail!(DSError::InvalidName("Reference to an empty label"));
                     }
                     final_offset = final_offset.or_else(|| Some(offset + 2));
                     offset = ref_offset;
@@ -87,7 +82,7 @@ impl Compress {
                 .any(|&c| c.is_ascii_control() || c == b'.' || c == b'\\' || c == 0)
             {
                 bail!(DSError::InvalidName("Unexpected character in name"));
-            };
+            }
             offset += label_len + 1;
             if label_len == 0 {
                 break;
