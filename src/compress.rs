@@ -513,7 +513,7 @@ impl Compress {
             }
             for &c in label {
                 match c {
-                    b'.' => res.extend(b"\\060"),
+                    b'.' => res.extend(b"\\046"),
                     _ => res.push(c),
                 }
             }
