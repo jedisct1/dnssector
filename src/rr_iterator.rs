@@ -367,7 +367,7 @@ pub trait RdataIterable {
     }
 
     /// Returns the raw record data for the current RR.
-    fn rr_rd(&self) -> Result<RawRRData, Error>
+    fn rr_rd(&self) -> Result<RawRRData<'_>, Error>
     where
         Self: DNSIterable + TypedIterable,
     {
