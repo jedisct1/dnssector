@@ -59,9 +59,7 @@ impl Compress {
                         bail!(DSError::InvalidName("Forward/self reference"));
                     }
                     if packet[ref_offset] & 0xc0 != 0xc0 && packet[ref_offset] < 1 {
-                        bail!(DSError::InvalidName(
-                            "Reference to a name that cannot be compressed"
-                        ));
+                        bail!(DSError::InvalidName("Reference to an empty label"));
                     }
                     final_offset = final_offset.or_else(|| Some(offset + 2));
                     offset = ref_offset;
