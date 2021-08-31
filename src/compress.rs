@@ -58,10 +58,7 @@ impl Compress {
                     if ref_offset == offset || ref_offset >= lowest_offset {
                         bail!(DSError::InvalidName("Forward/self reference"));
                     }
-                    if packet[ref_offset] & 0xc0 == 0xc0 {
-                        bail!(DSError::InvalidName("Double reference"));
-                    }
-                    if packet[ref_offset] < 1 {
+                    if packet[ref_offset] & 0xc0 != 0xc0 && packet[ref_offset] < 1 {
                         bail!(DSError::InvalidName(
                             "Reference to a name that cannot be compressed"
                         ));
