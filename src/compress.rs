@@ -61,7 +61,7 @@ impl Compress {
                     if packet[ref_offset] & 0xc0 != 0xc0 && packet[ref_offset] < 1 {
                         bail!(DSError::InvalidName("Reference to an empty label"));
                     }
-                    final_offset = final_offset.or_else(|| Some(offset + 2));
+                    final_offset = final_offset.or(Some(offset + 2));
                     offset = ref_offset;
                     barrier_offset = lowest_offset;
                     lowest_offset = ref_offset;
@@ -105,7 +105,7 @@ impl Compress {
         loop {
             let label_len = match packet[offset] {
                 len if len & 0xc0 == 0xc0 => {
-                    final_offset = final_offset.or_else(|| Some(offset + 2));
+                    final_offset = final_offset.or(Some(offset + 2));
                     let new_offset = (BigEndian::read_u16(&packet[offset..]) & 0x3fff) as usize;
                     assert!(new_offset < offset);
                     offset = new_offset;
@@ -130,7 +130,7 @@ impl Compress {
 
     /// Uncompresses trusted record's data and puts the result into `name`.
     fn uncompress_rdata(
-        mut uncompressed: &mut Vec<u8>,
+        uncompressed: &mut Vec<u8>,
         raw: RRRaw<'_>,
         rr_type: Option<u16>,
         rr_rdlen: Option<usize>,
@@ -147,7 +147,7 @@ impl Compress {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
                 let new_rdlen = Compress::copy_uncompressed_name(
-                    &mut uncompressed,
+                    uncompressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
                 )
@@ -161,7 +161,7 @@ impl Compress {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
                 let new_rdlen = 2 + Compress::copy_uncompressed_name(
-                    &mut uncompressed,
+                    uncompressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE + 2,
                 )
@@ -175,12 +175,12 @@ impl Compress {
                 let offset = uncompressed.len();
                 uncompressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
                 let u1 = Compress::copy_uncompressed_name(
-                    &mut uncompressed,
+                    uncompressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
                 );
                 let u2 =
-                    Compress::copy_uncompressed_name(&mut uncompressed, packet, u1.final_offset);
+                    Compress::copy_uncompressed_name(uncompressed, packet, u1.final_offset);
                 uncompressed.extend_from_slice(&packet[u2.final_offset..u2.final_offset + 20]);
                 let new_rdlen = u1.name_len + u2.name_len + 20;
                 BigEndian::write_u16(
@@ -196,8 +196,8 @@ impl Compress {
 
     /// Compresses trusted record's data and puts the result into `compressed`.
     pub fn compress_rdata(
-        mut dict: &mut SuffixDict,
-        mut compressed: &mut Vec<u8>,
+        dict: &mut SuffixDict,
+        compressed: &mut Vec<u8>,
         raw: RRRaw<'_>,
         rr_type: Option<u16>,
         rr_rdlen: Option<usize>,
@@ -214,8 +214,8 @@ impl Compress {
                 let offset = compressed.len();
                 compressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
                 let new_rdlen = Compress::copy_compressed_name(
-                    &mut dict,
-                    &mut compressed,
+                    dict,
+                    compressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
                 )
@@ -229,8 +229,8 @@ impl Compress {
                 let offset = compressed.len();
                 compressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE + 2]);
                 let new_rdlen = 2 + Compress::copy_compressed_name(
-                    &mut dict,
-                    &mut compressed,
+                    dict,
+                    compressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE + 2,
                 )
@@ -244,14 +244,14 @@ impl Compress {
                 let offset = compressed.len();
                 compressed.extend_from_slice(&rdata[..DNS_RR_HEADER_SIZE]);
                 let u1 = Compress::copy_compressed_name(
-                    &mut dict,
-                    &mut compressed,
+                    dict,
+                    compressed,
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
                 );
                 let u2 = Compress::copy_compressed_name(
-                    &mut dict,
-                    &mut compressed,
+                    dict,
+                    compressed,
                     packet,
                     u1.final_offset,
                 );

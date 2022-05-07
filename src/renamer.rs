@@ -71,10 +71,10 @@ impl Renamer {
     }
 
     fn copy_with_replaced_name(
-        mut renamed_packet: &mut Vec<u8>,
+        renamed_packet: &mut Vec<u8>,
         packet: &[u8],
         offset: usize,
-        mut suffix_dict: &mut SuffixDict,
+        suffix_dict: &mut SuffixDict,
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
@@ -86,8 +86,8 @@ impl Renamer {
         match replaced_name {
             None => {
                 Compress::copy_compressed_name_with_base_offset(
-                    &mut suffix_dict,
-                    &mut renamed_packet,
+                    suffix_dict,
+                    renamed_packet,
                     &name,
                     0,
                     renamed_packet_len,
@@ -95,8 +95,8 @@ impl Renamer {
             }
             Some(replaced_name) => {
                 Compress::copy_compressed_name_with_base_offset(
-                    &mut suffix_dict,
-                    &mut renamed_packet,
+                    suffix_dict,
+                    renamed_packet,
                     &replaced_name,
                     0,
                     renamed_packet_len,
@@ -107,9 +107,9 @@ impl Renamer {
     }
 
     fn rename_question_section(
-        mut renamed_packet: &mut Vec<u8>,
+        renamed_packet: &mut Vec<u8>,
         parsed_packet: &mut ParsedPacket,
-        mut suffix_dict: &mut SuffixDict,
+        suffix_dict: &mut SuffixDict,
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
@@ -119,10 +119,10 @@ impl Renamer {
             {
                 let raw = item.raw();
                 Self::copy_with_replaced_name(
-                    &mut renamed_packet,
+                    renamed_packet,
                     raw.packet,
                     raw.offset,
-                    &mut suffix_dict,
+                    suffix_dict,
                     target_name,
                     source_name,
                     match_suffix,
@@ -140,8 +140,8 @@ impl Renamer {
 
     fn rename_response_section(
         mut it: Option<ResponseIterator<'_>>,
-        mut renamed_packet: &mut Vec<u8>,
-        mut suffix_dict: &mut SuffixDict,
+        renamed_packet: &mut Vec<u8>,
+        suffix_dict: &mut SuffixDict,
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
@@ -150,10 +150,10 @@ impl Renamer {
             {
                 let raw = item.raw();
                 Self::copy_with_replaced_name(
-                    &mut renamed_packet,
+                    renamed_packet,
                     raw.packet,
                     raw.offset,
-                    &mut suffix_dict,
+                    suffix_dict,
                     target_name,
                     source_name,
                     match_suffix,
@@ -171,10 +171,10 @@ impl Renamer {
                     {
                         let offset_rdata = raw.name_end;
                         Self::copy_with_replaced_name(
-                            &mut renamed_packet,
+                            renamed_packet,
                             raw.packet,
                             offset_rdata + DNS_RR_HEADER_SIZE,
-                            &mut suffix_dict,
+                            suffix_dict,
                             target_name,
                             source_name,
                             match_suffix,
@@ -194,10 +194,10 @@ impl Renamer {
                         );
                         let renamed_packet_name_offset = renamed_packet.len();
                         Self::copy_with_replaced_name(
-                            &mut renamed_packet,
+                            renamed_packet,
                             raw.packet,
                             offset_rdata + DNS_RR_HEADER_SIZE + 2,
-                            &mut suffix_dict,
+                            suffix_dict,
                             target_name,
                             source_name,
                             match_suffix,
@@ -216,10 +216,10 @@ impl Renamer {
                         let name1_offset = offset_rdata + DNS_RR_HEADER_SIZE;
                         let name1_len = Compress::raw_name_len(&raw.packet[name1_offset..]);
                         Self::copy_with_replaced_name(
-                            &mut renamed_packet,
+                            renamed_packet,
                             raw.packet,
                             name1_offset,
-                            &mut suffix_dict,
+                            suffix_dict,
                             target_name,
                             source_name,
                             match_suffix,
@@ -227,10 +227,10 @@ impl Renamer {
                         let name2_offset = name1_offset + name1_len;
                         let name2_len = Compress::raw_name_len(&raw.packet[name2_offset..]);
                         Self::copy_with_replaced_name(
-                            &mut renamed_packet,
+                            renamed_packet,
                             raw.packet,
                             name2_offset,
-                            &mut suffix_dict,
+                            suffix_dict,
                             target_name,
                             source_name,
                             match_suffix,
@@ -321,7 +321,7 @@ impl Renamer {
     /// If `match_suffix` is `true`, do suffix matching instead of exact matching
     /// This allows renaming `*.example.com` into `*.example.net`.
     pub fn rename_with_raw_names(
-        mut parsed_packet: &mut ParsedPacket,
+        parsed_packet: &mut ParsedPacket,
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
@@ -337,7 +337,7 @@ impl Renamer {
         let mut suffix_dict = SuffixDict::new();
         Self::rename_question_section(
             &mut renamed_packet,
-            &mut parsed_packet,
+            parsed_packet,
             &mut suffix_dict,
             target_name,
             source_name,
@@ -345,7 +345,7 @@ impl Renamer {
         )?;
         Self::rename_answer_section(
             &mut renamed_packet,
-            &mut parsed_packet,
+            parsed_packet,
             &mut suffix_dict,
             target_name,
             source_name,
@@ -353,7 +353,7 @@ impl Renamer {
         )?;
         Self::rename_nameservers_section(
             &mut renamed_packet,
-            &mut parsed_packet,
+            parsed_packet,
             &mut suffix_dict,
             target_name,
             source_name,
@@ -361,7 +361,7 @@ impl Renamer {
         )?;
         Self::rename_additional_section(
             &mut renamed_packet,
-            &mut parsed_packet,
+            parsed_packet,
             &mut suffix_dict,
             target_name,
             source_name,

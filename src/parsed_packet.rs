@@ -225,7 +225,7 @@ impl ParsedPacket {
 
     /// Increments the number of records in a given section
     pub fn rrcount_inc(&mut self, section: Section) -> Result<u16, Error> {
-        let mut packet = &mut self.packet_mut();
+        let packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => {
                 let rrcount = DNSSector::qdcount(packet);
@@ -248,10 +248,10 @@ impl ParsedPacket {
         }
         rrcount += 1;
         match section {
-            Section::Question => DNSSector::set_qdcount(&mut packet, rrcount),
-            Section::Answer => DNSSector::set_ancount(&mut packet, rrcount),
-            Section::NameServers => DNSSector::set_nscount(&mut packet, rrcount),
-            Section::Additional => DNSSector::set_arcount(&mut packet, rrcount),
+            Section::Question => DNSSector::set_qdcount(packet, rrcount),
+            Section::Answer => DNSSector::set_ancount(packet, rrcount),
+            Section::NameServers => DNSSector::set_nscount(packet, rrcount),
+            Section::Additional => DNSSector::set_arcount(packet, rrcount),
             _ => panic!("EDNS section doesn't have a records count"),
         }
         Ok(rrcount)
@@ -259,7 +259,7 @@ impl ParsedPacket {
 
     /// Decrements the number of records in a given section
     pub fn rrcount_dec(&mut self, section: Section) -> Result<u16, Error> {
-        let mut packet = &mut self.packet_mut();
+        let packet = &mut self.packet_mut();
         let mut rrcount = match section {
             Section::Question => DNSSector::qdcount(packet),
             Section::Answer => DNSSector::ancount(packet),
@@ -275,10 +275,10 @@ impl ParsedPacket {
         }
         rrcount -= 1;
         match section {
-            Section::Question => DNSSector::set_qdcount(&mut packet, rrcount),
-            Section::Answer => DNSSector::set_ancount(&mut packet, rrcount),
-            Section::NameServers => DNSSector::set_nscount(&mut packet, rrcount),
-            Section::Additional => DNSSector::set_arcount(&mut packet, rrcount),
+            Section::Question => DNSSector::set_qdcount(packet, rrcount),
+            Section::Answer => DNSSector::set_ancount(packet, rrcount),
+            Section::NameServers => DNSSector::set_nscount(packet, rrcount),
+            Section::Additional => DNSSector::set_arcount(packet, rrcount),
             _ => panic!("EDNS section doesn't have a records count"),
         }
 
