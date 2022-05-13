@@ -1,11 +1,11 @@
-#[cfg(feature = "hooks")]
-use crate::c_abi::{self, FnTable};
+use dnssector::*;
 #[cfg(feature = "hooks")]
 use libc::c_int;
 #[cfg(feature = "hooks")]
 use libloading::{Library, Symbol};
 
-use dnssector::*;
+#[cfg(feature = "hooks")]
+use crate::c_abi::{self, FnTable};
 
 pub fn main() {
     let packet: Vec<u8> = vec![

@@ -1,6 +1,7 @@
-use super::gen::*;
-use crate::constants::*;
-use crate::errors::*;
+use std::net::{Ipv4Addr, Ipv6Addr};
+use std::str::{self, FromStr};
+use std::u32;
+
 use chomp::ascii::*;
 use chomp::combinators::*;
 use chomp::parsers;
@@ -9,9 +10,9 @@ use chomp::prelude::{
 };
 use chomp::primitives::Primitives;
 
-use std::net::{Ipv4Addr, Ipv6Addr};
-use std::str::{self, FromStr};
-use std::u32;
+use super::gen::*;
+use crate::constants::*;
+use crate::errors::*;
 
 #[inline]
 pub fn string_nocase<I: Input<Token = u8>>(mut i: I, s: &[u8]) -> SimpleResult<I, I::Buffer> {

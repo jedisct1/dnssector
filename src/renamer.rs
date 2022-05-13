@@ -1,17 +1,19 @@
+use byteorder::{BigEndian, ByteOrder};
+
 use crate::compress::*;
 use crate::constants::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
-use byteorder::{BigEndian, ByteOrder};
 
 pub struct Renamer;
 
 impl Renamer {
     /// Remplaces the substring `source_name`  in `name` with `target_name`.
     /// These are assumed to be strings (not raw names).
-    /// If `match_suffix` is `true`, match the suffix instead of doing an exact match.
+    /// If `match_suffix` is `true`, match the suffix instead of doing an exact
+    /// match.
     pub fn replace_raw(
         name: &[u8],
         target_name: &[u8],
@@ -318,8 +320,8 @@ impl Renamer {
     }
 
     /// Replaces `source_name` with `target_name` in all names, in all records.
-    /// If `match_suffix` is `true`, do suffix matching instead of exact matching
-    /// This allows renaming `*.example.com` into `*.example.net`.
+    /// If `match_suffix` is `true`, do suffix matching instead of exact
+    /// matching This allows renaming `*.example.com` into `*.example.net`.
     pub fn rename_with_raw_names(
         parsed_packet: &mut ParsedPacket,
         target_name: &[u8],

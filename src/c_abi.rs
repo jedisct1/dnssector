@@ -1,3 +1,11 @@
+use std::cell::RefCell;
+use std::convert::From;
+use std::ffi::{CStr, CString};
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::slice;
+
+use libc::{c_char, c_int, c_void, size_t};
+
 use crate::constants::*;
 use crate::edns_iterator::*;
 use crate::errors::*;
@@ -6,12 +14,6 @@ use crate::question_iterator::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use crate::synth::gen;
-use libc::{c_char, c_int, c_void, size_t};
-use std::cell::RefCell;
-use std::convert::From;
-use std::ffi::{CStr, CString};
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
-use std::slice;
 
 const ABI_VERSION: u64 = 0x2;
 

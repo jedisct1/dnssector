@@ -1,10 +1,12 @@
+use std::net::{Ipv4Addr, Ipv6Addr};
+
+use byteorder::{BigEndian, ByteOrder};
+use chomp::prelude::parse_only;
+
 use super::parser::*;
 use crate::constants::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
-use byteorder::{BigEndian, ByteOrder};
-use chomp::prelude::parse_only;
-use std::net::{Ipv4Addr, Ipv6Addr};
 
 #[derive(Clone, Debug)]
 pub struct RRHeader {

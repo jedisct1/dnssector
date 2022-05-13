@@ -1,11 +1,13 @@
+use std::marker;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+
+use byteorder::{BigEndian, ByteOrder};
+
 use crate::compress::*;
 use crate::constants::*;
 use crate::dns_sector::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
-use byteorder::{BigEndian, ByteOrder};
-use std::marker;
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 /// Accessor to the raw packet data.
 /// `offset` is the offset to the current RR.
@@ -26,17 +28,19 @@ pub struct RRRawMut<'t> {
     pub name_end: usize,
 }
 
-/// The `DNSIterable` trait represents a set of records that can be iterated over.
+/// The `DNSIterable` trait represents a set of records that can be iterated
+/// over.
 pub trait DNSIterable {
     /// Returns the next record, or `None` if there aren't any left.
     fn next(self) -> Option<Self>
     where
         Self: marker::Sized;
 
-    /// Returns the offset of the current RR, or `None` if we haven't started iterating yet
-    /// or if the current record has been deleted.
+    /// Returns the offset of the current RR, or `None` if we haven't started
+    /// iterating yet or if the current record has been deleted.
     ///
-    /// In order to check for the later, please use `is_tombstone()` instead for clarity.
+    /// In order to check for the later, please use `is_tombstone()` instead for
+    /// clarity.
     fn offset(&self) -> Option<usize>;
 
     /// Returns the offset right after the current RR.
@@ -49,11 +53,12 @@ pub trait DNSIterable {
     fn set_offset_next(&mut self, offset: usize);
 
     /// Prevents access to the current record.
-    /// This is useful after a delete operation: from a user perspective, the current
-    /// iterator doesn't point to a valid RR any more.
+    /// This is useful after a delete operation: from a user perspective, the
+    /// current iterator doesn't point to a valid RR any more.
     fn invalidate(&mut self);
 
-    /// Returns `true` if the record has been invalidated by a previous call to `delete()`
+    /// Returns `true` if the record has been invalidated by a previous call to
+    /// `delete()`
     fn is_tombstone(&self) -> bool {
         self.offset().is_none()
     }
@@ -104,7 +109,8 @@ pub trait DNSIterable {
         &mut raw.packet[raw.offset..raw.name_end]
     }
 
-    /// Accesses the mutable raw packet data, starting from right after the name.
+    /// Accesses the mutable raw packet data, starting from right after the
+    /// name.
     #[inline]
     fn rdata_slice_mut(&mut self) -> &mut [u8] {
         let raw = self.raw_mut();
@@ -130,7 +136,9 @@ pub trait DNSIterable {
 }
 
 pub trait TypedIterable {
-    /// Returns the RR name (labels are dot-delimited), as a byte vector. The name is not supposed to be valid UTF-8. It will be converted to lower-case, though, using traditional DNS conversion rules
+    /// Returns the RR name (labels are dot-delimited), as a byte vector. The
+    /// name is not supposed to be valid UTF-8. It will be converted to
+    /// lower-case, though, using traditional DNS conversion rules
     fn name(&self) -> Vec<u8>
     where
         Self: DNSIterable,
@@ -146,8 +154,9 @@ pub trait TypedIterable {
         name
     }
 
-    /// Appends the uncompressed RR name (raw format, with labels prefixed by their length) to the given vector.
-    /// Returns the length of the uncompressed name.
+    /// Appends the uncompressed RR name (raw format, with labels prefixed by
+    /// their length) to the given vector. Returns the length of the
+    /// uncompressed name.
     fn copy_raw_name(&self, name: &mut Vec<u8>) -> usize
     where
         Self: DNSIterable,
@@ -183,8 +192,8 @@ pub trait TypedIterable {
         Ok(section)
     }
 
-    /// Resizes the current record, by growing or shrinking (with a negative value) the current
-    /// record size by `shift` bytes.
+    /// Resizes the current record, by growing or shrinking (with a negative
+    /// value) the current record size by `shift` bytes.
     fn resize_rr(&mut self, shift: isize) -> Result<(), Error>
     where
         Self: DNSIterable,
@@ -451,7 +460,8 @@ pub struct RRIterator<'t> {
 }
 
 impl<'t> RRIterator<'t> {
-    /// Creates a new iterator over a pre-parsed packet, for the given `section`.
+    /// Creates a new iterator over a pre-parsed packet, for the given
+    /// `section`.
     pub fn new(parsed_packet: &'t mut ParsedPacket, section: Section) -> Self {
         RRIterator {
             parsed_packet,

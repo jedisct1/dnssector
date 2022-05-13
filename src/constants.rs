@@ -1,12 +1,15 @@
 #![allow(dead_code)]
 
-use crate::errors::*;
 use std::convert::From;
 
-/// Size of the main DNS header, that includes flags and the size of each section.
+use crate::errors::*;
+
+/// Size of the main DNS header, that includes flags and the size of each
+/// section.
 pub const DNS_HEADER_SIZE: usize = 12;
 
-/// Offset to the first (and usually only) record of the question section, from the start of the packet.
+/// Offset to the first (and usually only) record of the question section, from
+/// the start of the packet.
 pub const DNS_QUESTION_OFFSET: usize = DNS_HEADER_SIZE;
 
 /// Maximum length of a host name.
@@ -54,7 +57,8 @@ pub const DNS_OPT_RR_HEADER_SIZE: usize = 10;
 /// Offset to the extended RR code, from the beginning of an extended RR.
 pub const DNS_EDNS_RR_CODE_OFFSET: usize = 0;
 
-/// Offset to the length of an extended RR, from the beginning of the extended RR.
+/// Offset to the length of an extended RR, from the beginning of the extended
+/// RR.
 pub const DNS_EDNS_RR_RDLEN_OFFSET: usize = 2;
 
 /// Size of the header of an extended RR.
@@ -63,7 +67,8 @@ pub const DNS_EDNS_RR_HEADER_SIZE: usize = 4;
 /// Offset to the transaction ID, from the beginning of a DNS packet
 pub const DNS_TID_OFFSET: usize = 0;
 
-/// Offset to the flags (including rcode and opcode), from the beginning of the DNS packet
+/// Offset to the flags (including rcode and opcode), from the beginning of the
+/// DNS packet
 pub const DNS_FLAGS_OFFSET: usize = 2;
 
 /// Offset to the return code, from the beginning of the DNS packet

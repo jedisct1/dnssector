@@ -1,9 +1,11 @@
+use std::mem;
+
+use byteorder::{BigEndian, ByteOrder};
+
 use crate::compress::*;
 use crate::constants::*;
 use crate::errors::*;
 use crate::parsed_packet::*;
-use byteorder::{BigEndian, ByteOrder};
-use std::mem;
 
 /// A `DNSSector` object summarizes the structure of a DNS packet,
 /// so that individual sections can be accessed quickly.
@@ -114,7 +116,8 @@ impl DNSSector {
         Ok(())
     }
 
-    /// Sets the internal offset to the data to be parsed to an arbitrary location
+    /// Sets the internal offset to the data to be parsed to an arbitrary
+    /// location
     pub fn set_offset(&mut self, offset: usize) -> Result<usize, Error> {
         if offset >= self.packet.len() {
             bail!(DSError::InternalError(
@@ -154,9 +157,9 @@ impl DNSSector {
         Ok(BigEndian::read_u32(&self.packet[offset..]))
     }
 
-    /// Checks that an encoded DNS name is valid. This includes following indirections for
-    /// compressed names, checks for label lengths, checks for truncated names and checks for
-    /// cycles.
+    /// Checks that an encoded DNS name is valid. This includes following
+    /// indirections for compressed names, checks for label lengths, checks
+    /// for truncated names and checks for cycles.
     fn check_compressed_name(&self, offset: usize) -> Result<usize, Error> {
         Compress::check_compressed_name(&self.packet, offset)
     }
@@ -218,9 +221,10 @@ impl DNSSector {
         Ok(dns_sector)
     }
 
-    /// Parses and validates all records from all sections of an untrusted DNS packet.
-    /// If the validation succeeds, a `ParsedPacket` structure containing information
-    /// to quickly access (extended) flags and individual sections is returned.
+    /// Parses and validates all records from all sections of an untrusted DNS
+    /// packet. If the validation succeeds, a `ParsedPacket` structure
+    /// containing information to quickly access (extended) flags and
+    /// individual sections is returned.
     pub fn parse(mut self) -> Result<ParsedPacket, Error> {
         let packet_len = self.packet.len();
         if packet_len < DNS_HEADER_SIZE {
@@ -414,7 +418,8 @@ impl DNSSector {
         }
     }
 
-    /// Makes sure that at least `len` bytes remain to be parsed in the edns pseudo-section.
+    /// Makes sure that at least `len` bytes remain to be parsed in the edns
+    /// pseudo-section.
     #[inline]
     fn edns_ensure_remaining_len(&self, len: usize) -> Result<(), Error> {
         if self.edns_remaining_len() < len {
@@ -470,7 +475,8 @@ impl DNSSector {
         self.edns_increment_offset(inc).map(|_| {})
     }
 
-    /// Returns the maximum payload size for UDP packets, from an optional `OPT` record.
+    /// Returns the maximum payload size for UDP packets, from an optional `OPT`
+    /// record.
     #[allow(dead_code)]
     #[inline]
     fn opt_rr_max_payload(&self) -> Result<usize, Error> {
@@ -525,8 +531,8 @@ impl DNSSector {
         Ok(())
     }
 
-    /// Checks that an untrusted encoded DNS name is valid and does not contain any indirections.
-    /// Returns the location right after the name.
+    /// Checks that an untrusted encoded DNS name is valid and does not contain
+    /// any indirections. Returns the location right after the name.
     pub fn check_uncompressed_name(packet: &[u8], mut offset: usize) -> Result<usize, Error> {
         let packet_len = packet.len();
         let mut name_len = 0;

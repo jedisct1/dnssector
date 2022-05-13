@@ -1,3 +1,6 @@
+use byteorder::{BigEndian, ByteOrder};
+use rand::prelude::*;
+
 use crate::compress::*;
 use crate::constants::*;
 use crate::dns_sector::*;
@@ -8,11 +11,10 @@ use crate::renamer::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
 use crate::synth::gen;
-use byteorder::{BigEndian, ByteOrder};
-use rand::prelude::*;
 
 /// A `ParsedPacket` structure contains information about a successfully parsed
-/// DNS packet, that allows quick access to (extended) flags and to individual sections.
+/// DNS packet, that allows quick access to (extended) flags and to individual
+/// sections.
 #[derive(Debug)]
 pub struct ParsedPacket {
     pub packet: Option<Vec<u8>>,
@@ -137,10 +139,10 @@ impl ParsedPacket {
     }
 
     /// Returns the flags, including extended flags.
-    /// The extended flags optionally obtained using edns are exposed as the highest 16 bits,
-    /// instead of having distinct sets of flags.
-    /// The opcode and rcode are intentionally masked in order to prevent misuse:
-    /// these bits are never supposed to be accessed individually.
+    /// The extended flags optionally obtained using edns are exposed as the
+    /// highest 16 bits, instead of having distinct sets of flags.
+    /// The opcode and rcode are intentionally masked in order to prevent
+    /// misuse: these bits are never supposed to be accessed individually.
     pub fn flags(&self) -> u32 {
         let mut rflags = BigEndian::read_u16(&self.packet()[DNS_FLAGS_OFFSET..]);
         rflags &= !0x7800; // mask opcode
@@ -161,7 +163,8 @@ impl ParsedPacket {
         BigEndian::write_u16(&mut self.packet_mut()[DNS_FLAGS_OFFSET..], v);
     }
 
-    /// Check if this is a question with the DO bit, or a response with the AD bit
+    /// Check if this is a question with the DO bit, or a response with the AD
+    /// bit
     pub fn dnssec(&self) -> bool {
         let flags = self.flags();
         if flags & DNS_FLAG_QR == 0 {
@@ -364,10 +367,10 @@ impl ParsedPacket {
         self.insert_rr(section, rr)
     }
 
-    /// Recomputes all section offsets after an in-place decompression of the packet.
-    /// It is currently re-parsing everything by calling `parse()`, but this can be
-    /// optimized later to skip over RDATA, and by assuming that the input
-    /// is always well-formed.
+    /// Recomputes all section offsets after an in-place decompression of the
+    /// packet. It is currently re-parsing everything by calling `parse()`,
+    /// but this can be optimized later to skip over RDATA, and by assuming
+    /// that the input is always well-formed.
     pub fn recompute(&mut self) -> Result<(), Error> {
         if !self.maybe_compressed {
             return Ok(());
@@ -389,8 +392,8 @@ impl ParsedPacket {
         Ok(())
     }
 
-    /// Returns the question as a raw vector, without case conversion, as well as the query type and class
-    /// Names include a trailing `0`
+    /// Returns the question as a raw vector, without case conversion, as well
+    /// as the query type and class Names include a trailing `0`
     pub fn question_raw0(&mut self) -> Option<(&[u8], u16, u16)> {
         if let Some(ref cached) = self.cached {
             return Some((&cached.0, cached.1, cached.2));
@@ -414,14 +417,15 @@ impl ParsedPacket {
         Some((&cached.0, cached.1, cached.2))
     }
 
-    /// Returns the question as a raw vector, without case conversion, as well as the query type and class
-    /// Names do not include trailing `0`
+    /// Returns the question as a raw vector, without case conversion, as well
+    /// as the query type and class Names do not include trailing `0`
     pub fn question_raw(&mut self) -> Option<(&[u8], u16, u16)> {
         self.question_raw0()
             .map(|(name, rr_type, rr_class)| (&name[..name.len() - 1], rr_type, rr_class))
     }
 
-    /// Returns the question as a string, without case conversion, as well as the query type and class
+    /// Returns the question as a string, without case conversion, as well as
+    /// the query type and class
     pub fn question(&mut self) -> Option<(Vec<u8>, u16, u16)> {
         if let Some(ref cached) = self.cached {
             let mut name_str = Compress::raw_name_to_str(&cached.0, 0);
@@ -464,8 +468,8 @@ impl ParsedPacket {
     }
 
     /// Replaces `source_name` with `target_name` in all names, in all records.
-    /// If `match_suffix` is `true`, do suffix matching instead of exact matching
-    /// This allows renaming `*.example.com` into `*.example.net`.
+    /// If `match_suffix` is `true`, do suffix matching instead of exact
+    /// matching This allows renaming `*.example.com` into `*.example.net`.
     pub fn rename_with_raw_names(
         &mut self,
         target_name: &[u8],

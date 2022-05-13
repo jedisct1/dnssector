@@ -1,9 +1,10 @@
 use dnssector;
 
 mod tests {
+    use hex;
+
     use super::dnssector::constants::*;
     use super::dnssector::synth::gen::{self, RR};
-    use hex;
 
     #[test]
     fn test_gen_a() {
@@ -33,11 +34,11 @@ mod tests {
 
     #[test]
     fn test_gen_soa() {
-        assert!(
-            RR::from_string(
-                "example.com. 86399 IN SOA ns1.example.com. hostmaster.example.com. (289 21600 3600 604800 3600)"
-            ).is_ok()
-        );
+        assert!(RR::from_string(
+            "example.com. 86399 IN SOA ns1.example.com. hostmaster.example.com. (289 21600 3600 \
+             604800 3600)"
+        )
+        .is_ok());
     }
 
     #[test]
@@ -47,11 +48,16 @@ mod tests {
             "example.com. 86399 IN TXT \"Sample escaped \\000\\008\\128\\255 text\""
         )
         .is_ok());
-        assert!(
-            RR::from_string(
-                "example.com. 86399 IN TXT \"Long text that has to be split into chunks: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\""
-            ).is_ok()
-        );
+        assert!(RR::from_string(
+            "example.com. 86399 IN TXT \"Long text that has to be split into chunks: Lorem ipsum \
+             dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut \
+             labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation \
+             ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in \
+             reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. \
+             Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt \
+             mollit anim id est laborum.\""
+        )
+        .is_ok());
         assert!(RR::from_string("example.com. 86399 IN TXT \"\"").is_err());
         assert!(RR::from_string("example.com. 86399 IN TXT unquoted").is_err());
         assert!(RR::from_string("example.com. 86399 IN TXT").is_err());
@@ -85,10 +91,25 @@ mod tests {
 
     #[test]
     fn test_gen_ds() {
-        assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E A").is_err());
-        assert!(RR::from_string("fr. 10464 IN DS 35095 A 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E").is_err());
-        assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 Z23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF843E2C4E").is_err());
-        let rr = RR::from_string("fr. 10464 IN DS 35095 8 2 23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E");
+        assert!(RR::from_string(
+            "fr. 10464 IN DS 35095 8 2 \
+             23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E A"
+        )
+        .is_err());
+        assert!(RR::from_string(
+            "fr. 10464 IN DS 35095 A 2 \
+             23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E"
+        )
+        .is_err());
+        assert!(RR::from_string(
+            "fr. 10464 IN DS 35095 8 2 \
+             Z23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF843E2C4E"
+        )
+        .is_err());
+        let rr = RR::from_string(
+            "fr. 10464 IN DS 35095 8 2 \
+             23C6CAADC9927EE98061F2B52C9B8DA6B53F3F648F814A4A86A0FAF9843E2C4E",
+        );
         assert!(rr.is_ok());
         let rr = rr.unwrap();
         let rdata = rr.rdata();

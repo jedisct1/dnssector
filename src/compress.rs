@@ -1,9 +1,11 @@
+use std::cmp;
+
+use byteorder::{BigEndian, ByteOrder};
+
 use crate::constants::*;
 use crate::dns_sector::*;
 use crate::errors::*;
 use crate::rr_iterator::*;
-use byteorder::{BigEndian, ByteOrder};
-use std::cmp;
 
 /// Output of the `copy_uncompressed_name()` function.
 #[derive(Copy, Clone, Debug)]
@@ -22,9 +24,9 @@ pub struct CompressedNameResult {
 pub struct Compress;
 
 impl Compress {
-    /// Checks that an untrusted encoded DNS name is valid. This includes following indirections for
-    /// compressed names, checks for label lengths, checks for truncated names and checks for
-    /// cycles.
+    /// Checks that an untrusted encoded DNS name is valid. This includes
+    /// following indirections for compressed names, checks for label
+    /// lengths, checks for truncated names and checks for cycles.
     /// Returns the location right after the name.
     pub fn check_compressed_name(packet: &[u8], mut offset: usize) -> Result<usize, Error> {
         let packet_len = packet.len();
@@ -92,9 +94,10 @@ impl Compress {
         Ok(final_offset)
     }
 
-    /// Uncompresses a name starting at `offset`, and puts the result into `name`.
-    /// This function assumes that the input is trusted and doesn't perform any checks.
-    /// Returns the length of the name as well as the location right after the (possibly compressed) name.
+    /// Uncompresses a name starting at `offset`, and puts the result into
+    /// `name`. This function assumes that the input is trusted and doesn't
+    /// perform any checks. Returns the length of the name as well as the
+    /// location right after the (possibly compressed) name.
     pub fn copy_uncompressed_name(
         name: &mut Vec<u8>,
         packet: &[u8],
@@ -179,8 +182,7 @@ impl Compress {
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
                 );
-                let u2 =
-                    Compress::copy_uncompressed_name(uncompressed, packet, u1.final_offset);
+                let u2 = Compress::copy_uncompressed_name(uncompressed, packet, u1.final_offset);
                 uncompressed.extend_from_slice(&packet[u2.final_offset..u2.final_offset + 20]);
                 let new_rdlen = u1.name_len + u2.name_len + 20;
                 BigEndian::write_u16(
@@ -249,12 +251,7 @@ impl Compress {
                     packet,
                     offset_rdata + DNS_RR_HEADER_SIZE,
                 );
-                let u2 = Compress::copy_compressed_name(
-                    dict,
-                    compressed,
-                    packet,
-                    u1.final_offset,
-                );
+                let u2 = Compress::copy_compressed_name(dict, compressed, packet, u1.final_offset);
                 compressed.extend_from_slice(&packet[u2.final_offset..u2.final_offset + 20]);
                 let new_rdlen = u1.name_len + u2.name_len + 20;
                 BigEndian::write_u16(
@@ -450,7 +447,8 @@ impl Compress {
         Ok(compressed)
     }
 
-    /// Returns the total length of a raw name *without decompressing it*, including the final `0` label length.
+    /// Returns the total length of a raw name *without decompressing it*,
+    /// including the final `0` label length.
     pub fn raw_name_len(name: &[u8]) -> usize {
         let mut i = 0;
         while name[i] != 0 {
@@ -464,7 +462,8 @@ impl Compress {
         i + 1
     }
 
-    /// Returns the total length of a raw name, possibly after decompression, including the final `0` label length.
+    /// Returns the total length of a raw name, possibly after decompression,
+    /// including the final `0` label length.
     pub fn raw_name_len_after_decompression(packet: &[u8], mut offset: usize) -> usize {
         let mut name_len = 0;
         loop {
@@ -522,9 +521,10 @@ impl Compress {
     }
 
     /// Compress a name starting at `offset` using the suffix dictionary `dict`
-    /// `base_offset` is an additional offset added to the location stored in the dictionary.
-    /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
-    /// Returns the length of the name as well as the location right after the uncompressed name.
+    /// `base_offset` is an additional offset added to the location stored in
+    /// the dictionary. This function assumes that the input is trusted and
+    /// uncompressed, and doesn't perform any checks. Returns the length of
+    /// the name as well as the location right after the uncompressed name.
     pub fn copy_compressed_name_with_base_offset(
         dict: &mut SuffixDict,
         compressed: &mut Vec<u8>,
@@ -562,8 +562,9 @@ impl Compress {
     }
 
     /// Compress a name starting at `offset` using the suffix dictionary `dict`
-    /// This function assumes that the input is trusted and uncompressed, and doesn't perform any checks.
-    /// Returns the length of the name as well as the location right after the uncompressed name.
+    /// This function assumes that the input is trusted and uncompressed, and
+    /// doesn't perform any checks. Returns the length of the name as well
+    /// as the location right after the uncompressed name.
     pub fn copy_compressed_name(
         dict: &mut SuffixDict,
         compressed: &mut Vec<u8>,
@@ -607,7 +608,8 @@ impl SuffixDict {
     }
 
     /// Inserts a new suffix into the suffix table
-    /// Returns the offset of an existing suffix, if there is any, or `None` if there was none.
+    /// Returns the offset of an existing suffix, if there is any, or `None` if
+    /// there was none.
     fn insert(&mut self, suffix: &[u8], offset: usize) -> Option<usize> {
         if offset >= 65536 >> 2 {
             return None;
@@ -634,14 +636,15 @@ impl SuffixDict {
         self.count = cmp::max(self.index, self.count);
         if self.index == MAX_SUFFIXES {
             debug_assert!(MAX_SUFFIXES > 1);
-            self.index = 1; // keep the first entry, which is likely to be the question
+            self.index = 1; // keep the first entry, which is likely to be the
+                            // question
         }
         None
     }
 
     /// Copy a trusted raw DNS name into a `to` slice.
-    /// This doesn't perform any check nor decompression, but stops after the last label
-    /// even if this is not the end of the slice.
+    /// This doesn't perform any check nor decompression, but stops after the
+    /// last label even if this is not the end of the slice.
     /// Returns the length of the name.
     fn raw_name_copy(to: &mut [u8], name: &[u8]) -> usize {
         let len = Compress::raw_name_len(name);
@@ -650,8 +653,9 @@ impl SuffixDict {
     }
 
     /// Compares two trusted raw DNS names.
-    /// Returns `true` if they are equivalent, using a case-insensitive comparison.
-    /// Stops after the last label even if there are more data in the slice.
+    /// Returns `true` if they are equivalent, using a case-insensitive
+    /// comparison. Stops after the last label even if there are more data
+    /// in the slice.
     fn raw_names_eq_ignore_case(name1: &[u8], name2: &[u8]) -> bool {
         let mut label_len = 0;
         for (&c1, &c2) in name1.iter().zip(name2.iter()) {
