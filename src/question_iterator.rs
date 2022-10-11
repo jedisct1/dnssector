@@ -68,7 +68,7 @@ impl<'t> DNSIterable for QuestionIterator<'t> {
 
     #[inline]
     fn parsed_packet_mut(&mut self) -> &mut ParsedPacket {
-        &mut self.rr_iterator.parsed_packet
+        self.rr_iterator.parsed_packet
     }
 
     fn next(mut self) -> Option<Self> {
