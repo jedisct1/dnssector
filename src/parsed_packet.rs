@@ -313,7 +313,7 @@ impl ParsedPacket {
             let uncompressed = Compress::uncompress(self.packet())?;
             self.packet = Some(uncompressed);
             self.recompute()?;
-            debug_assert_eq!(self.maybe_compressed, false);
+            debug_assert!(!self.maybe_compressed);
         }
         let rr_len = rr.packet.len();
         if DNS_MAX_UNCOMPRESSED_SIZE - self.packet().len() < rr_len {

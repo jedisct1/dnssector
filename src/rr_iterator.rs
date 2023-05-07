@@ -213,7 +213,7 @@ pub trait TypedIterable {
                 packet.resize(new_packet_len, 0);
                 debug_assert_eq!(
                     new_packet_len,
-                    (offset as isize + shift) as usize + (packet_len - offset) as usize
+                    (offset as isize + shift) as usize + (packet_len - offset)
                 );
                 packet.copy_within(offset..offset + packet_len, offset + shift as usize);
             } else if shift < 0 {
@@ -267,7 +267,7 @@ pub trait TypedIterable {
             self.recompute_sections();
         }
         let offset = self.offset().ok_or(DSError::VoidRecord)?;
-        debug_assert_eq!(self.parsed_packet().maybe_compressed, false);
+        debug_assert!(!self.parsed_packet().maybe_compressed);
         let current_name_len = Compress::raw_name_len(self.name_slice());
         let shift = new_name_len as isize - current_name_len as isize;
         self.resize_rr(shift)?;
