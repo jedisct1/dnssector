@@ -1,6 +1,6 @@
 [package]
 name = "dnssector"
-version = "0.2.13"
+version = "0.2.14"
 authors = ["Frank Denis <github@pureftpd.org>"]
 description = "A very fast library to parse, validate, create and mangle DNS packets"
 license = "ISC"
