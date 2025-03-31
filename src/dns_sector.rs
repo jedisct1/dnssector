@@ -440,7 +440,7 @@ impl DNSSector {
     fn edns_be16_load(&self, rr_offset: usize) -> Result<u16, Error> {
         self.edns_ensure_remaining_len(rr_offset + 2)?;
         let offset = self.offset + rr_offset;
-        Ok((self.packet[offset] as u16) << 8 | self.packet[offset + 1] as u16)
+        Ok(((self.packet[offset] as u16) << 8) | self.packet[offset + 1] as u16)
     }
 
     #[allow(dead_code)]
@@ -448,9 +448,9 @@ impl DNSSector {
     fn edns_be32_load(&self, rr_offset: usize) -> Result<u32, Error> {
         self.edns_ensure_remaining_len(rr_offset + 4)?;
         let offset = self.offset + rr_offset;
-        Ok((self.packet[offset] as u32) << 24
-            | (self.packet[offset + 1] as u32) << 16
-            | (self.packet[offset + 2] as u32) << 8
+        Ok(((self.packet[offset] as u32) << 24)
+            | ((self.packet[offset + 1] as u32) << 16)
+            | ((self.packet[offset + 2] as u32) << 8)
             | self.packet[offset + 3] as u32)
     }
 

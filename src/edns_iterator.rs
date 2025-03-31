@@ -7,7 +7,7 @@ pub struct EdnsIterator<'t> {
     rr_iterator: RRIterator<'t>,
 }
 
-impl<'t> DNSIterable for EdnsIterator<'t> {
+impl DNSIterable for EdnsIterator<'_> {
     #[inline]
     fn offset(&self) -> Option<usize> {
         self.rr_iterator.offset

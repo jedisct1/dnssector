@@ -56,9 +56,9 @@ impl Renamer {
                 return Ok(None);
             }
             i += 1;
-            if !(0..label_len).all(|j| {
-                name[i + j].to_ascii_lowercase() == source_name[i + j - offset].to_ascii_lowercase()
-            }) {
+            if !(0..label_len)
+                .all(|j| name[i + j].eq_ignore_ascii_case(&source_name[i + j - offset]))
+            {
                 return Ok(None);
             }
             i += label_len;

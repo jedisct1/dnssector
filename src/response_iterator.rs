@@ -12,10 +12,10 @@ pub type AnswerIterator<'t> = ResponseIterator<'t>;
 pub type NameServersIterator<'t> = ResponseIterator<'t>;
 pub type AdditionalIterator<'t> = ResponseIterator<'t>;
 
-impl<'t> TypedIterable for ResponseIterator<'t> {}
-impl<'t> RdataIterable for ResponseIterator<'t> {}
+impl TypedIterable for ResponseIterator<'_> {}
+impl RdataIterable for ResponseIterator<'_> {}
 
-impl<'t> DNSIterable for ResponseIterator<'t> {
+impl DNSIterable for ResponseIterator<'_> {
     #[inline]
     fn offset(&self) -> Option<usize> {
         self.rr_iterator.offset

@@ -147,7 +147,7 @@ impl ParsedPacket {
         let mut rflags = BigEndian::read_u16(&self.packet()[DNS_FLAGS_OFFSET..]);
         rflags &= !0x7800; // mask opcode
         rflags &= !0x000f; // mask rcode
-        (self.ext_flags.unwrap_or(0) as u32) << 16 | (rflags as u32)
+        ((self.ext_flags.unwrap_or(0) as u32) << 16) | (rflags as u32)
     }
 
     /// Changes the flags.
@@ -398,10 +398,7 @@ impl ParsedPacket {
         if let Some(ref cached) = self.cached {
             return Some((&cached.0, cached.1, cached.2));
         }
-        let offset = match self.offset_question {
-            None => return None,
-            Some(offset) => offset,
-        };
+        let offset = self.offset_question?;
         let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
         let uncompressed_name_result =
             Compress::copy_uncompressed_name(&mut name, self.packet(), offset);
@@ -432,10 +429,7 @@ impl ParsedPacket {
             name_str.make_ascii_lowercase();
             return Some((name_str, cached.1, cached.2));
         }
-        let offset = match self.offset_question {
-            None => return None,
-            Some(offset) => offset,
-        };
+        let offset = self.offset_question?;
         let mut name_str = Compress::raw_name_to_str(self.packet(), offset);
         name_str.make_ascii_lowercase();
         let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
@@ -453,10 +447,7 @@ impl ParsedPacket {
         if let Some(ref cached) = self.cached {
             return Some((cached.1, cached.2));
         }
-        let offset = match self.offset_question {
-            None => return None,
-            Some(offset) => offset,
-        };
+        let offset = self.offset_question?;
         let offset = offset + Compress::raw_name_len(&self.packet()[offset..]);
         let (rr_type, rr_class) = {
             let rdata = &self.packet()[offset..];

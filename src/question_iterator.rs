@@ -8,9 +8,9 @@ pub struct QuestionIterator<'t> {
     rr_iterator: RRIterator<'t>,
 }
 
-impl<'t> TypedIterable for QuestionIterator<'t> {}
+impl TypedIterable for QuestionIterator<'_> {}
 
-impl<'t> DNSIterable for QuestionIterator<'t> {
+impl DNSIterable for QuestionIterator<'_> {
     #[inline]
     fn offset(&self) -> Option<usize> {
         self.rr_iterator.offset
