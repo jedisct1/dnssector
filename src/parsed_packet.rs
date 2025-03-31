@@ -10,7 +10,7 @@ use crate::question_iterator::*;
 use crate::renamer::*;
 use crate::response_iterator::*;
 use crate::rr_iterator::*;
-use crate::synth::gen;
+use crate::synth::r#gen;
 
 /// A `ParsedPacket` structure contains information about a successfully parsed
 /// DNS packet, that allows quick access to (extended) flags and to individual
@@ -308,7 +308,7 @@ impl ParsedPacket {
         Ok(offset)
     }
 
-    pub fn insert_rr(&mut self, section: Section, rr: gen::RR) -> Result<(), Error> {
+    pub fn insert_rr(&mut self, section: Section, rr: r#gen::RR) -> Result<(), Error> {
         if self.maybe_compressed {
             let uncompressed = Compress::uncompress(self.packet())?;
             self.packet = Some(uncompressed);
@@ -363,7 +363,7 @@ impl ParsedPacket {
     }
 
     pub fn insert_rr_from_string(&mut self, section: Section, rr_str: &str) -> Result<(), Error> {
-        let rr = gen::RR::from_string(rr_str)?;
+        let rr = r#gen::RR::from_string(rr_str)?;
         self.insert_rr(section, rr)
     }
 

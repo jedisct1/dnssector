@@ -4,7 +4,7 @@ mod tests {
     use hex;
 
     use super::dnssector::constants::*;
-    use super::dnssector::synth::gen::{self, RR};
+    use super::dnssector::synth::r#gen::{self, RR};
 
     #[test]
     fn test_gen_a() {
@@ -133,7 +133,7 @@ mod tests {
             Class::from_string("IN").unwrap(),
         )
         .unwrap();
-        let parsed_packet = gen::query(
+        let parsed_packet = r#gen::query(
             b"example.com",
             Type::from_string("A").unwrap(),
             Class::from_string("IN").unwrap(),
