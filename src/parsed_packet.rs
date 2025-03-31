@@ -50,8 +50,8 @@ impl ParsedPacket {
             max_payload: DNS_MAX_UNCOMPRESSED_SIZE,
             cached: None,
         };
-        let mut rng = thread_rng();
-        let tid: u16 = rng.gen();
+        let mut rng = rand::rng();
+        let tid: u16 = rng.random();
         parsed_packet.set_tid(tid);
         parsed_packet.set_flags(DNS_FLAG_RD);
         parsed_packet.set_response(false);
