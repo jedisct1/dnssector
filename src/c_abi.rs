@@ -40,7 +40,7 @@ fn throw_err(e: Error, c_err: *mut *const CErr) -> c_int {
 }
 
 unsafe extern "C" fn error_description(c_err: *const CErr) -> *const c_char {
-    unsafe { (*c_err).description_cs.as_bytes() as *const _ as *const c_char }
+    unsafe { (*c_err).description_cs.as_ptr() }
 }
 
 unsafe extern "C" fn flags(parsed_packet: *const ParsedPacket) -> u32 {

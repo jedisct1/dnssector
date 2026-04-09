@@ -62,7 +62,7 @@ impl DNSSector {
         BigEndian::write_u16(&mut packet[4..], value);
     }
 
-    /// Returns the numbersof records in the answer section.
+    /// Returns the number of records in the answer section.
     #[inline]
     pub fn ancount(packet: &[u8]) -> u16 {
         BigEndian::read_u16(&packet[6..])

@@ -91,9 +91,9 @@ typedef struct FnTable {
                     char name[DNS_MAX_HOSTNAME_LEN + 1], uint16_t *rr_type);
     int (*rename_with_raw_names)(const ParsedPacket *parsed_packet,
                                  const CErr **       err,
-                                 const uint8_t       raw_target_name,
+                                 const uint8_t *     raw_target_name,
                                  size_t              raw_target_name_len,
-                                 const uint8_t       raw_source_name,
+                                 const uint8_t *     raw_source_name,
                                  const size_t        raw_source_name_len,
                                  bool                match_suffix);
     uint64_t abi_version;

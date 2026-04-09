@@ -130,10 +130,11 @@ impl<'t> ResponseIterator<'t> {
         if self.rr_type() == Type::OPT.into() {
             let rr_iterator = &mut self.rr_iterator;
             debug_assert_eq!(rr_iterator.section, Section::Additional);
-            let parsed_packet = &mut rr_iterator.parsed_packet;
             if rr_iterator.rrs_left == 0 {
                 return None;
             }
+            rr_iterator.rrs_left -= 1;
+            let parsed_packet = &mut rr_iterator.parsed_packet;
             rr_iterator.offset = Some(rr_iterator.offset_next);
             rr_iterator.name_end =
                 RRIterator::skip_name(parsed_packet.packet(), rr_iterator.offset.unwrap());

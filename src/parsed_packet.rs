@@ -122,8 +122,11 @@ impl ParsedPacket {
         }
         let offset_edns_header = offset_edns - (1 + DNS_RR_HEADER_SIZE);
         debug_assert_eq!(self.packet()[offset_edns_header], 0);
-        let edns_len = self.packet().len() - offset_edns_header;
-        raw_edns.extend_from_slice(&self.packet()[offset_edns_header..]);
+        let edns_len = 1
+            + DNS_OPT_RR_HEADER_SIZE
+            + BigEndian::read_u16(&self.packet()[offset_edns - 2..]) as usize;
+        raw_edns
+            .extend_from_slice(&self.packet()[offset_edns_header..offset_edns_header + edns_len]);
         edns_len
     }
 
@@ -309,6 +312,7 @@ impl ParsedPacket {
     }
 
     pub fn insert_rr(&mut self, section: Section, rr: r#gen::RR) -> Result<(), Error> {
+        self.cached = None;
         if self.maybe_compressed {
             let uncompressed = Compress::uncompress(self.packet())?;
             self.packet = Some(uncompressed);
@@ -460,13 +464,14 @@ impl ParsedPacket {
 
     /// Replaces `source_name` with `target_name` in all names, in all records.
     /// If `match_suffix` is `true`, do suffix matching instead of exact
-    /// matching This allows renaming `*.example.com` into `*.example.net`.
+    /// matching. This allows renaming `*.example.com` into `*.example.net`.
     pub fn rename_with_raw_names(
         &mut self,
         target_name: &[u8],
         source_name: &[u8],
         match_suffix: bool,
     ) -> Result<(), Error> {
+        self.cached = None;
         let packet = Renamer::rename_with_raw_names(self, target_name, source_name, match_suffix)?;
         self.packet = Some(packet);
         let dns_sector = DNSSector::new(self.packet.take().unwrap())?;
@@ -481,6 +486,7 @@ impl ParsedPacket {
         assert_eq!(self.edns_version, parsed_packet.edns_version);
         assert_eq!(self.ext_flags, parsed_packet.ext_flags);
         self.maybe_compressed = true;
+        self.packet = Some(parsed_packet.into_packet());
         Ok(())
     }
 }

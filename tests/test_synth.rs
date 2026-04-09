@@ -126,6 +126,11 @@ mod tests {
     }
 
     #[test]
+    fn test_gen_ds_odd_hex_digest_is_rejected_without_panicking() {
+        assert!(RR::from_string("fr. 10464 IN DS 35095 8 2 ABC").is_err());
+    }
+
+    #[test]
     fn test_gen_question() {
         RR::new_question(
             b"example.com",

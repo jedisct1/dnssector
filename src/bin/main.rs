@@ -66,11 +66,18 @@ pub fn main() {
 
         let hook_deliver: Symbol<
             '_,
-            unsafe extern "C" fn(*const FnTable, *mut ParsedPacket) -> c_int,
+            unsafe extern "C" fn(*const (), *mut (), *const FnTable, *mut ParsedPacket) -> c_int,
         > = unsafe { dlh.get(b"hook_deliver").unwrap() };
 
         let fn_table = c_abi::fn_table();
-        let _ = unsafe { hook_deliver(&fn_table, &mut parsed_packet) };
+        let _ = unsafe {
+            hook_deliver(
+                std::ptr::null(),
+                std::ptr::null_mut(),
+                &fn_table,
+                &mut parsed_packet,
+            )
+        };
         println!("flags after the C hook:      {:x}", parsed_packet.flags());
     }
 

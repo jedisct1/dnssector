@@ -10,7 +10,7 @@ use crate::rr_iterator::*;
 pub struct Renamer;
 
 impl Renamer {
-    /// Remplaces the substring `source_name`  in `name` with `target_name`.
+    /// Replaces the substring `source_name` in `name` with `target_name`.
     /// These are assumed to be strings (not raw names).
     /// If `match_suffix` is `true`, match the suffix instead of doing an exact
     /// match.
@@ -82,15 +82,16 @@ impl Renamer {
         match_suffix: bool,
     ) -> Result<(), Error> {
         let mut name = Vec::with_capacity(DNS_MAX_HOSTNAME_LEN);
-        let _compressed_name_len = Compress::copy_uncompressed_name(&mut name, packet, offset);
-        let replaced_name = Self::replace_raw(&name, target_name, source_name, match_suffix)?;
+        let uncompressed_name = Compress::copy_uncompressed_name(&mut name, packet, offset);
+        let name = &name[..uncompressed_name.name_len];
+        let replaced_name = Self::replace_raw(name, target_name, source_name, match_suffix)?;
         let renamed_packet_len = renamed_packet.len();
         match replaced_name {
             None => {
                 Compress::copy_compressed_name_with_base_offset(
                     suffix_dict,
                     renamed_packet,
-                    &name,
+                    name,
                     0,
                     renamed_packet_len,
                 );
@@ -204,9 +205,7 @@ impl Renamer {
                             source_name,
                             match_suffix,
                         )?;
-                        let new_rdlen = 2 + renamed_packet.len()
-                            - renamed_packet_name_offset
-                            - DNS_RR_HEADER_SIZE;
+                        let new_rdlen = 2 + renamed_packet.len() - renamed_packet_name_offset;
                         BigEndian::write_u16(
                             &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
                             new_rdlen as u16,
@@ -240,8 +239,7 @@ impl Renamer {
                         let soa_metadata_offset = name2_offset + name2_len;
                         renamed_packet
                             .extend(&raw.packet[soa_metadata_offset..soa_metadata_offset + 20]);
-                        let new_rdlen =
-                            renamed_packet.len() - renamed_packet_name1_offset - DNS_RR_HEADER_SIZE;
+                        let new_rdlen = renamed_packet.len() - renamed_packet_name1_offset;
                         BigEndian::write_u16(
                             &mut renamed_packet[renamed_packet_offset_data + DNS_RR_RDLEN_OFFSET..],
                             new_rdlen as u16,

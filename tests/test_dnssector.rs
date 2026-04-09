@@ -378,4 +378,115 @@ mod tests {
         let ret = dns_sector.parse();
         assert!(ret.is_ok());
     }
+
+    #[test]
+    fn test_rename_nonfirst_answer_can_grow_name() {
+        let mut packet = ParsedPacket::empty();
+        packet
+            .insert_rr(
+                Section::Question,
+                synth::r#gen::RR::new_question(b"example.com", Type::A, Class::IN).unwrap(),
+            )
+            .unwrap();
+        packet.set_response(true);
+        packet
+            .insert_rr_from_string(Section::Answer, "a.example.com. 300 IN A 1.1.1.1")
+            .unwrap();
+        packet
+            .insert_rr_from_string(Section::Answer, "b.example.com. 300 IN A 2.2.2.2")
+            .unwrap();
+
+        let mut it = packet.into_iter_answer().unwrap();
+        it = it.next().unwrap();
+        it.set_raw_name(b"\x08longer-b\x07example\x03com\x00")
+            .unwrap();
+
+        let reparsed = DNSSector::new(packet.into_packet())
+            .unwrap()
+            .parse()
+            .unwrap();
+        let mut reparsed = reparsed;
+        let it = reparsed.into_iter_answer().unwrap();
+        assert_eq!(it.name(), b"a.example.com".to_vec());
+        let it = it.next().unwrap();
+        assert_eq!(it.name(), b"longer-b.example.com".to_vec());
+    }
+
+    #[test]
+    fn test_rename_with_opt_before_additional_preserves_tail_records() {
+        let data = vec![
+            0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 3, 7, 101, 120, 97, 109, 112, 108, 101, 3, 99, 111,
+            109, 0, 0, 1, 0, 1, 4, 116, 97, 105, 108, 7, 101, 120, 97, 109, 112, 108, 101, 3, 99,
+            111, 109, 0, 0, 1, 0, 1, 0, 0, 0, 60, 0, 4, 3, 3, 3, 3, 0, 0, 41, 2, 0, 0, 0, 0, 0, 0,
+            0, 4, 108, 97, 116, 101, 7, 101, 120, 97, 109, 112, 108, 101, 3, 99, 111, 109, 0, 0, 1,
+            0, 1, 0, 0, 0, 60, 0, 4, 4, 4, 4, 4,
+        ];
+        let mut parsed = DNSSector::new(data.clone()).unwrap().parse().unwrap();
+        let question = parsed.question_raw0().unwrap().0.to_vec();
+        assert_eq!(question, b"\x07example\x03com\x00".to_vec());
+        parsed
+            .rename_with_raw_names(b"\x07renamed\x03com\x00", b"\x07example\x03com\x00", true)
+            .unwrap();
+
+        let renamed_packet = parsed.into_packet();
+        assert_eq!(DNSSector::arcount(&renamed_packet), 3);
+        assert!(DNSSector::new(renamed_packet.clone())
+            .unwrap()
+            .parse()
+            .is_ok());
+
+        let mut reparsed = DNSSector::new(renamed_packet).unwrap().parse().unwrap();
+        let it = reparsed.into_iter_additional().unwrap();
+        assert_eq!(it.name(), b"tail.renamed.com".to_vec());
+        let it = it.next().unwrap();
+        assert_eq!(it.name(), b"late.renamed.com".to_vec());
+        assert!(it.next().is_none());
+    }
+
+    #[test]
+    fn test_rename_mx_and_soa_recompute_rdlen() {
+        let mut packet = ParsedPacket::empty();
+        packet
+            .insert_rr(
+                Section::Question,
+                synth::r#gen::RR::new_question(b"example.com", Type::MX, Class::IN).unwrap(),
+            )
+            .unwrap();
+        packet.set_response(true);
+        packet
+            .insert_rr_from_string(Section::Answer, "example.com. 300 IN MX 10 mx.example.com.")
+            .unwrap();
+        packet
+            .insert_rr_from_string(
+                Section::NameServers,
+                "example.com. 300 IN SOA ns.example.com. hostmaster.example.com. (1 2 3 4 5)",
+            )
+            .unwrap();
+
+        packet
+            .rename_with_raw_names(b"\x07renamed\x03net\x00", b"\x07example\x03com\x00", true)
+            .unwrap();
+
+        assert!(DNSSector::new(packet.into_packet())
+            .unwrap()
+            .parse()
+            .is_ok());
+    }
+
+    #[test]
+    fn test_question_cache_is_invalidated_after_question_rename() {
+        let mut packet = ParsedPacket::empty();
+        packet
+            .insert_rr(
+                Section::Question,
+                synth::r#gen::RR::new_question(b"example.com", Type::A, Class::IN).unwrap(),
+            )
+            .unwrap();
+        assert_eq!(packet.question().unwrap().0, b"example.com".to_vec());
+
+        let mut it = packet.into_iter_question().unwrap();
+        it.set_raw_name(b"\x07renamed\x03com\x00").unwrap();
+
+        assert_eq!(packet.question().unwrap().0, b"renamed.com".to_vec());
+    }
 }

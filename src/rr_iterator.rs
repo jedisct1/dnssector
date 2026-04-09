@@ -206,20 +206,18 @@ pub trait TypedIterable {
             let packet = &mut self.parsed_packet_mut().packet_mut();
             let packet_len = packet.len();
             if shift > 0 {
-                let new_packet_len = packet_len + shift as usize;
+                let shift = shift as usize;
+                let new_packet_len = packet_len + shift;
                 if new_packet_len > 0xffff {
                     bail!(DSError::PacketTooLarge);
                 }
                 packet.resize(new_packet_len, 0);
-                debug_assert_eq!(
-                    new_packet_len,
-                    (offset as isize + shift) as usize + (packet_len - offset)
-                );
-                packet.copy_within(offset..offset + packet_len, offset + shift as usize);
+                debug_assert_eq!(new_packet_len, packet_len + shift);
+                packet.copy_within(offset..packet_len, offset + shift);
             } else if shift < 0 {
                 let shift = (-shift) as usize;
                 assert!(packet_len >= shift);
-                packet.copy_within(offset + shift.., offset);
+                packet.copy_within(offset + shift..packet_len, offset);
                 packet.truncate(packet_len - shift);
             }
         }
@@ -245,6 +243,12 @@ pub trait TypedIterable {
                 .offset_answers
                 .map(|x| (x as isize + shift) as usize)
         }
+        if section != Section::Edns {
+            parsed_packet.offset_edns = parsed_packet
+                .offset_edns
+                .map(|x| (x as isize + shift) as usize)
+        }
+        parsed_packet.cached = None;
         Ok(())
     }
 
@@ -478,7 +482,11 @@ impl<'t> RRIterator<'t> {
             .offset
             .expect("recompute() called prior to iterating over RRs");
         let name_end = Self::skip_name(self.parsed_packet.packet(), offset);
-        let offset_next = Self::skip_rdata(self.parsed_packet.packet(), name_end);
+        let offset_next = if self.section == Section::Question {
+            name_end + DNS_RR_QUESTION_HEADER_SIZE
+        } else {
+            Self::skip_rdata(self.parsed_packet.packet(), name_end)
+        };
         self.name_end = name_end;
         self.offset_next = offset_next;
     }
