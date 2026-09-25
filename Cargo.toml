@@ -1,8 +1,9 @@
 [package]
+keywords = ["dns", "parser", "packet", "protocol", "network"]
 name = "dnssector"
 version = "0.2.14"
 authors = ["Frank Denis <github@pureftpd.org>"]
-description = "A very fast library to parse, validate, create and mangle DNS packets"
+description = "DNS packet parser and builder with wire-format validation, query and response manipulation, and DNS record editing."
 license = "ISC"
 edition = "2021"
 homepage = "https://github.com/jedisct1/dnssector"
