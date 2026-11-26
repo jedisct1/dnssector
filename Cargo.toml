@@ -6,7 +6,6 @@ description = "DNS packet parser and builder with wire-format validation, query 
 keywords = ["dns", "parser", "packet", "protocol", "network"]
 license = "ISC"
 edition = "2021"
-homepage = "https://github.com/jedisct1/dnssector"
 repository = "https://github.com/jedisct1/dnssector"
 
 [dependencies]
